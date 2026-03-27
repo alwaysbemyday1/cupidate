@@ -10,6 +10,6 @@ Core files:
 
 View specs:
 - `views/home.md`
+- `views/network.md`
 - `views/matching.md`
-- `views/cupid.md`
 - `views/my.md`

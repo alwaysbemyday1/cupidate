@@ -2,47 +2,40 @@
 Last Updated: 2026-03-28
 
 Current Track: Service Build (Post-POC)
-Current Phase: S0 Matching Data Foundation
+Current Phase: View IA Restructure
 Overall Status: in_progress
 
+Information Architecture Decision
+- 기존: Home / Cupid / Matching / My
+- 변경: Home / Network / Matching / My
+- 이유: Cupid(운영)과 Matching(실행)의 경계가 모호하여 사용자 흐름 기준으로 통합하고, 사람/관계 관리 기능은 Network로 분리
+
 Critical Focus
-- 매칭률 계산 정확도 향상
-- 입력 데이터(프로필/선호도) 정합성 확보
-- 매칭 결과 설명가능성 확보
+- 매칭률 계산 정확도
+- 입력 데이터 정합성
+- 설명 가능한 매칭 결과
 
-S0 Progress
-- Step 1 (완료): 입력 스키마 + 검증/정규화 레이어 구현
-  - `src/domain/matching/profileInput.ts`
-  - `src/domain/matching/profileValidation.ts`
-  - `src/domain/matching/profileNormalization.ts`
-  - 관련 테스트 2종 추가 및 통과
-- Step 2 (다음): 매칭 점수 정책(하드필터 + 가중치 + 보정치) 구현
-- Step 3 (대기): 매칭 결과 설명 필드/API 포맷 정의
-
-POC Baseline (Completed)
-- Supabase 스키마/RLS 토대 구축
-- 테스트 환경 구축(Jest + RN Testing Library)
-- 등록/목록/대시보드 기반 POC 구현
+S0 Progress (Matching Data Foundation)
+- Step 1 완료: 입력 스키마 + 검증/정규화 레이어 구현
+- Step 2 예정: 하드필터/가중치/보정치 정책 구현
+- Step 3 예정: 결과 설명 필드/API 포맷 정의
 
 Service Phases
 - S0 매칭 데이터 기반 설계 (in_progress)
-- S1 Home View 구축 (pending)
+- S1 Network View 구축 (pending)
 - S2 Matching View 구축 (pending)
-- S3 Cupid View 구축 (pending)
+- S3 Home View 구축 (pending)
 - S4 My View 구축 (pending)
 
 Next Action
-- Step 2 착수: 하드필터/가중치/보정치 정책 코드화 + 테스트
+- App IA를 4뷰 구조(Home/Network/Matching/My)로 반영
+- Network와 Matching의 책임 분리 구현
 
 Notes
 - 핵심 스펙 문서:
   - docs/agent/matching_data_spec.md
-- 화면별 명세 문서:
+- 화면 명세 문서:
   - docs/agent/views/home.md
+  - docs/agent/views/network.md
   - docs/agent/views/matching.md
-  - docs/agent/views/cupid.md
   - docs/agent/views/my.md
-- 하네스 정본 문서:
-  - docs/agent/codexrules.md
-  - docs/agent/feature_list.json
-  - docs/agent/progress.txt
