@@ -1,7 +1,7 @@
 [Cupidate Progress Tracker]
 Last Updated: 2026-03-28
 
-Current Phase: 3 (지인 등록 UI)
+Current Phase: 4 (매칭 알고리즘)
 Overall Status: in_progress
 
 Completed
@@ -18,14 +18,17 @@ Completed
   - App 렌더 테스트 추가
   - 도메인 유닛 테스트 템플릿 추가
   - Supabase mock 헬퍼 및 QueryClient 테스트 유틸 추가
+- Phase 3: 지인 등록 UI
+  - 픽셀 톤 등록/목록 탭 UI 구현
+  - 필수 입력(이름/성별) 및 출생연도 유효성 검사
+  - 등록 완료 시 목록 갱신 및 카드형 렌더링
 
 Pending Phases
-3) 지인 등록 UI
 4) 매칭 알고리즘
 5) 픽셀 대시보드
 
 Next Action
-- Phase 3 시작: Cupidate 등록/목록 UI 기본 플로우 구현
+- Phase 4 시작: 연결된 Cupid 관계 기반 매칭 점수 계산 로직 구현
 
 Notes
 - 하네스 정본 문서 경로:
