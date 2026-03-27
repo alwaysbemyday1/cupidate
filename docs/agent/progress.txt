@@ -1,41 +1,34 @@
-[Cupidate Progress Tracker]
+﻿[Cupidate Progress Tracker]
 Last Updated: 2026-03-28
 
 Current Track: Service Build (Post-POC)
-Current Phase: View IA Restructure
+Current Phase: S1 Network View Implementation
 Overall Status: in_progress
 
-Information Architecture Decision
-- 기존: Home / Cupid / Matching / My
-- 변경: Home / Network / Matching / My
-- 이유: Cupid(운영)과 Matching(실행)의 경계가 모호하여 사용자 흐름 기준으로 통합하고, 사람/관계 관리 기능은 Network로 분리
+Architecture Decision
+- Final IA: Home / Network / Matching / My
+- Responsibility Split:
+  - Home: summary + notification + quick actions
+  - Network: cupidate and connected-cupid management
+  - Matching: recommendation and request lifecycle
+  - My: profile/settings/account controls
 
-Critical Focus
-- 매칭률 계산 정확도
-- 입력 데이터 정합성
-- 설명 가능한 매칭 결과
+Completed Work
+- [x] S0 matching domain foundation (schema/validation/scoring baseline)
+- [x] 4-view app shell (single-file prototype)
+- [x] App modularization (Task 2026-03-28-01)
 
-S0 Progress (Matching Data Foundation)
-- Step 1 완료: 입력 스키마 + 검증/정규화 레이어 구현
-- Step 2 예정: 하드필터/가중치/보정치 정책 구현
-- Step 3 예정: 결과 설명 필드/API 포맷 정의
+Task 2026-03-28-01 (Completed)
+- Refactored monolithic App.tsx into feature modules:
+  - state hook: src/features/app/model/useCupidateAppState.ts
+  - shared models: src/features/app/model/types.ts
+  - shared styles: src/features/app/styles.ts
+  - components: PixelButton, SummaryCard
+  - views: HomeView, NetworkView, MatchingView, MyView
+- App.tsx now acts as composition/root shell only.
+- Verified with tests and TypeScript check.
 
-Service Phases
-- S0 매칭 데이터 기반 설계 (in_progress)
-- S1 Network View 구축 (pending)
-- S2 Matching View 구축 (pending)
-- S3 Home View 구축 (pending)
-- S4 My View 구축 (pending)
-
-Next Action
-- App IA를 4뷰 구조(Home/Network/Matching/My)로 반영
-- Network와 Matching의 책임 분리 구현
-
-Notes
-- 핵심 스펙 문서:
-  - docs/agent/matching_data_spec.md
-- 화면 명세 문서:
-  - docs/agent/views/home.md
-  - docs/agent/views/network.md
-  - docs/agent/views/matching.md
-  - docs/agent/views/my.md
+Next Tasks
+- Task 2026-03-28-02: add repository/data-source layer for Network/Matching
+- Task 2026-03-28-03: wire repository + react-query hooks + optimistic actions
+- Task 2026-03-28-04: align docs with data contracts and rollout checkpoints
