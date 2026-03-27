@@ -1,0 +1,129 @@
+{
+  "project": {
+    "name": "Cupidate",
+    "description": "픽셀 아트 기반 지인 소개팅 앱",
+    "version": "0.1.0",
+    "harness_method": {
+      "micro_commits": true,
+      "state_tracking_files": [
+        "feature_list.json",
+        "progress.txt"
+      ],
+      "rules_source": "codexrules.md"
+    }
+  },
+  "domain_rules": {
+    "roles": {
+      "cupid": "지인을 관리하고 다른 Cupid와 연결되는 주선자",
+      "cupidate": "Cupid에게 종속된 소개 대상 엔티티"
+    },
+    "matching_constraints": [
+      "Cupidate 간 직접 검색/직접 매칭 금지",
+      "서로 연결된 Cupid 네트워크를 통해서만 매칭률 계산 및 제안"
+    ],
+    "security": [
+      "Supabase RLS 기반 데이터 격리",
+      "Cupid는 자신의 Cupidate + 연결된 Cupid의 Cupidate 정보만 조회 가능"
+    ]
+  },
+  "design_and_tech_constraints": {
+    "ui_theme": "8-bit/16-bit 레트로 픽셀 아트",
+    "styling_rules": [
+      "borderRadius 0 또는 계단형 픽셀 모서리만 허용",
+      "검은색 굵은 실선 테두리 사용",
+      "픽셀 폰트(Galmuri/NeoDunggeunmo 계열) 우선",
+      "파스텔/그라데이션 지양, 고채도 원색 팔레트 우선"
+    ],
+    "stack": {
+      "framework": "React Native (Expo Managed Workflow)",
+      "state_management": [
+        "Zustand",
+        "TanStack Query"
+      ],
+      "backend": "Supabase",
+      "animation": "Reanimated 3 with step-based easing"
+    },
+    "asset_policy": [
+      "고품질 픽셀 캐릭터/아이콘은 외부 이미지 AI로 생성 요청",
+      "코드 작업 중에는 플레이스홀더 우선",
+      "이미지 렌더링 시 픽셀 선명도 보존"
+    ]
+  },
+  "phases": [
+    {
+      "id": 1,
+      "title": "Supabase 스키마 셋업",
+      "status": "pending",
+      "goal": "도메인 룰을 반영한 최소 스키마 + RLS 기반 보안 토대 구축",
+      "deliverables": [
+        "users/cupids/cupidates/cupid_connections/match_candidates 테이블 설계",
+        "RLS 정책 초안(자신 + 연결된 Cupid 범위만 허용)",
+        "초기 마이그레이션 파일 및 시드 전략"
+      ],
+      "acceptance_criteria": [
+        "직접 Cupidate 조회/매칭 남용이 정책상 차단됨",
+        "연결된 Cupid 관계를 기준으로 조회 가능 범위가 검증됨"
+      ]
+    },
+    {
+      "id": 2,
+      "title": "테스트 코드 환경 구성",
+      "status": "pending",
+      "goal": "기능 단위 검증이 가능한 자동화 테스트 기반 확보",
+      "deliverables": [
+        "테스트 러너(Jest) 및 RN 테스트 유틸 설정",
+        "도메인 유닛 테스트 템플릿",
+        "Supabase 접근 계층 모킹 전략"
+      ],
+      "acceptance_criteria": [
+        "샘플 테스트가 CI/로컬에서 통과",
+        "매칭 규칙과 RLS 접근 조건 테스트 골격 확보"
+      ]
+    },
+    {
+      "id": 3,
+      "title": "지인 등록 UI",
+      "status": "pending",
+      "goal": "Cupid가 Cupidate를 등록/수정/조회하는 기본 화면 구현",
+      "deliverables": [
+        "픽셀 스타일 폼 컴포넌트",
+        "지인 등록 화면 + 목록 화면",
+        "입력 유효성 검사 및 에러 상태 UI"
+      ],
+      "acceptance_criteria": [
+        "Cupidate 등록 플로우가 모바일에서 정상 동작",
+        "디자인 규칙(직각 테두리/픽셀 톤)이 반영됨"
+      ]
+    },
+    {
+      "id": 4,
+      "title": "매칭 알고리즘",
+      "status": "pending",
+      "goal": "연결된 Cupid 네트워크 내에서만 매칭률 계산 엔진 구현",
+      "deliverables": [
+        "Preference Data 정규화 로직",
+        "매칭 점수 계산 함수",
+        "연결 관계 필터링 + 추천 후보 생성"
+      ],
+      "acceptance_criteria": [
+        "연결되지 않은 Cupidate 쌍은 후보에서 제외",
+        "점수 계산 로직에 대한 테스트 통과"
+      ]
+    },
+    {
+      "id": 5,
+      "title": "픽셀 대시보드",
+      "status": "pending",
+      "goal": "Cupid 관점에서 등록 현황/추천/네트워크 상태를 보는 메인 대시보드 제공",
+      "deliverables": [
+        "요약 카드(지인 수, 연결 수, 추천 수)",
+        "추천 목록 위젯",
+        "픽셀 스타일 네비게이션 및 상태 배지"
+      ],
+      "acceptance_criteria": [
+        "핵심 지표와 추천 결과를 한 화면에서 확인 가능",
+        "픽셀 아트 UX 가이드와 일관성 유지"
+      ]
+    }
+  ]
+}
