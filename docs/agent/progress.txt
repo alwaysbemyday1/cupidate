@@ -1,40 +1,49 @@
 [Cupidate Progress Tracker]
 Last Updated: 2026-03-28
 
-Current Phase: Completed (MVP baseline)
-Overall Status: completed
+Current Track: Service Build (Post-POC)
+Current Phase: S1 Home View
+Overall Status: in_progress
 
-Completed
-- Phase 0: Harness bootstrap
-  - docs/agent 문서 체계 정리
-  - init.sh 구성
-- Phase 1: Supabase 스키마 셋업
-  - 핵심 테이블/관계 생성
-  - RLS 정책 적용
-  - search_path 보안 하드닝
-  - seed 템플릿 추가
-- Phase 2: 테스트 코드 환경 구성
-  - Jest + jest-expo + RN Testing Library 구성
-  - App 렌더 테스트 추가
-  - 도메인 유닛 테스트 템플릿 추가
-  - Supabase mock 헬퍼 및 QueryClient 테스트 유틸 추가
-- Phase 3: 지인 등록 UI
-  - 픽셀 톤 등록/목록 탭 UI 구현
-  - 필수 입력(이름/성별) 및 출생연도 유효성 검사
-  - 등록 완료 시 목록 갱신 및 카드형 렌더링
-- Phase 4: 매칭 알고리즘
-  - Preference 정규화 로직 구현
-  - 양방향 선호 기반 점수 계산 로직 구현
-  - 연결 관계 필터 기반 추천 후보 생성 로직 구현
-  - 매칭 알고리즘 단위 테스트 추가
-- Phase 5: 픽셀 대시보드
-  - 요약 카드와 추천 목록 중심 대시보드 구현
-  - 3개 탭 네비게이션(등록/목록/대시보드) 구성
-  - 상태 배지 및 픽셀 스타일 컴포넌트 확장
+POC Baseline (Completed)
+- Supabase 스키마/RLS 토대 구축
+- 테스트 환경 구축(Jest + RN Testing Library)
+- 지인 등록 UI/매칭 알고리즘/픽셀 대시보드 POC 구현
 
-Next Focus
-- Supabase 실데이터 연동(등록/조회/추천)
-- 픽셀 폰트 및 스프라이트 에셋 반영
+Service View Scope
+- Home View
+  - 전체 알림 피드
+  - 주요 공지
+  - 오늘의 추천
+  - 최근 활동 요약
+  - 빠른 액션 버튼
+- Matching View
+  - Cupidate 프로필 카드 리스트
+  - 매칭률 실시간 표시
+  - 요청/수락/거절 액션
+  - 필터(나이/지역/직업군)
+  - 매칭 히스토리
+- Cupid View
+  - 주선 진행 현황 대시보드
+  - 성사율 통계
+  - 요청 관리 및 상태 필터
+  - 히스토리/피드백
+  - 주선 후 연락처 교환 view
+- My View
+  - 프로필 표시/수정
+  - 기본 정보 관리
+  - 선호도 설정
+  - 알림 설정
+  - 계정 관리/보안
+
+Service Phases
+- S1 Home View 구축 (in_progress)
+- S2 Matching View 구축 (pending)
+- S3 Cupid View 구축 (pending)
+- S4 My View 구축 (pending)
+
+Next Action
+- S1 착수: Home View 와이어프레임 + 데이터 모델 + 상태/액션 정의
 
 Notes
 - 하네스 정본 문서 경로:
