@@ -117,7 +117,7 @@
     {
       "id": 4,
       "title": "매칭 알고리즘",
-      "status": "pending",
+      "status": "completed",
       "goal": "연결된 Cupid 네트워크 내에서만 매칭률 계산 엔진 구현",
       "deliverables": [
         "Preference Data 정규화 로직",
@@ -127,12 +127,19 @@
       "acceptance_criteria": [
         "연결되지 않은 Cupidate 쌍은 후보에서 제외",
         "점수 계산 로직에 대한 테스트 통과"
+      ],
+      "completed_at": "2026-03-28",
+      "result_summary": [
+        "Preference Data ??? ??(normalizePreferenceData) ??",
+        "??? ?? ?? ?? ?? ??(calculateMatchScore) ??",
+        "?? ?? ?? + ?? ?? ?? ?? ??(buildMatchCandidates) ??",
+        "?? ???? ?? ??? ?? ? ??"
       ]
     },
     {
       "id": 5,
       "title": "픽셀 대시보드",
-      "status": "pending",
+      "status": "completed",
       "goal": "Cupid 관점에서 등록 현황/추천/네트워크 상태를 보는 메인 대시보드 제공",
       "deliverables": [
         "요약 카드(지인 수, 연결 수, 추천 수)",
@@ -142,6 +149,12 @@
       "acceptance_criteria": [
         "핵심 지표와 추천 결과를 한 화면에서 확인 가능",
         "픽셀 아트 UX 가이드와 일관성 유지"
+      ],
+      "completed_at": "2026-03-28",
+      "result_summary": [
+        "?? ??(? ??/?? ??/?? ??/?? ??) ???? ??",
+        "?? ?? ??? ?? ?? ?? UI ??",
+        "??/??/???? 3? ? ?????? ?? ?? ??"
       ]
     }
   ]
