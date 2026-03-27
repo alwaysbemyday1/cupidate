@@ -1,8 +1,8 @@
-﻿[Cupidate Progress Tracker]
+[Cupidate Progress Tracker]
 Last Updated: 2026-03-28
 
 Current Track: Service Build (Post-POC)
-Current Phase: S2 Matching Persistence Wiring
+Current Phase: S3 View Hardening + Docs Alignment
 Overall Status: in_progress
 
 Architecture Decision
@@ -20,6 +20,7 @@ Completed Work
 - [x] Network repository foundation (Task 2026-03-28-02)
 - [x] App-state and data-hook wiring (Task 2026-03-28-03)
 - [x] Matching request persistence (Task 2026-03-28-04)
+- [x] Docs/data-contract alignment (Task 2026-03-28-05)
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:
@@ -32,8 +33,8 @@ Task 2026-03-28-01 (Completed)
 - Verified with tests and TypeScript check.
 
 Next Tasks
-- Task 2026-03-28-05: align docs with data contracts and rollout checkpoints
- - Task 2026-03-28-06: add dedicated Network/Matching interaction tests (UI flow)
+- Task 2026-03-28-06: add dedicated Network/Matching interaction tests (UI flow)
+ - Task 2026-03-28-07: add auth session bootstrap and protected data gate
 
 Task 2026-03-28-02 (Completed)
 - Added `src/features/network/repository` data layer:
@@ -71,3 +72,12 @@ Task 2026-03-28-04 (Completed)
   - accept/reject -> status update (`accepted` / `dismissed`)
   - contact exchange complete -> reason metadata `contactSharedAt`
 - Added in-memory matching repository tests.
+
+Task 2026-03-28-05 (Completed)
+- Rewrote `docs/agent/feature_list.json` into clean UTF-8/JSON with current architecture and phase status.
+- Added `docs/agent/data_contracts.md` covering:
+  - network/matching repository contracts
+  - backend implementations
+  - app-state status mapping
+  - query-key conventions
+- Updated `docs/agent/README.md` index to include progress/worklog/contract docs.

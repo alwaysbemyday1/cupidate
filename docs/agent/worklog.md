@@ -1,4 +1,4 @@
-﻿# Agent Worklog
+# Agent Worklog
 
 ## 2026-03-28
 
@@ -72,3 +72,15 @@ Verification:
 
 Notes:
 - Request lifecycle now persists and can be shared across sessions/backends.
+
+### Task 2026-03-28-05 - Docs/Data Contract Alignment
+Status: Completed
+
+Changes:
+- Cleaned and rewrote `feature_list.json` to match current architecture and phase status.
+- Added `data_contracts.md` with concrete app/repository contracts and mapping rules.
+- Updated docs index (`README.md`) for discoverability.
+
+Verification:
+- JSON parse sanity check for `feature_list.json`.
+- Full test/typecheck remained green after docs updates.

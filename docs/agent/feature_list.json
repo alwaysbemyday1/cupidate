@@ -1,89 +1,80 @@
 {
   "project": {
     "name": "Cupidate",
-    "description": "픽셀 아트 기반 지인 소개팅 서비스",
-    "version": "1.1.0-view-restructure",
+    "description": "Pixel-art based trusted introduction and matchmaking service",
+    "version": "1.2.0-service-foundation",
     "harness_method": {
       "micro_commits": true,
       "state_tracking_files": [
         "docs/agent/feature_list.json",
-        "docs/agent/progress.txt"
+        "docs/agent/progress.txt",
+        "docs/agent/worklog.md"
       ],
       "rules_source": "docs/agent/codexrules.md"
     }
   },
   "domain_rules": {
     "roles": {
-      "cupid": "지인을 관리하고 다른 Cupid와 연결되는 주선자",
-      "cupidate": "Cupid에게 종속된 소개 대상 엔티티"
+      "cupid": "Network orchestrator who manages acquaintances and sends/receives introductions",
+      "cupidate": "Person profile managed by a Cupid and evaluated by matching logic"
     },
     "matching_constraints": [
-      "Cupidate 간 직접 검색/직접 매칭 금지",
-      "서로 연결된 Cupid 네트워크를 통해서만 양측 Cupidate 매칭률 계산 및 제안"
+      "Direct cupidate-to-cupidate search is not the primary flow",
+      "High-confidence recommendations require accepted network connection between cupids"
     ],
     "security": [
-      "Supabase RLS 기반 데이터 격리",
-      "Cupid는 자신의 Cupidate와 연결된 Cupid 네트워크의 Cupidate 정보만 조회 가능"
+      "Supabase RLS as the baseline for all access paths",
+      "Cupid can read own data and connected-network scope only"
     ]
   },
   "critical_focus": {
-    "title": "매칭률 계산 품질",
-    "reason": "서비스 핵심 KPI는 매칭 성공률과 성사율이며, 이를 위해 프로필/선호도 데이터 정합성과 점수 정책 정밀화가 최우선이다.",
+    "title": "Match-rate correctness and explainability",
+    "reason": "Product success depends on trustworthy match quality and transparent recommendation reasons.",
     "source_of_truth": "docs/agent/matching_data_spec.md"
   },
   "service_views": [
     {
       "id": "home",
-      "title": "홈(Home) View",
-      "icon": "🏠",
-      "description": "전체 알림 피드, 공지, 오늘의 추천, 최근 활동 요약, 빠른 액션",
+      "title": "Home View",
+      "description": "Notification feed, recommendation summary, and quick actions",
       "core_features": [
-        "실시간 알림 대시보드",
-        "오늘의 추천 카드",
-        "요청/수락 빠른 액션",
-        "활동 통계 요약",
-        "공지 및 업데이트"
+        "Activity summary cards",
+        "Recent request notifications",
+        "Quick navigation to Network and Matching"
       ],
       "spec_path": "docs/agent/views/home.md"
     },
     {
       "id": "network",
-      "title": "네트워크(Network) View",
-      "icon": "🕸️",
-      "description": "내 Cupidate와 연결 Cupid 리스트를 관리하는 관계 중심 화면",
+      "title": "Network View",
+      "description": "Manage own cupidates and connected cupids",
       "core_features": [
-        "내 Cupidate 리스트/등록/수정",
-        "연결 Cupid 리스트/상태 확인",
-        "네트워크 관계 관리(연결/차단/해제)",
-        "관계 기반 검색/필터"
+        "Cupidate registration and list",
+        "Connected cupid request/list/status",
+        "Network scope management"
       ],
       "spec_path": "docs/agent/views/network.md"
     },
     {
       "id": "matching",
-      "title": "매칭(Matching) View",
-      "icon": "💕",
-      "description": "후보 탐색부터 요청/응답/진행/히스토리까지 매칭 흐름을 통합 관리",
+      "title": "Matching View",
+      "description": "Recommendation board and request lifecycle management",
       "core_features": [
-        "후보 카드 탐색(스와이프/탭)",
-        "매칭률 및 근거 태그 표시",
-        "요청/수락/거절 원클릭",
-        "진행 상태/히스토리/통계",
-        "주선 후 연락처 교환 단계"
+        "Recommendation cards with score/reasons",
+        "Request/accept/reject flow",
+        "Contact-shared completion",
+        "Matching history"
       ],
       "spec_path": "docs/agent/views/matching.md"
     },
     {
       "id": "my",
-      "title": "내 정보(My) View",
-      "icon": "👤",
-      "description": "프로필/선호도/알림/계정 보안을 관리하는 개인 설정 화면",
+      "title": "My View",
+      "description": "Profile/settings/account security controls",
       "core_features": [
-        "프로필 정보 표시/수정",
-        "기본 정보 관리",
-        "선호도 설정",
-        "알림 설정",
-        "계정 관리 및 보안"
+        "Nickname/profile settings",
+        "Privacy and notification preferences",
+        "Account summary"
       ],
       "spec_path": "docs/agent/views/my.md"
     }
@@ -91,60 +82,52 @@
   "service_phases": [
     {
       "id": "S0",
-      "title": "매칭 데이터 기반 설계",
-      "status": "in_progress",
-      "goal": "프로필/선호도 입력 정합성과 매칭 계산 설명가능성 확보",
+      "title": "Matching Data Foundation",
+      "status": "completed",
       "deliverables": [
-        "입력 스키마/검증 규칙",
-        "정규화 레이어",
-        "점수 정책(하드필터/가중치/보정치)",
-        "결과 설명 모델"
+        "Domain input schema",
+        "Validation/normalization",
+        "Scoring baseline and reasoning"
       ]
     },
     {
       "id": "S1",
-      "title": "Network View 구축",
-      "status": "pending",
-      "goal": "내 Cupidate/연결 Cupid 리스트 관리 기능 구현",
+      "title": "Network Data Layer",
+      "status": "completed",
       "deliverables": [
-        "리스트 조회/등록/수정",
-        "연결 상태 관리",
-        "네트워크 필터/검색"
+        "Network repository interfaces",
+        "In-memory + Supabase data source",
+        "Network query/mutation hooks"
       ]
     },
     {
       "id": "S2",
-      "title": "Matching View 구축",
-      "status": "pending",
-      "goal": "탐색→요청→응답→진행→히스토리 흐름 통합 구현",
+      "title": "App Wiring + Matching Persistence",
+      "status": "completed",
       "deliverables": [
-        "후보 카드 + 매칭률 표시",
-        "요청/수락/거절 액션",
-        "진행 상태/히스토리",
-        "연락처 교환 흐름"
+        "4-view modular app shell",
+        "React Query integration in app state",
+        "Persisted match request lifecycle"
       ]
     },
     {
       "id": "S3",
-      "title": "Home View 구축",
-      "status": "pending",
-      "goal": "추천/알림/요약 중심 홈 경험 완성",
+      "title": "View-Level Hardening",
+      "status": "in_progress",
       "deliverables": [
-        "알림 피드",
-        "추천 위젯",
-        "빠른 액션",
-        "공지/활동 요약"
+        "UI interaction tests",
+        "Error/loading UX hardening",
+        "Supabase auth-flow alignment"
       ]
     },
     {
       "id": "S4",
-      "title": "My View 구축",
+      "title": "Service Readiness",
       "status": "pending",
-      "goal": "개인화 설정과 계정 보안 완성",
       "deliverables": [
-        "프로필/선호도 설정",
-        "알림/프라이버시 설정",
-        "계정 보안 관리"
+        "Operational metrics",
+        "Rollout checklist",
+        "QA and release gates"
       ]
     }
   ]
