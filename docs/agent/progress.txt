@@ -10,16 +10,19 @@ Critical Focus
 - 입력 데이터(프로필/선호도) 정합성 확보
 - 매칭 결과 설명가능성 확보
 
+S0 Progress
+- Step 1 (완료): 입력 스키마 + 검증/정규화 레이어 구현
+  - `src/domain/matching/profileInput.ts`
+  - `src/domain/matching/profileValidation.ts`
+  - `src/domain/matching/profileNormalization.ts`
+  - 관련 테스트 2종 추가 및 통과
+- Step 2 (다음): 매칭 점수 정책(하드필터 + 가중치 + 보정치) 구현
+- Step 3 (대기): 매칭 결과 설명 필드/API 포맷 정의
+
 POC Baseline (Completed)
 - Supabase 스키마/RLS 토대 구축
 - 테스트 환경 구축(Jest + RN Testing Library)
-- 등록/목록/대시보드 기반 POC 동작 확인
-
-Service View Scope
-- Home View
-- Matching View
-- Cupid View
-- My View
+- 등록/목록/대시보드 기반 POC 구현
 
 Service Phases
 - S0 매칭 데이터 기반 설계 (in_progress)
@@ -28,14 +31,8 @@ Service Phases
 - S3 Cupid View 구축 (pending)
 - S4 My View 구축 (pending)
 
-S0 Deliverables
-- 프로필/선호도 입력 스키마 정의
-- 정규화/검증 규칙 구현
-- 매칭 점수 정책(필터/가중치/보정치) 구현
-- 매칭 결과 설명 필드 정의
-
 Next Action
-- Step 1 착수: 입력 스키마 + 검증/정규화 레이어 구현
+- Step 2 착수: 하드필터/가중치/보정치 정책 코드화 + 테스트
 
 Notes
 - 핵심 스펙 문서:
