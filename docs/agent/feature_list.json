@@ -6,10 +6,10 @@
     "harness_method": {
       "micro_commits": true,
       "state_tracking_files": [
-        "feature_list.json",
-        "progress.txt"
+        "docs/agent/feature_list.json",
+        "docs/agent/progress.txt"
       ],
-      "rules_source": "codexrules.md"
+      "rules_source": "docs/agent/codexrules.md"
     }
   },
   "domain_rules": {
@@ -74,7 +74,7 @@
     {
       "id": 2,
       "title": "테스트 코드 환경 구성",
-      "status": "pending",
+      "status": "completed",
       "goal": "기능 단위 검증이 가능한 자동화 테스트 기반 확보",
       "deliverables": [
         "테스트 러너(Jest) 및 RN 테스트 유틸 설정",
@@ -84,6 +84,13 @@
       "acceptance_criteria": [
         "샘플 테스트가 CI/로컬에서 통과",
         "매칭 규칙과 RLS 접근 조건 테스트 골격 확보"
+      ],
+      "completed_at": "2026-03-28",
+      "result_summary": [
+        "Jest + jest-expo ??? ??? ?? ??",
+        "React Native ?? ???(App.test.tsx) ??",
+        "??? ?? ??? ???(networkAccessRule.test.ts) ??",
+        "Supabase mock ??? QueryClient ??? ?? ??"
       ]
     },
     {
