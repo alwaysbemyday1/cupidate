@@ -17,3 +17,22 @@ Verification:
 
 Notes:
 - This sets up a clean boundary for upcoming repository/data-source integration.
+
+### Task 2026-03-28-02 - Network Repository/Data Layer
+Status: Completed
+
+Changes:
+- Added a repository abstraction for Network domain entities.
+- Implemented two data sources:
+  - in-memory repository for local/dev fallback
+  - Supabase repository for production data path
+- Added repository factory (`getNetworkRepository`) with lazy singleton behavior.
+- Added React Query hooks for current cupid, cupidates, connections, and related mutations.
+- Made Supabase bootstrap optional-safe when env vars are absent.
+
+Verification:
+- `npm.cmd test` passed (including new in-memory repository tests).
+- `npx.cmd tsc --noEmit` passed.
+
+Notes:
+- App UI is still powered by local state; next task will wire this data layer into the app state and screens.

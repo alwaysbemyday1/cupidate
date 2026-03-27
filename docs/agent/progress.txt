@@ -2,7 +2,7 @@
 Last Updated: 2026-03-28
 
 Current Track: Service Build (Post-POC)
-Current Phase: S1 Network View Implementation
+Current Phase: S1 Network Data Layer Implementation
 Overall Status: in_progress
 
 Architecture Decision
@@ -17,6 +17,7 @@ Completed Work
 - [x] S0 matching domain foundation (schema/validation/scoring baseline)
 - [x] 4-view app shell (single-file prototype)
 - [x] App modularization (Task 2026-03-28-01)
+- [x] Network repository foundation (Task 2026-03-28-02)
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:
@@ -29,6 +30,18 @@ Task 2026-03-28-01 (Completed)
 - Verified with tests and TypeScript check.
 
 Next Tasks
-- Task 2026-03-28-02: add repository/data-source layer for Network/Matching
-- Task 2026-03-28-03: wire repository + react-query hooks + optimistic actions
-- Task 2026-03-28-04: align docs with data contracts and rollout checkpoints
+- Task 2026-03-28-03: wire repository + react-query hooks into App state
+- Task 2026-03-28-04: implement persisted match request lifecycle
+- Task 2026-03-28-05: align docs with data contracts and rollout checkpoints
+
+Task 2026-03-28-02 (Completed)
+- Added `src/features/network/repository` data layer:
+  - repository interface/types (`types.ts`)
+  - in-memory implementation (`inMemoryNetworkRepository.ts`)
+  - supabase implementation (`supabaseNetworkRepository.ts`)
+  - repository factory (`createNetworkRepository.ts`)
+- Added React Query hook set: `src/features/network/hooks/useNetworkData.ts`.
+- Updated Supabase client bootstrap to be optional-safe when env vars are missing:
+  - `src/lib/supabase.ts` now exports `isSupabaseConfigured`, nullable `supabase`,
+    and `getSupabaseClientOrThrow()`.
+- Added unit tests for in-memory repository behavior.
