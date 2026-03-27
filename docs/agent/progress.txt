@@ -2,51 +2,45 @@
 Last Updated: 2026-03-28
 
 Current Track: Service Build (Post-POC)
-Current Phase: S1 Home View
+Current Phase: S0 Matching Data Foundation
 Overall Status: in_progress
+
+Critical Focus
+- 매칭률 계산 정확도 향상
+- 입력 데이터(프로필/선호도) 정합성 확보
+- 매칭 결과 설명가능성 확보
 
 POC Baseline (Completed)
 - Supabase 스키마/RLS 토대 구축
 - 테스트 환경 구축(Jest + RN Testing Library)
-- 지인 등록 UI/매칭 알고리즘/픽셀 대시보드 POC 구현
+- 등록/목록/대시보드 기반 POC 동작 확인
 
 Service View Scope
 - Home View
-  - 전체 알림 피드
-  - 주요 공지
-  - 오늘의 추천
-  - 최근 활동 요약
-  - 빠른 액션 버튼
 - Matching View
-  - Cupidate 프로필 카드 리스트
-  - 매칭률 실시간 표시
-  - 요청/수락/거절 액션
-  - 필터(나이/지역/직업군)
-  - 매칭 히스토리
 - Cupid View
-  - 주선 진행 현황 대시보드
-  - 성사율 통계
-  - 요청 관리 및 상태 필터
-  - 히스토리/피드백
-  - 주선 후 연락처 교환 view
 - My View
-  - 프로필 표시/수정
-  - 기본 정보 관리
-  - 선호도 설정
-  - 알림 설정
-  - 계정 관리/보안
 
 Service Phases
-- S1 Home View 구축 (in_progress)
+- S0 매칭 데이터 기반 설계 (in_progress)
+- S1 Home View 구축 (pending)
 - S2 Matching View 구축 (pending)
 - S3 Cupid View 구축 (pending)
 - S4 My View 구축 (pending)
 
+S0 Deliverables
+- 프로필/선호도 입력 스키마 정의
+- 정규화/검증 규칙 구현
+- 매칭 점수 정책(필터/가중치/보정치) 구현
+- 매칭 결과 설명 필드 정의
+
 Next Action
-- S1 착수: Home View 와이어프레임 + 데이터 모델 + 상태/액션 정의
+- Step 1 착수: 입력 스키마 + 검증/정규화 레이어 구현
 
 Notes
-- 하네스 정본 문서 경로:
+- 핵심 스펙 문서:
+  - docs/agent/matching_data_spec.md
+- 하네스 정본 문서:
   - docs/agent/codexrules.md
   - docs/agent/feature_list.json
   - docs/agent/progress.txt
