@@ -45,5 +45,5 @@
 ## 5. AI Agent Workflow (Harness Method)
 
 - **Micro-Commits:** 한 번에 하나의 컴포넌트 또는 로직만 작성하고 검토를 요청할 것.
-- **State Tracking:** 작업 시작 시 반드시 루트의 `feature_list.json`과 `progress.txt`를 읽고 현재 컨텍스트를 파악할 것. 작업 완료 후 진행 상태를 업데이트할 것.
-- **No Assumptions:** 매칭 알고리즘이나 RLS 정책 작성 시, 추측하지 말고 `codexrules.md`의 도메인 룰을 최우선으로 따를 것.
+- **State Tracking:** 작업 시작 시 반드시 `docs/agent/feature_list.json`과 `docs/agent/progress.txt`를 읽고 현재 컨텍스트를 파악할 것. 작업 완료 후 진행 상태를 업데이트할 것.
+- **No Assumptions:** 매칭 알고리즘이나 RLS 정책 작성 시, 추측하지 말고 `docs/agent/codexrules.md`의 도메인 룰을 최우선으로 따를 것.

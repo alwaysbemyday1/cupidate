@@ -53,7 +53,8 @@
     {
       "id": 1,
       "title": "Supabase 스키마 셋업",
-      "status": "pending",
+      "status": "completed",
+      "completed_at": "2026-03-28",
       "goal": "도메인 룰을 반영한 최소 스키마 + RLS 기반 보안 토대 구축",
       "deliverables": [
         "users/cupids/cupidates/cupid_connections/match_candidates 테이블 설계",
@@ -63,6 +64,11 @@
       "acceptance_criteria": [
         "직접 Cupidate 조회/매칭 남용이 정책상 차단됨",
         "연결된 Cupid 관계를 기준으로 조회 가능 범위가 검증됨"
+      ],
+      "result_summary": [
+        "프로젝트 fuzuoehehnbcngvwoypd에 core/RLS 마이그레이션 적용 완료",
+        "모든 핵심 테이블 public 스키마에 생성 + RLS 활성화 완료",
+        "시드 전략 템플릿(supabase/seed.sql) 추가"
       ]
     },
     {
