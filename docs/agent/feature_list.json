@@ -189,5 +189,11 @@
       "Step 1 ??: ???(normalizeUserProfileInput, normalizeIdealPreferenceInput) ??"
     ],
     "next_step": "Step 2: ?? ?? ??(???? + ??? + ???) ??"
+  },
+  "view_spec_docs": {
+    "home": "docs/agent/views/home.md",
+    "matching": "docs/agent/views/matching.md",
+    "cupid": "docs/agent/views/cupid.md",
+    "my": "docs/agent/views/my.md"
   }
 }

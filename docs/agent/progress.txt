@@ -37,6 +37,11 @@ Next Action
 Notes
 - 핵심 스펙 문서:
   - docs/agent/matching_data_spec.md
+- 화면별 명세 문서:
+  - docs/agent/views/home.md
+  - docs/agent/views/matching.md
+  - docs/agent/views/cupid.md
+  - docs/agent/views/my.md
 - 하네스 정본 문서:
   - docs/agent/codexrules.md
   - docs/agent/feature_list.json
