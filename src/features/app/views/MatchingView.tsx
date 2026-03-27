@@ -10,12 +10,14 @@ type MatchingViewProps = {
   cupidates: CupidateRecord[];
   requestByPair: Map<string, MatchRequest>;
   requests: MatchRequest[];
-  onSendRequest: (sourceCupidateId: string, targetCupidateId: string) => void;
+  onSendRequest: (sourceCupidateId: string, targetCupidateId: string) => void | Promise<void>;
   onUpdateRequestStatus: (
     sourceCupidateId: string,
     targetCupidateId: string,
     status: MatchRequestStatus
-  ) => void;
+  ) => void | Promise<void>;
+  isMatchingLoading?: boolean;
+  isMutatingMatching?: boolean;
 };
 
 export function MatchingView({
@@ -24,10 +26,14 @@ export function MatchingView({
   requestByPair,
   requests,
   onSendRequest,
-  onUpdateRequestStatus
+  onUpdateRequestStatus,
+  isMatchingLoading,
+  isMutatingMatching
 }: MatchingViewProps) {
   return (
     <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
+      {isMatchingLoading && <Text style={styles.listMeta}>Syncing matching requests...</Text>}
+
       <Text style={styles.sectionTitle}>Recommendation Board</Text>
       {recommendations.length === 0 ? (
         <View style={styles.emptyCard}>
@@ -59,7 +65,7 @@ export function MatchingView({
               <View style={styles.buttonRow}>
                 {!request && (
                   <PixelButton
-                    label="Request Match"
+                    label={isMutatingMatching ? "Processing..." : "Request Match"}
                     onPress={() => onSendRequest(item.sourceCupidateId, item.targetCupidateId)}
                   />
                 )}

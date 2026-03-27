@@ -2,6 +2,12 @@
 
 import { buildMatchCandidates } from "../../../domain/matching/buildMatchCandidates";
 import {
+  useMarkContactSharedMutation,
+  useMatchCandidatesQuery,
+  useRequestMatchMutation,
+  useUpdateMatchStatusMutation
+} from "../../matching/hooks/useMatchingData";
+import {
   useConnectionsQuery,
   useCreateConnectionMutation,
   useCreateCupidateMutation,
@@ -19,6 +25,7 @@ import {
   type MatchRequestStatus,
   MY_CUPID_ID,
   type NetworkSegment,
+  type RecommendationItem,
   type ValidationErrors
 } from "./types";
 
@@ -71,6 +78,22 @@ function mapConnectionStatus(status: string): CupidConnection["status"] {
   return "pending";
 }
 
+function mapMatchRequestStatus(status: string, reason: Record<string, unknown>): MatchRequestStatus {
+  if (status === "dismissed") {
+    return "rejected";
+  }
+
+  if (status === "accepted" && reason.contactSharedAt) {
+    return "completed";
+  }
+
+  if (status === "accepted") {
+    return "accepted";
+  }
+
+  return "requested";
+}
+
 export function pairKey(sourceCupidateId: string, targetCupidateId: string) {
   return `${sourceCupidateId}:${targetCupidateId}`;
 }
@@ -87,7 +110,6 @@ export function useCupidateAppState() {
   const [ownerType, setOwnerType] = useState<"mine" | "connected">("mine");
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [newConnectionCupidId, setNewConnectionCupidId] = useState(CONNECTED_CUPID_ID);
-  const [requests, setRequests] = useState<MatchRequest[]>([]);
   const [myNickname, setMyNickname] = useState("cupid_master");
   const [privacyNetworkOnly, setPrivacyNetworkOnly] = useState(true);
   const [notificationEnabled, setNotificationEnabled] = useState(true);
@@ -96,9 +118,15 @@ export function useCupidateAppState() {
   const currentCupidQuery = useCurrentCupidQuery();
   const cupidatesQuery = useCupidatesQuery();
   const connectionsQuery = useConnectionsQuery();
+  const matchCandidatesQuery = useMatchCandidatesQuery();
+
   const createCupidateMutation = useCreateCupidateMutation();
   const createConnectionMutation = useCreateConnectionMutation();
   const upsertNicknameMutation = useUpsertCurrentCupidNicknameMutation();
+
+  const requestMatchMutation = useRequestMatchMutation();
+  const updateMatchStatusMutation = useUpdateMatchStatusMutation();
+  const markContactSharedMutation = useMarkContactSharedMutation();
 
   useEffect(() => {
     if (!nicknameHydrated && currentCupidQuery.data?.nickname) {
@@ -168,6 +196,18 @@ export function useCupidateAppState() {
     return matches.slice(0, 20);
   }, [connectedCupidates, connections, myCupidId, myCupidates]);
 
+  const requests = useMemo<MatchRequest[]>(
+    () =>
+      (matchCandidatesQuery.data ?? []).map((item) => ({
+        id: item.id,
+        sourceCupidateId: item.sourceCupidateId,
+        targetCupidateId: item.targetCupidateId,
+        status: mapMatchRequestStatus(item.status, item.reason),
+        createdAt: item.createdAt
+      })),
+    [matchCandidatesQuery.data]
+  );
+
   const requestByPair = useMemo(() => {
     const map = new Map<string, MatchRequest>();
     requests.forEach((request) => {
@@ -208,6 +248,7 @@ export function useCupidateAppState() {
     }
 
     const parsedBirthYear = birthYearInput ? Number(birthYearInput) : null;
+
     await createCupidateMutation.mutateAsync({
       displayName: displayName.trim(),
       birthYear: parsedBirthYear,
@@ -252,32 +293,63 @@ export function useCupidateAppState() {
     setMyNickname(updated.nickname);
   };
 
-  const onSendRequest = (sourceCupidateId: string, targetCupidateId: string) => {
+  const onSendRequest = async (sourceCupidateId: string, targetCupidateId: string) => {
     const key = pairKey(sourceCupidateId, targetCupidateId);
     if (requestByPair.get(key)) {
       return;
     }
 
-    setRequests((prev) => [
-      {
-        id: `req-${Date.now()}`,
-        sourceCupidateId,
-        targetCupidateId,
-        status: "requested",
-        createdAt: new Date().toISOString()
-      },
-      ...prev
-    ]);
+    const recommendation = recommendations.find(
+      (item) => item.sourceCupidateId === sourceCupidateId && item.targetCupidateId === targetCupidateId
+    );
+
+    if (!recommendation) {
+      return;
+    }
+
+    await requestMatchMutation.mutateAsync({
+      sourceCupidateId,
+      targetCupidateId,
+      matchScore: recommendation.matchScore,
+      reason: {
+        breakdown: recommendation.reason.breakdown,
+        matchedHobbies: recommendation.reason.matchedHobbies,
+        requestedAt: new Date().toISOString()
+      }
+    });
   };
 
-  const onUpdateRequestStatus = (sourceCupidateId: string, targetCupidateId: string, status: MatchRequestStatus) => {
-    setRequests((prev) =>
-      prev.map((request) =>
-        request.sourceCupidateId === sourceCupidateId && request.targetCupidateId === targetCupidateId
-          ? { ...request, status }
-          : request
-      )
-    );
+  const onUpdateRequestStatus = async (
+    sourceCupidateId: string,
+    targetCupidateId: string,
+    status: MatchRequestStatus
+  ) => {
+    const request = requestByPair.get(pairKey(sourceCupidateId, targetCupidateId));
+    if (!request) {
+      return;
+    }
+
+    if (status === "accepted") {
+      await updateMatchStatusMutation.mutateAsync({
+        candidateId: request.id,
+        status: "accepted"
+      });
+      return;
+    }
+
+    if (status === "rejected") {
+      await updateMatchStatusMutation.mutateAsync({
+        candidateId: request.id,
+        status: "dismissed"
+      });
+      return;
+    }
+
+    if (status === "completed") {
+      await markContactSharedMutation.mutateAsync({
+        candidateId: request.id
+      });
+    }
   };
 
   return {
@@ -319,6 +391,9 @@ export function useCupidateAppState() {
     homeSummary,
     isNetworkLoading: cupidatesQuery.isLoading || connectionsQuery.isLoading,
     isMutatingNetwork: createCupidateMutation.isPending || createConnectionMutation.isPending,
+    isMatchingLoading: matchCandidatesQuery.isLoading,
+    isMutatingMatching:
+      requestMatchMutation.isPending || updateMatchStatusMutation.isPending || markContactSharedMutation.isPending,
     isSavingNickname: upsertNicknameMutation.isPending,
     onRegisterCupidate,
     onAddConnection,

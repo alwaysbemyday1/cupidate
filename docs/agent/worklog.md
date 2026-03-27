@@ -55,3 +55,20 @@ Verification:
 
 Notes:
 - Matching request lifecycle is still local-only; next task will persist it through repository/match tables.
+
+### Task 2026-03-28-04 - Matching Request Persistence
+Status: Completed
+
+Changes:
+- Added a dedicated matching repository abstraction (`src/features/matching/repository`).
+- Implemented in-memory and Supabase backends for `match_candidates`.
+- Added matching query/mutation hooks (`useMatchingData`).
+- Wired app state so matching request/history is now repository-driven instead of local-only state.
+- Added tests for in-memory matching repository behavior.
+
+Verification:
+- `npm.cmd test` passed.
+- `npx.cmd tsc --noEmit` passed.
+
+Notes:
+- Request lifecycle now persists and can be shared across sessions/backends.

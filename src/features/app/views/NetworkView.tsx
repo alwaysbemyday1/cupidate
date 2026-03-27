@@ -25,11 +25,11 @@ type NetworkViewProps = {
   onChangeBio: (value: string) => void;
   errors: ValidationErrors;
   canSubmit: boolean;
-  onSaveCupidate: () => void;
+  onSaveCupidate: () => void | Promise<void>;
   currentCupidId: string;
   newConnectionCupidId: string;
   onChangeNewConnectionCupidId: (value: string) => void;
-  onAddConnection: () => void;
+  onAddConnection: () => void | Promise<void>;
   isNetworkLoading?: boolean;
   isMutatingNetwork?: boolean;
 };

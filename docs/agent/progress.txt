@@ -2,7 +2,7 @@
 Last Updated: 2026-03-28
 
 Current Track: Service Build (Post-POC)
-Current Phase: S2 App-State + Data Wiring
+Current Phase: S2 Matching Persistence Wiring
 Overall Status: in_progress
 
 Architecture Decision
@@ -19,6 +19,7 @@ Completed Work
 - [x] App modularization (Task 2026-03-28-01)
 - [x] Network repository foundation (Task 2026-03-28-02)
 - [x] App-state and data-hook wiring (Task 2026-03-28-03)
+- [x] Matching request persistence (Task 2026-03-28-04)
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:
@@ -31,8 +32,8 @@ Task 2026-03-28-01 (Completed)
 - Verified with tests and TypeScript check.
 
 Next Tasks
-- Task 2026-03-28-04: implement persisted match request lifecycle
 - Task 2026-03-28-05: align docs with data contracts and rollout checkpoints
+ - Task 2026-03-28-06: add dedicated Network/Matching interaction tests (UI flow)
 
 Task 2026-03-28-02 (Completed)
 - Added `src/features/network/repository` data layer:
@@ -57,3 +58,16 @@ Task 2026-03-28-03 (Completed)
   - My view now includes explicit nickname save action
 - Added test-time repository override and Query notify-manager act bridge:
   - prevents hanging tests and act warnings with async query updates.
+
+Task 2026-03-28-04 (Completed)
+- Added `src/features/matching/repository` data layer:
+  - repository interface/types (`types.ts`)
+  - in-memory implementation (`inMemoryMatchingRepository.ts`)
+  - supabase implementation (`supabaseMatchingRepository.ts`)
+  - repository factory (`createMatchingRepository.ts`)
+- Added matching React Query hooks: `src/features/matching/hooks/useMatchingData.ts`.
+- Replaced local-only matching request lifecycle with persisted repository flow:
+  - request match -> upsert `match_candidates` as `proposed`
+  - accept/reject -> status update (`accepted` / `dismissed`)
+  - contact exchange complete -> reason metadata `contactSharedAt`
+- Added in-memory matching repository tests.

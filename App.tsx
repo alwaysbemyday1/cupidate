@@ -92,6 +92,8 @@ function CupidateAppShell() {
             requests={state.requests}
             onSendRequest={state.onSendRequest}
             onUpdateRequestStatus={state.onUpdateRequestStatus}
+            isMatchingLoading={state.isMatchingLoading}
+            isMutatingMatching={state.isMutatingMatching}
           />
         )}
 

@@ -6,7 +6,7 @@ import { styles } from "../styles";
 type MyViewProps = {
   myNickname: string;
   onChangeMyNickname: (value: string) => void;
-  onSaveMyNickname: () => void;
+  onSaveMyNickname: () => void | Promise<void>;
   isSavingNickname?: boolean;
   privacyNetworkOnly: boolean;
   onChangePrivacyNetworkOnly: (value: boolean) => void;
