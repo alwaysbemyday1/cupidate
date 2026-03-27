@@ -84,3 +84,19 @@ Changes:
 Verification:
 - JSON parse sanity check for `feature_list.json`.
 - Full test/typecheck remained green after docs updates.
+
+### Task 2026-03-28-06 - Matching Interaction Flow Test
+Status: Completed
+
+Changes:
+- Added UI-flow test for persisted matching lifecycle:
+  - `src/features/app/__tests__/matchingFlow.test.tsx`
+- Scenario covers:
+  - recommendation render from seeded network graph
+  - request creation
+  - accept transition
+  - contact-shared completion transition
+
+Verification:
+- `npm.cmd test` passed (now 9 suites / 21 tests).
+- `npx.cmd tsc --noEmit` passed.

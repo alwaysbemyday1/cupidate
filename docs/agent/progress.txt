@@ -21,6 +21,7 @@ Completed Work
 - [x] App-state and data-hook wiring (Task 2026-03-28-03)
 - [x] Matching request persistence (Task 2026-03-28-04)
 - [x] Docs/data-contract alignment (Task 2026-03-28-05)
+- [x] Matching UI interaction flow tests (Task 2026-03-28-06)
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:
@@ -33,8 +34,8 @@ Task 2026-03-28-01 (Completed)
 - Verified with tests and TypeScript check.
 
 Next Tasks
-- Task 2026-03-28-06: add dedicated Network/Matching interaction tests (UI flow)
  - Task 2026-03-28-07: add auth session bootstrap and protected data gate
+ - Task 2026-03-28-08: implement connected-cupid discovery/search flow (ID input removal)
 
 Task 2026-03-28-02 (Completed)
 - Added `src/features/network/repository` data layer:
@@ -81,3 +82,10 @@ Task 2026-03-28-05 (Completed)
   - app-state status mapping
   - query-key conventions
 - Updated `docs/agent/README.md` index to include progress/worklog/contract docs.
+
+Task 2026-03-28-06 (Completed)
+- Added app-level matching lifecycle interaction test:
+  - file: `src/features/app/__tests__/matchingFlow.test.tsx`
+  - flow: request -> accept -> contact shared completion
+- Test uses deterministic in-memory repositories for network + matching state seeding.
+- Validates that status transitions are reflected in UI rendering.
