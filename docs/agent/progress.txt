@@ -2,7 +2,7 @@
 Last Updated: 2026-03-28
 
 Current Track: Service Build (Post-POC)
-Current Phase: S1 Network Data Layer Implementation
+Current Phase: S2 App-State + Data Wiring
 Overall Status: in_progress
 
 Architecture Decision
@@ -18,6 +18,7 @@ Completed Work
 - [x] 4-view app shell (single-file prototype)
 - [x] App modularization (Task 2026-03-28-01)
 - [x] Network repository foundation (Task 2026-03-28-02)
+- [x] App-state and data-hook wiring (Task 2026-03-28-03)
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:
@@ -30,7 +31,6 @@ Task 2026-03-28-01 (Completed)
 - Verified with tests and TypeScript check.
 
 Next Tasks
-- Task 2026-03-28-03: wire repository + react-query hooks into App state
 - Task 2026-03-28-04: implement persisted match request lifecycle
 - Task 2026-03-28-05: align docs with data contracts and rollout checkpoints
 
@@ -45,3 +45,15 @@ Task 2026-03-28-02 (Completed)
   - `src/lib/supabase.ts` now exports `isSupabaseConfigured`, nullable `supabase`,
     and `getSupabaseClientOrThrow()`.
 - Added unit tests for in-memory repository behavior.
+
+Task 2026-03-28-03 (Completed)
+- Wired Network repository hooks into app state (`useCupidateAppState`):
+  - cupidates/connections/current cupid now fetched via React Query
+  - create cupidate/create connection now mutation-based
+  - nickname save path wired to `upsertCurrentCupidNickname`
+- Added QueryClientProvider bootstrap in `App.tsx`.
+- Updated views to consume new data flow:
+  - Network connection request input now based on connected cupid ID
+  - My view now includes explicit nickname save action
+- Added test-time repository override and Query notify-manager act bridge:
+  - prevents hanging tests and act warnings with async query updates.

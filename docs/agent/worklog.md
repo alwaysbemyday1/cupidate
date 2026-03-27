@@ -36,3 +36,22 @@ Verification:
 
 Notes:
 - App UI is still powered by local state; next task will wire this data layer into the app state and screens.
+
+### Task 2026-03-28-03 - App State/Data Hook Wiring
+Status: Completed
+
+Changes:
+- Connected app state to repository/query layer using `useNetworkData` hooks.
+- Added `QueryClientProvider` to app root with test-friendly defaults.
+- Replaced local-only cupidate/connection paths with mutation/query flow.
+- Updated UI:
+  - Network view connection request now accepts connected cupid ID.
+  - My view now has explicit `Save Nickname` action.
+- Stabilized tests with repository override helpers and query notify-manager setup.
+
+Verification:
+- `npm.cmd test` passed.
+- `npx.cmd tsc --noEmit` passed.
+
+Notes:
+- Matching request lifecycle is still local-only; next task will persist it through repository/match tables.

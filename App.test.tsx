@@ -1,22 +1,36 @@
-import { fireEvent, render, screen } from "@testing-library/react-native";
+﻿import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 
 import App from "./App";
+import { setNetworkRepositoryForTest } from "./src/features/network/repository/createNetworkRepository";
+import { createInMemoryNetworkRepository } from "./src/features/network/repository/inMemoryNetworkRepository";
 
 describe("App", () => {
-  it("renders registry header", () => {
-    render(<App />);
-
-    expect(screen.getByText("CUPIDATE REGISTRY")).toBeTruthy();
-    expect(screen.getByText("PIXEL MATCH NETWORK")).toBeTruthy();
+  beforeEach(() => {
+    setNetworkRepositoryForTest(createInMemoryNetworkRepository());
   });
 
-  it("shows validation message when required fields are missing", () => {
+  afterEach(() => {
+    setNetworkRepositoryForTest(null);
+  });
+
+  it("renders registry header", async () => {
+    render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByText("CUPIDATE REGISTRY")).toBeTruthy();
+      expect(screen.getByText("PIXEL MATCH NETWORK")).toBeTruthy();
+    });
+  });
+
+  it("shows validation message when required fields are missing", async () => {
     render(<App />);
 
     fireEvent.press(screen.getByText("NETWORK"));
     fireEvent.press(screen.getByText("Save Cupidate"));
 
-    expect(screen.getByText("Name is required.")).toBeTruthy();
-    expect(screen.getByText("Gender is required.")).toBeTruthy();
+    await waitFor(() => {
+      expect(screen.getByText("Name is required.")).toBeTruthy();
+      expect(screen.getByText("Gender is required.")).toBeTruthy();
+    });
   });
 });

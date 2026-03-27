@@ -1,4 +1,6 @@
-﻿import { StatusBar } from "expo-status-bar";
+﻿import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { StatusBar } from "expo-status-bar";
+import { useState } from "react";
 import { Text, View } from "react-native";
 
 import { PixelButton } from "./src/features/app/components/PixelButton";
@@ -9,7 +11,7 @@ import { MatchingView } from "./src/features/app/views/MatchingView";
 import { MyView } from "./src/features/app/views/MyView";
 import { NetworkView } from "./src/features/app/views/NetworkView";
 
-export default function App() {
+function CupidateAppShell() {
   const state = useCupidateAppState();
 
   return (
@@ -73,11 +75,12 @@ export default function App() {
             errors={state.errors}
             canSubmit={state.canSubmit}
             onSaveCupidate={state.onRegisterCupidate}
-            newConnectionName={state.newConnectionName}
-            onChangeNewConnectionName={state.setNewConnectionName}
-            newConnectionRegion={state.newConnectionRegion}
-            onChangeNewConnectionRegion={state.setNewConnectionRegion}
+            currentCupidId={state.myCupidId}
+            newConnectionCupidId={state.newConnectionCupidId}
+            onChangeNewConnectionCupidId={state.setNewConnectionCupidId}
             onAddConnection={state.onAddConnection}
+            isNetworkLoading={state.isNetworkLoading}
+            isMutatingNetwork={state.isMutatingNetwork}
           />
         )}
 
@@ -96,6 +99,8 @@ export default function App() {
           <MyView
             myNickname={state.myNickname}
             onChangeMyNickname={state.setMyNickname}
+            onSaveMyNickname={state.onSaveNickname}
+            isSavingNickname={state.isSavingNickname}
             privacyNetworkOnly={state.privacyNetworkOnly}
             onChangePrivacyNetworkOnly={state.setPrivacyNetworkOnly}
             notificationEnabled={state.notificationEnabled}
@@ -107,5 +112,31 @@ export default function App() {
         )}
       </View>
     </View>
+  );
+}
+
+export default function App() {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: false,
+            gcTime: 0,
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: false
+          },
+          mutations: {
+            retry: false,
+            gcTime: 0
+          }
+        }
+      })
+  );
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <CupidateAppShell />
+    </QueryClientProvider>
   );
 }

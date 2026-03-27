@@ -1,6 +1,14 @@
-﻿import { useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 
 import { buildMatchCandidates } from "../../../domain/matching/buildMatchCandidates";
+import {
+  useConnectionsQuery,
+  useCreateConnectionMutation,
+  useCreateCupidateMutation,
+  useCupidatesQuery,
+  useCurrentCupidQuery,
+  useUpsertCurrentCupidNicknameMutation
+} from "../../network/hooks/useNetworkData";
 import {
   CONNECTED_CUPID_ID,
   type AppView,
@@ -51,6 +59,18 @@ function parseHobbies(input: string): string[] {
     .filter(Boolean);
 }
 
+function mapConnectionStatus(status: string): CupidConnection["status"] {
+  if (status === "accepted") {
+    return "connected";
+  }
+
+  if (status === "blocked" || status === "rejected") {
+    return "blocked";
+  }
+
+  return "pending";
+}
+
 export function pairKey(sourceCupidateId: string, targetCupidateId: string) {
   return `${sourceCupidateId}:${targetCupidateId}`;
 }
@@ -66,28 +86,69 @@ export function useCupidateAppState() {
   const [locationInput, setLocationInput] = useState("seoul");
   const [ownerType, setOwnerType] = useState<"mine" | "connected">("mine");
   const [errors, setErrors] = useState<ValidationErrors>({});
-  const [cupidates, setCupidates] = useState<CupidateRecord[]>([]);
-  const [connections, setConnections] = useState<CupidConnection[]>([
-    { cupidId: CONNECTED_CUPID_ID, name: "Connected Cupid A", region: "seoul", status: "connected" },
-    { cupidId: "cupid-connected-2", name: "Connected Cupid B", region: "busan", status: "pending" }
-  ]);
-  const [newConnectionName, setNewConnectionName] = useState("");
-  const [newConnectionRegion, setNewConnectionRegion] = useState("");
+  const [newConnectionCupidId, setNewConnectionCupidId] = useState(CONNECTED_CUPID_ID);
   const [requests, setRequests] = useState<MatchRequest[]>([]);
   const [myNickname, setMyNickname] = useState("cupid_master");
   const [privacyNetworkOnly, setPrivacyNetworkOnly] = useState(true);
   const [notificationEnabled, setNotificationEnabled] = useState(true);
+  const [nicknameHydrated, setNicknameHydrated] = useState(false);
+
+  const currentCupidQuery = useCurrentCupidQuery();
+  const cupidatesQuery = useCupidatesQuery();
+  const connectionsQuery = useConnectionsQuery();
+  const createCupidateMutation = useCreateCupidateMutation();
+  const createConnectionMutation = useCreateConnectionMutation();
+  const upsertNicknameMutation = useUpsertCurrentCupidNicknameMutation();
+
+  useEffect(() => {
+    if (!nicknameHydrated && currentCupidQuery.data?.nickname) {
+      setMyNickname(currentCupidQuery.data.nickname);
+      setNicknameHydrated(true);
+      return;
+    }
+
+    if (!nicknameHydrated && currentCupidQuery.isSuccess) {
+      setNicknameHydrated(true);
+    }
+  }, [currentCupidQuery.data?.nickname, currentCupidQuery.isSuccess, nicknameHydrated]);
 
   const canSubmit = useMemo(() => displayName.trim().length > 0 && !!gender, [displayName, gender]);
 
+  const myCupidId = currentCupidQuery.data?.id ?? MY_CUPID_ID;
+
+  const cupidates = useMemo<CupidateRecord[]>(
+    () =>
+      (cupidatesQuery.data ?? []).map((item) => ({
+        cupidateId: item.id,
+        ownerCupidId: item.ownerCupidId,
+        birthYear: item.birthYear,
+        displayName: item.displayName,
+        gender: item.gender ?? "unknown",
+        bio: item.bio ?? "",
+        preferences: item.preferences
+      })),
+    [cupidatesQuery.data]
+  );
+
+  const connections = useMemo<CupidConnection[]>(
+    () =>
+      (connectionsQuery.data ?? []).map((item) => ({
+        cupidId: item.counterpartCupidId,
+        name: item.counterpartNickname ?? item.counterpartCupidId,
+        region: "-",
+        status: mapConnectionStatus(item.status)
+      })),
+    [connectionsQuery.data]
+  );
+
   const myCupidates = useMemo(
-    () => cupidates.filter((item) => item.ownerCupidId === MY_CUPID_ID),
-    [cupidates]
+    () => cupidates.filter((item) => item.ownerCupidId === myCupidId),
+    [cupidates, myCupidId]
   );
 
   const connectedCupidates = useMemo(
-    () => cupidates.filter((item) => item.ownerCupidId !== MY_CUPID_ID),
-    [cupidates]
+    () => cupidates.filter((item) => item.ownerCupidId !== myCupidId),
+    [cupidates, myCupidId]
   );
 
   const recommendations = useMemo(() => {
@@ -97,17 +158,15 @@ export function useCupidateAppState() {
         targets: connectedCupidates,
         currentYear: 2026,
         isConnected: (sourceOwnerCupidId, targetOwnerCupidId) =>
+          sourceOwnerCupidId === myCupidId &&
           connections.some(
-            (connection) =>
-              connection.cupidId === targetOwnerCupidId &&
-              connection.status === "connected" &&
-              sourceOwnerCupidId === MY_CUPID_ID
+            (connection) => connection.cupidId === targetOwnerCupidId && connection.status === "connected"
           )
       })
     );
 
     return matches.slice(0, 20);
-  }, [connectedCupidates, connections, myCupidates]);
+  }, [connectedCupidates, connections, myCupidId, myCupidates]);
 
   const requestByPair = useMemo(() => {
     const map = new Map<string, MatchRequest>();
@@ -140,7 +199,7 @@ export function useCupidateAppState() {
     [connections, myCupidates.length, recommendations.length, requests]
   );
 
-  const onRegisterCupidate = () => {
+  const onRegisterCupidate = async () => {
     const formErrors = validateForm(displayName, birthYearInput, gender);
     setErrors(formErrors);
 
@@ -149,26 +208,19 @@ export function useCupidateAppState() {
     }
 
     const parsedBirthYear = birthYearInput ? Number(birthYearInput) : null;
-    const ownerCupidId = ownerType === "mine" ? MY_CUPID_ID : CONNECTED_CUPID_ID;
-
-    setCupidates((prev) => [
-      {
-        cupidateId: `${Date.now()}`,
-        ownerCupidId,
-        birthYear: parsedBirthYear,
-        displayName: displayName.trim(),
-        gender,
-        bio: bio.trim(),
-        preferences: {
-          ageRange: [24, 35],
-          hobbies: parseHobbies(hobbiesInput),
-          smoking: "any",
-          drinking: "any",
-          location: locationInput.trim() || "seoul"
-        }
-      },
-      ...prev
-    ]);
+    await createCupidateMutation.mutateAsync({
+      displayName: displayName.trim(),
+      birthYear: parsedBirthYear,
+      gender,
+      bio: bio.trim(),
+      preferences: {
+        ageRange: [24, 35],
+        hobbies: parseHobbies(hobbiesInput),
+        smoking: "any",
+        drinking: "any",
+        location: locationInput.trim() || "seoul"
+      } as CupidateRecord["preferences"]
+    });
 
     setDisplayName("");
     setBirthYearInput("");
@@ -179,23 +231,25 @@ export function useCupidateAppState() {
     setErrors({});
   };
 
-  const onAddConnection = () => {
-    if (!newConnectionName.trim() || !newConnectionRegion.trim()) {
+  const onAddConnection = async () => {
+    if (!newConnectionCupidId.trim()) {
       return;
     }
 
-    setConnections((prev) => [
-      {
-        cupidId: `cupid-${Date.now()}`,
-        name: newConnectionName.trim(),
-        region: newConnectionRegion.trim().toLowerCase(),
-        status: "pending"
-      },
-      ...prev
-    ]);
+    await createConnectionMutation.mutateAsync({
+      addresseeCupidId: newConnectionCupidId.trim()
+    });
 
-    setNewConnectionName("");
-    setNewConnectionRegion("");
+    setNewConnectionCupidId("");
+  };
+
+  const onSaveNickname = async () => {
+    if (!myNickname.trim()) {
+      return;
+    }
+
+    const updated = await upsertNicknameMutation.mutateAsync(myNickname.trim());
+    setMyNickname(updated.nickname);
   };
 
   const onSendRequest = (sourceCupidateId: string, targetCupidateId: string) => {
@@ -248,10 +302,8 @@ export function useCupidateAppState() {
     errors,
     cupidates,
     connections,
-    newConnectionName,
-    setNewConnectionName,
-    newConnectionRegion,
-    setNewConnectionRegion,
+    newConnectionCupidId,
+    setNewConnectionCupidId,
     requests,
     myNickname,
     setMyNickname,
@@ -260,12 +312,17 @@ export function useCupidateAppState() {
     notificationEnabled,
     setNotificationEnabled,
     canSubmit,
+    myCupidId,
     recommendations,
     requestByPair,
     notifications,
     homeSummary,
+    isNetworkLoading: cupidatesQuery.isLoading || connectionsQuery.isLoading,
+    isMutatingNetwork: createCupidateMutation.isPending || createConnectionMutation.isPending,
+    isSavingNickname: upsertNicknameMutation.isPending,
     onRegisterCupidate,
     onAddConnection,
+    onSaveNickname,
     onSendRequest,
     onUpdateRequestStatus
   };

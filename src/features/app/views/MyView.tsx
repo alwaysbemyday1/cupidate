@@ -1,10 +1,13 @@
 ﻿import { ScrollView, Switch, Text, TextInput, View } from "react-native";
 
+import { PixelButton } from "../components/PixelButton";
 import { styles } from "../styles";
 
 type MyViewProps = {
   myNickname: string;
   onChangeMyNickname: (value: string) => void;
+  onSaveMyNickname: () => void;
+  isSavingNickname?: boolean;
   privacyNetworkOnly: boolean;
   onChangePrivacyNetworkOnly: (value: boolean) => void;
   notificationEnabled: boolean;
@@ -17,6 +20,8 @@ type MyViewProps = {
 export function MyView({
   myNickname,
   onChangeMyNickname,
+  onSaveMyNickname,
+  isSavingNickname,
   privacyNetworkOnly,
   onChangePrivacyNetworkOnly,
   notificationEnabled,
@@ -29,6 +34,7 @@ export function MyView({
     <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
       <Text style={styles.fieldLabel}>Nickname</Text>
       <TextInput value={myNickname} onChangeText={onChangeMyNickname} style={styles.input} />
+      <PixelButton label={isSavingNickname ? "Saving..." : "Save Nickname"} onPress={onSaveMyNickname} />
 
       <View style={styles.settingRow}>
         <Text style={styles.fieldLabel}>Network-only profile visibility</Text>

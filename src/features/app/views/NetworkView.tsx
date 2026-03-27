@@ -3,7 +3,6 @@
 import { PixelButton } from "../components/PixelButton";
 import { styles } from "../styles";
 import type { CupidConnection, CupidateRecord, NetworkSegment, ValidationErrors } from "../model/types";
-import { MY_CUPID_ID } from "../model/types";
 
 type NetworkViewProps = {
   networkSegment: NetworkSegment;
@@ -27,11 +26,12 @@ type NetworkViewProps = {
   errors: ValidationErrors;
   canSubmit: boolean;
   onSaveCupidate: () => void;
-  newConnectionName: string;
-  onChangeNewConnectionName: (value: string) => void;
-  newConnectionRegion: string;
-  onChangeNewConnectionRegion: (value: string) => void;
+  currentCupidId: string;
+  newConnectionCupidId: string;
+  onChangeNewConnectionCupidId: (value: string) => void;
   onAddConnection: () => void;
+  isNetworkLoading?: boolean;
+  isMutatingNetwork?: boolean;
 };
 
 export function NetworkView({
@@ -56,14 +56,17 @@ export function NetworkView({
   errors,
   canSubmit,
   onSaveCupidate,
-  newConnectionName,
-  onChangeNewConnectionName,
-  newConnectionRegion,
-  onChangeNewConnectionRegion,
-  onAddConnection
+  currentCupidId,
+  newConnectionCupidId,
+  onChangeNewConnectionCupidId,
+  onAddConnection,
+  isNetworkLoading,
+  isMutatingNetwork
 }: NetworkViewProps) {
   return (
     <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
+      {isNetworkLoading && <Text style={styles.listMeta}>Syncing network data...</Text>}
+
       <View style={styles.buttonRow}>
         <PixelButton
           label={`My Cupidates (${cupidates.length})`}
@@ -161,7 +164,7 @@ export function NetworkView({
                 </Text>
                 <Text style={styles.listMeta}>Birth Year: {item.birthYear ?? "-"}</Text>
                 <Text style={styles.listMeta}>
-                  Owner: {item.ownerCupidId === MY_CUPID_ID ? "My Cupidate" : "Connected Cupidate"}
+                  Owner: {item.ownerCupidId === currentCupidId ? "My Cupidate" : "Connected Cupidate"}
                 </Text>
                 <Text style={styles.listMeta}>Bio: {item.bio || "-"}</Text>
               </View>
@@ -172,26 +175,22 @@ export function NetworkView({
         <>
           <Text style={styles.fieldLabel}>Add Connected Cupid</Text>
           <TextInput
-            value={newConnectionName}
-            onChangeText={onChangeNewConnectionName}
-            placeholder="Cupid name"
+            value={newConnectionCupidId}
+            onChangeText={onChangeNewConnectionCupidId}
+            placeholder="Connected Cupid ID (e.g. local-cupid-a)"
             placeholderTextColor="#6D4AFF"
             style={styles.input}
           />
-          <TextInput
-            value={newConnectionRegion}
-            onChangeText={onChangeNewConnectionRegion}
-            placeholder="region (e.g. seoul)"
-            placeholderTextColor="#6D4AFF"
-            style={styles.input}
+          <PixelButton
+            label={isMutatingNetwork ? "Adding..." : "Add Connection Request"}
+            onPress={onAddConnection}
           />
-          <PixelButton label="Add Connection Request" onPress={onAddConnection} />
 
           <Text style={styles.sectionTitle}>Connected Cupid List</Text>
           {connections.map((connection) => (
             <View key={connection.cupidId} style={styles.listCard}>
               <Text style={styles.listName}>{connection.name}</Text>
-              <Text style={styles.listMeta}>Region: {connection.region}</Text>
+              <Text style={styles.listMeta}>Cupid ID: {connection.cupidId}</Text>
               <Text style={styles.listMeta}>Status: {connection.status}</Text>
             </View>
           ))}
