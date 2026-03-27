@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
+
 import App from "./App";
 
 describe("App", () => {
@@ -12,9 +13,10 @@ describe("App", () => {
   it("shows validation message when required fields are missing", () => {
     render(<App />);
 
-    fireEvent.press(screen.getByText("지인 등록 완료"));
+    fireEvent.press(screen.getByText("NETWORK"));
+    fireEvent.press(screen.getByText("Save Cupidate"));
 
-    expect(screen.getByText("이름을 입력해 주세요.")).toBeTruthy();
-    expect(screen.getByText("성별을 선택해 주세요.")).toBeTruthy();
+    expect(screen.getByText("Name is required.")).toBeTruthy();
+    expect(screen.getByText("Gender is required.")).toBeTruthy();
   });
 });

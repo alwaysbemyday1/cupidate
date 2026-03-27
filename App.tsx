@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from "react-native";
 
 import { buildMatchCandidates } from "./src/domain/matching/buildMatchCandidates";
 import type { CupidateProfile } from "./src/domain/matching/types";
@@ -8,10 +8,29 @@ import type { CupidateProfile } from "./src/domain/matching/types";
 const MY_CUPID_ID = "cupid-me";
 const CONNECTED_CUPID_ID = "cupid-connected-1";
 
+type AppView = "home" | "network" | "matching" | "my";
+type NetworkSegment = "cupidates" | "cupids";
+type MatchRequestStatus = "requested" | "accepted" | "rejected" | "completed";
+
 type CupidateRecord = CupidateProfile & {
   displayName: string;
   gender: string;
   bio: string;
+};
+
+type CupidConnection = {
+  cupidId: string;
+  name: string;
+  region: string;
+  status: "connected" | "pending" | "blocked";
+};
+
+type MatchRequest = {
+  id: string;
+  sourceCupidateId: string;
+  targetCupidateId: string;
+  status: MatchRequestStatus;
+  createdAt: string;
 };
 
 type ValidationErrors = {
@@ -26,7 +45,7 @@ function validateForm(displayName: string, birthYearInput: string, gender: strin
   const parsedBirthYear = birthYearInput ? Number(birthYearInput) : null;
 
   if (!displayName.trim()) {
-    errors.displayName = "이름을 입력해 주세요.";
+    errors.displayName = "Name is required.";
   }
 
   if (
@@ -36,11 +55,11 @@ function validateForm(displayName: string, birthYearInput: string, gender: strin
       parsedBirthYear < 1900 ||
       parsedBirthYear > currentYear)
   ) {
-    errors.birthYear = `출생연도는 1900-${currentYear} 범위여야 해요.`;
+    errors.birthYear = `Birth year must be in range 1900-${currentYear}.`;
   }
 
   if (!gender) {
-    errors.gender = "성별을 선택해 주세요.";
+    errors.gender = "Gender is required.";
   }
 
   return errors;
@@ -55,6 +74,10 @@ function parseHobbies(input: string): string[] {
     .split(",")
     .map((value) => value.trim())
     .filter(Boolean);
+}
+
+function pairKey(sourceCupidateId: string, targetCupidateId: string) {
+  return `${sourceCupidateId}:${targetCupidateId}`;
 }
 
 function PixelButton({
@@ -87,7 +110,8 @@ function SummaryCard({ label, value }: { label: string; value: string | number }
 }
 
 export default function App() {
-  const [tab, setTab] = useState<"register" | "list" | "dashboard">("register");
+  const [activeView, setActiveView] = useState<AppView>("home");
+  const [networkSegment, setNetworkSegment] = useState<NetworkSegment>("cupidates");
   const [displayName, setDisplayName] = useState("");
   const [birthYearInput, setBirthYearInput] = useState("");
   const [gender, setGender] = useState("");
@@ -97,6 +121,16 @@ export default function App() {
   const [ownerType, setOwnerType] = useState<"mine" | "connected">("mine");
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [cupidates, setCupidates] = useState<CupidateRecord[]>([]);
+  const [connections, setConnections] = useState<CupidConnection[]>([
+    { cupidId: CONNECTED_CUPID_ID, name: "Connected Cupid A", region: "seoul", status: "connected" },
+    { cupidId: "cupid-connected-2", name: "Connected Cupid B", region: "busan", status: "pending" }
+  ]);
+  const [newConnectionName, setNewConnectionName] = useState("");
+  const [newConnectionRegion, setNewConnectionRegion] = useState("");
+  const [requests, setRequests] = useState<MatchRequest[]>([]);
+  const [myNickname, setMyNickname] = useState("cupid_master");
+  const [privacyNetworkOnly, setPrivacyNetworkOnly] = useState(true);
+  const [notificationEnabled, setNotificationEnabled] = useState(true);
 
   const canSubmit = useMemo(() => displayName.trim().length > 0 && !!gender, [displayName, gender]);
 
@@ -104,6 +138,7 @@ export default function App() {
     () => cupidates.filter((item) => item.ownerCupidId === MY_CUPID_ID),
     [cupidates]
   );
+
   const connectedCupidates = useMemo(
     () => cupidates.filter((item) => item.ownerCupidId !== MY_CUPID_ID),
     [cupidates]
@@ -116,15 +151,50 @@ export default function App() {
         targets: connectedCupidates,
         currentYear: 2026,
         isConnected: (sourceOwnerCupidId, targetOwnerCupidId) =>
-          (sourceOwnerCupidId === MY_CUPID_ID && targetOwnerCupidId === CONNECTED_CUPID_ID) ||
-          (sourceOwnerCupidId === CONNECTED_CUPID_ID && targetOwnerCupidId === MY_CUPID_ID)
+          connections.some(
+            (connection) =>
+              connection.cupidId === targetOwnerCupidId &&
+              connection.status === "connected" &&
+              sourceOwnerCupidId === MY_CUPID_ID
+          )
       })
     );
 
-    return matches.slice(0, 5);
-  }, [connectedCupidates, myCupidates]);
+    return matches.slice(0, 20);
+  }, [connectedCupidates, connections, myCupidates]);
 
-  const onSubmit = () => {
+  const requestByPair = useMemo(() => {
+    const map = new Map<string, MatchRequest>();
+    requests.forEach((request) => {
+      map.set(pairKey(request.sourceCupidateId, request.targetCupidateId), request);
+    });
+    return map;
+  }, [requests]);
+
+  const notifications = useMemo(
+    () =>
+      requests
+        .slice()
+        .reverse()
+        .slice(0, 5)
+        .map(
+          (request) =>
+            `Request ${request.sourceCupidateId} -> ${request.targetCupidateId}: ${request.status.toUpperCase()}`
+        ),
+    [requests]
+  );
+
+  const homeSummary = useMemo(
+    () => ({
+      myCupidates: myCupidates.length,
+      connectedCupids: connections.filter((connection) => connection.status === "connected").length,
+      recommendations: recommendations.length,
+      pendingRequests: requests.filter((request) => request.status === "requested").length
+    }),
+    [connections, myCupidates.length, recommendations.length, requests]
+  );
+
+  const onRegisterCupidate = () => {
     const formErrors = validateForm(displayName, birthYearInput, gender);
     setErrors(formErrors);
 
@@ -161,8 +231,331 @@ export default function App() {
     setHobbiesInput("");
     setLocationInput("seoul");
     setErrors({});
-    setTab("dashboard");
   };
+
+  const onAddConnection = () => {
+    if (!newConnectionName.trim() || !newConnectionRegion.trim()) {
+      return;
+    }
+
+    setConnections((prev) => [
+      {
+        cupidId: `cupid-${Date.now()}`,
+        name: newConnectionName.trim(),
+        region: newConnectionRegion.trim().toLowerCase(),
+        status: "pending"
+      },
+      ...prev
+    ]);
+
+    setNewConnectionName("");
+    setNewConnectionRegion("");
+  };
+
+  const onSendRequest = (sourceCupidateId: string, targetCupidateId: string) => {
+    const key = pairKey(sourceCupidateId, targetCupidateId);
+    if (requestByPair.get(key)) {
+      return;
+    }
+
+    setRequests((prev) => [
+      {
+        id: `req-${Date.now()}`,
+        sourceCupidateId,
+        targetCupidateId,
+        status: "requested",
+        createdAt: new Date().toISOString()
+      },
+      ...prev
+    ]);
+  };
+
+  const onUpdateRequestStatus = (sourceCupidateId: string, targetCupidateId: string, status: MatchRequestStatus) => {
+    setRequests((prev) =>
+      prev.map((request) =>
+        request.sourceCupidateId === sourceCupidateId && request.targetCupidateId === targetCupidateId
+          ? { ...request, status }
+          : request
+      )
+    );
+  };
+
+  const renderHome = () => (
+    <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
+      <View style={styles.summaryGrid}>
+        <SummaryCard label="My Cupidates" value={homeSummary.myCupidates} />
+        <SummaryCard label="Connected Cupids" value={homeSummary.connectedCupids} />
+        <SummaryCard label="Recommendations" value={homeSummary.recommendations} />
+        <SummaryCard label="Pending Requests" value={homeSummary.pendingRequests} />
+      </View>
+
+      <Text style={styles.sectionTitle}>Notification Feed</Text>
+      {notifications.length === 0 ? (
+        <View style={styles.emptyCard}>
+          <Text style={styles.emptyText}>No notifications yet.</Text>
+          <Text style={styles.emptySubText}>Actions in Network and Matching will appear here.</Text>
+        </View>
+      ) : (
+        notifications.map((item) => (
+          <View key={item} style={styles.listCard}>
+            <Text style={styles.listMeta}>{item}</Text>
+          </View>
+        ))
+      )}
+
+      <Text style={styles.sectionTitle}>Quick Actions</Text>
+      <View style={styles.buttonRow}>
+        <PixelButton label="Go to Network" onPress={() => setActiveView("network")} />
+        <PixelButton label="Go to Matching" onPress={() => setActiveView("matching")} />
+      </View>
+    </ScrollView>
+  );
+
+  const renderNetwork = () => (
+    <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
+      <View style={styles.buttonRow}>
+        <PixelButton
+          label={`My Cupidates (${cupidates.length})`}
+          active={networkSegment === "cupidates"}
+          onPress={() => setNetworkSegment("cupidates")}
+        />
+        <PixelButton
+          label={`Connected Cupids (${connections.length})`}
+          active={networkSegment === "cupids"}
+          onPress={() => setNetworkSegment("cupids")}
+        />
+      </View>
+
+      {networkSegment === "cupidates" ? (
+        <>
+          <Text style={styles.fieldLabel}>Owner Type</Text>
+          <View style={styles.buttonRow}>
+            <PixelButton label="My Cupidate" active={ownerType === "mine"} onPress={() => setOwnerType("mine")} />
+            <PixelButton
+              label="Connected Cupidate"
+              active={ownerType === "connected"}
+              onPress={() => setOwnerType("connected")}
+            />
+          </View>
+
+          <Text style={styles.fieldLabel}>Name</Text>
+          <TextInput
+            value={displayName}
+            onChangeText={setDisplayName}
+            placeholder="e.g. Mina"
+            placeholderTextColor="#6D4AFF"
+            style={styles.input}
+          />
+          {!!errors.displayName && <Text style={styles.errorText}>{errors.displayName}</Text>}
+
+          <Text style={styles.fieldLabel}>Birth Year</Text>
+          <TextInput
+            value={birthYearInput}
+            onChangeText={setBirthYearInput}
+            keyboardType="numeric"
+            placeholder="e.g. 1998"
+            placeholderTextColor="#6D4AFF"
+            style={styles.input}
+          />
+          {!!errors.birthYear && <Text style={styles.errorText}>{errors.birthYear}</Text>}
+
+          <Text style={styles.fieldLabel}>Gender</Text>
+          <View style={styles.buttonRow}>
+            <PixelButton label="Male" active={gender === "male"} onPress={() => setGender("male")} />
+            <PixelButton label="Female" active={gender === "female"} onPress={() => setGender("female")} />
+          </View>
+          {!!errors.gender && <Text style={styles.errorText}>{errors.gender}</Text>}
+
+          <Text style={styles.fieldLabel}>Hobbies (comma separated)</Text>
+          <TextInput
+            value={hobbiesInput}
+            onChangeText={setHobbiesInput}
+            placeholder="hiking,music,coffee"
+            placeholderTextColor="#6D4AFF"
+            style={styles.input}
+          />
+
+          <Text style={styles.fieldLabel}>Location</Text>
+          <TextInput
+            value={locationInput}
+            onChangeText={setLocationInput}
+            placeholder="seoul"
+            placeholderTextColor="#6D4AFF"
+            style={styles.input}
+          />
+
+          <Text style={styles.fieldLabel}>Bio</Text>
+          <TextInput
+            value={bio}
+            onChangeText={setBio}
+            multiline
+            numberOfLines={3}
+            placeholder="A short profile summary"
+            placeholderTextColor="#6D4AFF"
+            style={[styles.input, styles.multilineInput]}
+          />
+
+          <PixelButton label="Save Cupidate" onPress={onRegisterCupidate} active={canSubmit} />
+
+          <Text style={styles.sectionTitle}>Cupidate List</Text>
+          {cupidates.length === 0 ? (
+            <View style={styles.emptyCard}>
+              <Text style={styles.emptyText}>No cupidates yet.</Text>
+            </View>
+          ) : (
+            cupidates.map((item) => (
+              <View key={item.cupidateId} style={styles.listCard}>
+                <Text style={styles.listName}>
+                  {item.displayName} ({item.gender})
+                </Text>
+                <Text style={styles.listMeta}>Birth Year: {item.birthYear ?? "-"}</Text>
+                <Text style={styles.listMeta}>
+                  Owner: {item.ownerCupidId === MY_CUPID_ID ? "My Cupidate" : "Connected Cupidate"}
+                </Text>
+                <Text style={styles.listMeta}>Bio: {item.bio || "-"}</Text>
+              </View>
+            ))
+          )}
+        </>
+      ) : (
+        <>
+          <Text style={styles.fieldLabel}>Add Connected Cupid</Text>
+          <TextInput
+            value={newConnectionName}
+            onChangeText={setNewConnectionName}
+            placeholder="Cupid name"
+            placeholderTextColor="#6D4AFF"
+            style={styles.input}
+          />
+          <TextInput
+            value={newConnectionRegion}
+            onChangeText={setNewConnectionRegion}
+            placeholder="region (e.g. seoul)"
+            placeholderTextColor="#6D4AFF"
+            style={styles.input}
+          />
+          <PixelButton label="Add Connection Request" onPress={onAddConnection} />
+
+          <Text style={styles.sectionTitle}>Connected Cupid List</Text>
+          {connections.map((connection) => (
+            <View key={connection.cupidId} style={styles.listCard}>
+              <Text style={styles.listName}>{connection.name}</Text>
+              <Text style={styles.listMeta}>Region: {connection.region}</Text>
+              <Text style={styles.listMeta}>Status: {connection.status}</Text>
+            </View>
+          ))}
+        </>
+      )}
+    </ScrollView>
+  );
+
+  const renderMatching = () => (
+    <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
+      <Text style={styles.sectionTitle}>Recommendation Board</Text>
+      {recommendations.length === 0 ? (
+        <View style={styles.emptyCard}>
+          <Text style={styles.emptyText}>No recommendations yet.</Text>
+          <Text style={styles.emptySubText}>Register my and connected cupidates first in Network.</Text>
+        </View>
+      ) : (
+        recommendations.map((item) => {
+          const key = pairKey(item.sourceCupidateId, item.targetCupidateId);
+          const request = requestByPair.get(key);
+          const sourceName =
+            cupidates.find((profile) => profile.cupidateId === item.sourceCupidateId)?.displayName ||
+            item.sourceCupidateId;
+          const targetName =
+            cupidates.find((profile) => profile.cupidateId === item.targetCupidateId)?.displayName ||
+            item.targetCupidateId;
+
+          return (
+            <View key={key} style={styles.listCard}>
+              <Text style={styles.listName}>
+                {sourceName} x {targetName}
+              </Text>
+              <Text style={styles.listMeta}>Match Rate: {item.matchScore}%</Text>
+              <Text style={styles.listMeta}>
+                Shared Hobbies: {item.reason.matchedHobbies.length ? item.reason.matchedHobbies.join(", ") : "-"}
+              </Text>
+              <Text style={styles.listMeta}>Status: {request?.status ?? "none"}</Text>
+
+              <View style={styles.buttonRow}>
+                {!request && (
+                  <PixelButton
+                    label="Request Match"
+                    onPress={() => onSendRequest(item.sourceCupidateId, item.targetCupidateId)}
+                  />
+                )}
+                {request?.status === "requested" && (
+                  <>
+                    <PixelButton
+                      label="Accept"
+                      onPress={() => onUpdateRequestStatus(item.sourceCupidateId, item.targetCupidateId, "accepted")}
+                    />
+                    <PixelButton
+                      label="Reject"
+                      onPress={() => onUpdateRequestStatus(item.sourceCupidateId, item.targetCupidateId, "rejected")}
+                    />
+                  </>
+                )}
+                {request?.status === "accepted" && (
+                  <PixelButton
+                    label="Mark Contact Shared"
+                    onPress={() => onUpdateRequestStatus(item.sourceCupidateId, item.targetCupidateId, "completed")}
+                  />
+                )}
+              </View>
+            </View>
+          );
+        })
+      )}
+
+      <Text style={styles.sectionTitle}>Match Request History</Text>
+      {requests.length === 0 ? (
+        <View style={styles.emptyCard}>
+          <Text style={styles.emptyText}>No history yet.</Text>
+        </View>
+      ) : (
+        requests.map((request) => (
+          <View key={request.id} style={styles.listCard}>
+            <Text style={styles.listMeta}>
+              {request.sourceCupidateId}
+              {" -> "}
+              {request.targetCupidateId}
+            </Text>
+            <Text style={styles.listMeta}>Status: {request.status}</Text>
+            <Text style={styles.listMeta}>Created: {request.createdAt.slice(0, 10)}</Text>
+          </View>
+        ))
+      )}
+    </ScrollView>
+  );
+
+  const renderMy = () => (
+    <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
+      <Text style={styles.fieldLabel}>Nickname</Text>
+      <TextInput value={myNickname} onChangeText={setMyNickname} style={styles.input} />
+
+      <View style={styles.settingRow}>
+        <Text style={styles.fieldLabel}>Network-only profile visibility</Text>
+        <Switch value={privacyNetworkOnly} onValueChange={setPrivacyNetworkOnly} />
+      </View>
+      <Text style={styles.listMeta}>Visibility: {privacyNetworkOnly ? "Network only" : "Private"}</Text>
+
+      <View style={styles.settingRow}>
+        <Text style={styles.fieldLabel}>Notifications</Text>
+        <Switch value={notificationEnabled} onValueChange={setNotificationEnabled} />
+      </View>
+      <Text style={styles.listMeta}>Notification status: {notificationEnabled ? "ON" : "OFF"}</Text>
+
+      <Text style={styles.sectionTitle}>Account Summary</Text>
+      <View style={styles.listCard}>
+        <Text style={styles.listMeta}>Connected Cupids: {connections.length}</Text>
+        <Text style={styles.listMeta}>Registered Cupidates: {cupidates.length}</Text>
+        <Text style={styles.listMeta}>Match Requests: {requests.length}</Text>
+      </View>
+    </ScrollView>
+  );
 
   return (
     <View style={styles.safeArea}>
@@ -179,141 +572,20 @@ export default function App() {
         </View>
 
         <View style={styles.tabRow}>
-          <PixelButton label="등록" active={tab === "register"} onPress={() => setTab("register")} />
-          <PixelButton label={`목록 (${cupidates.length})`} active={tab === "list"} onPress={() => setTab("list")} />
+          <PixelButton label="HOME" active={activeView === "home"} onPress={() => setActiveView("home")} />
+          <PixelButton label="NETWORK" active={activeView === "network"} onPress={() => setActiveView("network")} />
           <PixelButton
-            label={`대시보드 (${recommendations.length})`}
-            active={tab === "dashboard"}
-            onPress={() => setTab("dashboard")}
+            label="MATCHING"
+            active={activeView === "matching"}
+            onPress={() => setActiveView("matching")}
           />
+          <PixelButton label="MY" active={activeView === "my"} onPress={() => setActiveView("my")} />
         </View>
 
-        {tab === "register" && (
-          <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
-            <Text style={styles.fieldLabel}>소유 네트워크</Text>
-            <View style={styles.buttonRow}>
-              <PixelButton label="내 지인" active={ownerType === "mine"} onPress={() => setOwnerType("mine")} />
-              <PixelButton
-                label="연결 지인"
-                active={ownerType === "connected"}
-                onPress={() => setOwnerType("connected")}
-              />
-            </View>
-
-            <Text style={styles.fieldLabel}>이름</Text>
-            <TextInput
-              value={displayName}
-              onChangeText={setDisplayName}
-              placeholder="예: 민지"
-              placeholderTextColor="#6D4AFF"
-              style={styles.input}
-            />
-            {!!errors.displayName && <Text style={styles.errorText}>{errors.displayName}</Text>}
-
-            <Text style={styles.fieldLabel}>출생연도</Text>
-            <TextInput
-              value={birthYearInput}
-              onChangeText={setBirthYearInput}
-              keyboardType="numeric"
-              placeholder="예: 1998"
-              placeholderTextColor="#6D4AFF"
-              style={styles.input}
-            />
-            {!!errors.birthYear && <Text style={styles.errorText}>{errors.birthYear}</Text>}
-
-            <Text style={styles.fieldLabel}>성별</Text>
-            <View style={styles.buttonRow}>
-              <PixelButton label="여성" active={gender === "여성"} onPress={() => setGender("여성")} />
-              <PixelButton label="남성" active={gender === "남성"} onPress={() => setGender("남성")} />
-            </View>
-            {!!errors.gender && <Text style={styles.errorText}>{errors.gender}</Text>}
-
-            <Text style={styles.fieldLabel}>취미 (쉼표 구분)</Text>
-            <TextInput
-              value={hobbiesInput}
-              onChangeText={setHobbiesInput}
-              placeholder="예: hiking,music,coffee"
-              placeholderTextColor="#6D4AFF"
-              style={styles.input}
-            />
-
-            <Text style={styles.fieldLabel}>위치</Text>
-            <TextInput
-              value={locationInput}
-              onChangeText={setLocationInput}
-              placeholder="예: seoul"
-              placeholderTextColor="#6D4AFF"
-              style={styles.input}
-            />
-
-            <Text style={styles.fieldLabel}>소개</Text>
-            <TextInput
-              value={bio}
-              onChangeText={setBio}
-              multiline
-              numberOfLines={3}
-              placeholder="취미, 성향 등 간단 소개"
-              placeholderTextColor="#6D4AFF"
-              style={[styles.input, styles.multilineInput]}
-            />
-
-            <PixelButton label="지인 등록 완료" onPress={onSubmit} active={canSubmit} />
-          </ScrollView>
-        )}
-
-        {tab === "list" && (
-          <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
-            {cupidates.length === 0 ? (
-              <View style={styles.emptyCard}>
-                <Text style={styles.emptyText}>등록된 지인이 없습니다.</Text>
-                <Text style={styles.emptySubText}>[등록] 탭에서 첫 지인을 추가해 주세요.</Text>
-              </View>
-            ) : (
-              cupidates.map((item) => (
-                <View key={item.cupidateId} style={styles.listCard}>
-                  <Text style={styles.listName}>
-                    {item.displayName} ({item.gender})
-                  </Text>
-                  <Text style={styles.listMeta}>출생연도: {item.birthYear ?? "-"}</Text>
-                  <Text style={styles.listMeta}>네트워크: {item.ownerCupidId === MY_CUPID_ID ? "내 지인" : "연결 지인"}</Text>
-                  <Text style={styles.listMeta}>소개: {item.bio || "-"}</Text>
-                </View>
-              ))
-            )}
-          </ScrollView>
-        )}
-
-        {tab === "dashboard" && (
-          <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
-            <View style={styles.summaryGrid}>
-              <SummaryCard label="내 지인" value={myCupidates.length} />
-              <SummaryCard label="연결 지인" value={connectedCupidates.length} />
-              <SummaryCard label="전체 등록" value={cupidates.length} />
-              <SummaryCard label="추천 매칭" value={recommendations.length} />
-            </View>
-
-            <Text style={styles.sectionTitle}>추천 목록</Text>
-            {recommendations.length === 0 ? (
-              <View style={styles.emptyCard}>
-                <Text style={styles.emptyText}>추천 가능한 매칭이 아직 없어요.</Text>
-                <Text style={styles.emptySubText}>내 지인과 연결 지인을 각각 등록하면 추천이 생성됩니다.</Text>
-              </View>
-            ) : (
-              recommendations.map((item, index) => (
-                <View key={`${item.sourceCupidateId}-${item.targetCupidateId}`} style={styles.listCard}>
-                  <Text style={styles.listName}>
-                    #{index + 1} SCORE {item.matchScore}%
-                  </Text>
-                  <Text style={styles.listMeta}>출발: {item.sourceCupidateId}</Text>
-                  <Text style={styles.listMeta}>후보: {item.targetCupidateId}</Text>
-                  <Text style={styles.listMeta}>
-                    공통 취미: {item.reason.matchedHobbies.length ? item.reason.matchedHobbies.join(", ") : "-"}
-                  </Text>
-                </View>
-              ))
-            )}
-          </ScrollView>
-        )}
+        {activeView === "home" && renderHome()}
+        {activeView === "network" && renderNetwork()}
+        {activeView === "matching" && renderMatching()}
+        {activeView === "my" && renderMy()}
       </View>
     </View>
   );
@@ -365,7 +637,8 @@ const styles = StyleSheet.create({
   tabRow: {
     flexDirection: "row",
     gap: 8,
-    marginBottom: 10
+    marginBottom: 10,
+    flexWrap: "wrap"
   },
   panel: {
     flex: 1,
@@ -398,7 +671,8 @@ const styles = StyleSheet.create({
   },
   buttonRow: {
     flexDirection: "row",
-    gap: 8
+    gap: 8,
+    flexWrap: "wrap"
   },
   pixelButton: {
     borderWidth: 3,
@@ -485,5 +759,15 @@ const styles = StyleSheet.create({
     color: "#334155",
     fontFamily: "monospace",
     marginTop: 4
+  },
+  settingRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: "#000000",
+    backgroundColor: "#E0E7FF",
+    paddingHorizontal: 10,
+    paddingVertical: 8
   }
 });
