@@ -403,3 +403,36 @@ Changes:
 Verification:
 - `feature_list.json` parse check passed.
 - consolidated docs read check passed.
+
+### Task 2026-03-29-01C - Design System Fidelity Hardening
+Status: Completed
+
+Changes:
+- Re-reviewed prototype screens with a stricter implementation lens.
+- Upgraded `docs/agent/design_system.md` from summary doc to fidelity guide:
+  - prototype-derived screen analysis
+  - React Native-specific shadow/font/navigation directives
+  - canonical pink/navy/beige color-role mapping
+  - detailed pixel component rules for buttons, tab bar, slider, toggle, dropdown
+  - anti-patterns and QA checkpoints for visual validation
+
+Verification:
+- `Get-Content -Raw docs/agent/design_system.md` check passed.
+
+### Task 2026-03-29-01D - Prototype Source and Fidelity Clarification
+Status: Completed
+
+Changes:
+- Added explicit prototype source folder reference:
+  - `docs/design/`
+- Clarified that the design target is:
+  - same impression
+  - same visual language
+  - same interaction feel
+  - not a pixel-perfect screenshot copy
+- Updated:
+  - `docs/agent/design_system.md`
+  - `docs/agent/README.md`
+
+Verification:
+- UTF-8 read check passed for updated docs.

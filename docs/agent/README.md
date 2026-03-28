@@ -19,4 +19,5 @@ View specs (kept separate by request):
 - `views/my.md`
 
 Reference assets:
+- prototype folder: `docs/design/`
 - `../design/*.png`

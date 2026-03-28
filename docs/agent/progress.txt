@@ -40,6 +40,8 @@ Completed Work
 - [x] Prototype-based UI rebuild spec lock (Task 2026-03-29-01)
 - [x] Palette correction (remove ocean assumption, pink/navy lock) (Task 2026-03-29-01A)
 - [x] Agent docs consolidation (Task 2026-03-29-01B)
+- [x] Design system fidelity hardening (Task 2026-03-29-01C)
+- [x] Prototype source/fidelity clarification (Task 2026-03-29-01D)
 
 Next Tasks (Rebuild Track)
  - Task 2026-03-29-02: Pixel primitives refactor (`PixelText`, `PixelBox`, `PixelButton`, `PixelTabBar`)
@@ -298,3 +300,22 @@ Task 2026-03-29-01B (Completed)
 - Updated agent index and feature metadata references:
   - `docs/agent/README.md`
   - `docs/agent/feature_list.json`
+
+Task 2026-03-29-01C (Completed)
+- Re-analyzed prototype images with RN implementation constraints in mind.
+- Strengthened `docs/agent/design_system.md` into a fidelity-first build guide:
+  - explicit ban on RN soft shadows / `elevation`
+  - hard pixel shadow construction rules with layered `View` offsets
+  - custom pixel font usage and integration notes
+  - custom absolute bottom tab bar guidance before navigation wiring
+  - detailed component, color-role, anti-pattern, and QA checkpoint sections
+
+Task 2026-03-29-01D (Completed)
+- Clarified the prototype asset source folder in docs:
+  - `docs/design/`
+- Made the fidelity target explicit:
+  - same impression and interaction feel
+  - not a pixel-perfect screenshot clone
+- Updated:
+  - `docs/agent/design_system.md`
+  - `docs/agent/README.md`
