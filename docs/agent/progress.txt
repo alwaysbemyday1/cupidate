@@ -22,6 +22,7 @@ Completed Work
 - [x] Matching request persistence (Task 2026-03-28-04)
 - [x] Docs/data-contract alignment (Task 2026-03-28-05)
 - [x] Matching UI interaction flow tests (Task 2026-03-28-06)
+- [x] Design direction setup from visual references (Task 2026-03-28-09)
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:
@@ -34,6 +35,7 @@ Task 2026-03-28-01 (Completed)
 - Verified with tests and TypeScript check.
 
 Next Tasks
+ - Task 2026-03-28-10: apply design tokens/components to 4 views
  - Task 2026-03-28-07: add auth session bootstrap and protected data gate
  - Task 2026-03-28-08: implement connected-cupid discovery/search flow (ID input removal)
 
@@ -89,3 +91,10 @@ Task 2026-03-28-06 (Completed)
   - flow: request -> accept -> contact shared completion
 - Test uses deterministic in-memory repositories for network + matching state seeding.
 - Validates that status transitions are reflected in UI rendering.
+
+Task 2026-03-28-09 (Completed)
+- Added reference-based design direction document:
+  - `docs/agent/design_direction.md`
+- Updated agent docs index and feature metadata to include design-system direction:
+  - `docs/agent/README.md`
+  - `docs/agent/feature_list.json` (`design_system` section)

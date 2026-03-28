@@ -100,3 +100,18 @@ Changes:
 Verification:
 - `npm.cmd test` passed (now 9 suites / 21 tests).
 - `npx.cmd tsc --noEmit` passed.
+
+### Task 2026-03-28-09 - Reference-Based Design Direction
+Status: Completed
+
+Changes:
+- Added `docs/agent/design_direction.md` from provided visual references.
+- Captured concrete rules for:
+  - palette and semantic color usage
+  - typography and border treatment
+  - component behavior and motion cues
+  - anti-generic checklist
+- Updated docs index and feature metadata to include design direction.
+
+Verification:
+- JSON parse check for `feature_list.json` after metadata extension.

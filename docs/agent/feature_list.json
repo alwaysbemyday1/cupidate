@@ -130,5 +130,22 @@
         "QA and release gates"
       ]
     }
-  ]
+  ],
+  "design_system": {
+    "reference_docs": [
+      "docs/agent/design_direction.md"
+    ],
+    "style_keywords": [
+      "retro-pixel-console",
+      "sprite-first-identity",
+      "beveled-heavy-borders",
+      "navy-cyan-orange-palette"
+    ],
+    "mandatory_rules": [
+      "no-rounded-corners-default",
+      "semantic-button-variants",
+      "state-visible-ui",
+      "designed-empty-loading-error"
+    ]
+  }
 }

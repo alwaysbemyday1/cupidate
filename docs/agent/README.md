@@ -1,4 +1,4 @@
-# Agent Docs
+﻿# Agent Docs
 
 This folder is the single source of truth for agent workflow and execution records.
 
@@ -9,6 +9,7 @@ Core files:
 - `worklog.md`: chronological task-level implementation log
 - `matching_data_spec.md`: matching profile/preference/scoring spec
 - `data_contracts.md`: repository contracts and status mapping
+- `design_direction.md`: reference-based visual direction and design rules
 
 View specs:
 - `views/home.md`
