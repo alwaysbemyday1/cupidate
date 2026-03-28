@@ -1,6 +1,7 @@
-﻿import { ScrollView, Switch, Text, TextInput, View } from "react-native";
+import { ScrollView, Switch, Text, TextInput, View } from "react-native";
 
 import { PixelButton } from "../components/PixelButton";
+import { StateCard } from "../components/StateCard";
 import { styles } from "../styles";
 
 type MyViewProps = {
@@ -15,6 +16,8 @@ type MyViewProps = {
   connectionCount: number;
   cupidateCount: number;
   requestCount: number;
+  isMyLoading?: boolean;
+  myError?: string | null;
 };
 
 export function MyView({
@@ -28,10 +31,17 @@ export function MyView({
   onChangeNotificationEnabled,
   connectionCount,
   cupidateCount,
-  requestCount
+  requestCount,
+  isMyLoading,
+  myError
 }: MyViewProps) {
   return (
     <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
+      {isMyLoading ? (
+        <StateCard tone="loading" title="SYNCING PROFILE TERMINAL" description="Loading my account and settings snapshot." />
+      ) : null}
+      {myError ? <StateCard tone="error" title="PROFILE SYNC ERROR" description={myError} /> : null}
+
       <Text style={styles.fieldLabel}>Nickname</Text>
       <TextInput value={myNickname} onChangeText={onChangeMyNickname} style={styles.input} />
       <PixelButton
@@ -53,11 +63,19 @@ export function MyView({
       <Text style={styles.listMeta}>Notification status: {notificationEnabled ? "ON" : "OFF"}</Text>
 
       <Text style={styles.sectionTitle}>Account Summary</Text>
-      <View style={styles.listCard}>
-        <Text style={styles.listMeta}>Connected Cupids: {connectionCount}</Text>
-        <Text style={styles.listMeta}>Registered Cupidates: {cupidateCount}</Text>
-        <Text style={styles.listMeta}>Match Requests: {requestCount}</Text>
-      </View>
+      {connectionCount === 0 && cupidateCount === 0 && requestCount === 0 ? (
+        <StateCard
+          tone="empty"
+          title="NO ACTIVITY YET"
+          description="Start by registering cupidates and sending your first match request."
+        />
+      ) : (
+        <View style={styles.listCard}>
+          <Text style={styles.listMeta}>Connected Cupids: {connectionCount}</Text>
+          <Text style={styles.listMeta}>Registered Cupidates: {cupidateCount}</Text>
+          <Text style={styles.listMeta}>Match Requests: {requestCount}</Text>
+        </View>
+      )}
     </ScrollView>
   );
 }

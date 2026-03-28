@@ -1,6 +1,7 @@
 import { Image, ScrollView, Text, View } from "react-native";
 
 import { PixelButton } from "../components/PixelButton";
+import { StateCard } from "../components/StateCard";
 import { SummaryCard } from "../components/SummaryCard";
 import type { HomeSummary } from "../model/types";
 import { styles } from "../styles";
@@ -11,9 +12,18 @@ type HomeViewProps = {
   notifications: string[];
   onGoNetwork: () => void;
   onGoMatching: () => void;
+  isHomeLoading?: boolean;
+  homeError?: string | null;
 };
 
-export function HomeView({ homeSummary, notifications, onGoNetwork, onGoMatching }: HomeViewProps) {
+export function HomeView({
+  homeSummary,
+  notifications,
+  onGoNetwork,
+  onGoMatching,
+  isHomeLoading,
+  homeError
+}: HomeViewProps) {
   return (
     <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
       <View style={styles.heroCard}>
@@ -37,12 +47,22 @@ export function HomeView({ homeSummary, notifications, onGoNetwork, onGoMatching
         <SummaryCard label="Pending Requests" value={homeSummary.pendingRequests} />
       </View>
 
+      {isHomeLoading ? (
+        <StateCard
+          tone="loading"
+          title="SYNCING HOME FEED"
+          description="Refreshing network counters and matching activity."
+        />
+      ) : null}
+      {homeError ? <StateCard tone="error" title="HOME FEED ERROR" description={homeError} /> : null}
+
       <Text style={styles.sectionTitle}>Notification Feed</Text>
       {notifications.length === 0 ? (
-        <View style={styles.emptyCard}>
-          <Text style={styles.emptyText}>No notifications yet.</Text>
-          <Text style={styles.emptySubText}>Actions in Network and Matching will appear here.</Text>
-        </View>
+        <StateCard
+          tone="empty"
+          title="NO NOTIFICATIONS YET"
+          description="Actions in Network and Matching will appear here."
+        />
       ) : (
         notifications.map((item) => (
           <View key={item} style={styles.listCard}>

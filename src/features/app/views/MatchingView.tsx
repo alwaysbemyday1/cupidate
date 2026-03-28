@@ -1,6 +1,7 @@
-﻿import { ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 
 import { PixelButton } from "../components/PixelButton";
+import { StateCard } from "../components/StateCard";
 import { pairKey } from "../model/useCupidateAppState";
 import type { CupidateRecord, MatchRequest, MatchRequestStatus, RecommendationItem } from "../model/types";
 import { styles } from "../styles";
@@ -18,6 +19,7 @@ type MatchingViewProps = {
   ) => void | Promise<void>;
   isMatchingLoading?: boolean;
   isMutatingMatching?: boolean;
+  matchingError?: string | null;
 };
 
 export function MatchingView({
@@ -28,18 +30,27 @@ export function MatchingView({
   onSendRequest,
   onUpdateRequestStatus,
   isMatchingLoading,
-  isMutatingMatching
+  isMutatingMatching,
+  matchingError
 }: MatchingViewProps) {
   return (
     <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
-      {isMatchingLoading && <Text style={styles.listMeta}>Syncing matching requests...</Text>}
+      {isMatchingLoading ? (
+        <StateCard
+          tone="loading"
+          title="SYNCING MATCH STATUS"
+          description="Refreshing recommendation and request lifecycle data."
+        />
+      ) : null}
+      {matchingError ? <StateCard tone="error" title="MATCH BOARD ERROR" description={matchingError} /> : null}
 
       <Text style={styles.sectionTitle}>Recommendation Board</Text>
       {recommendations.length === 0 ? (
-        <View style={styles.emptyCard}>
-          <Text style={styles.emptyText}>No recommendations yet.</Text>
-          <Text style={styles.emptySubText}>Register my and connected cupidates first in Network.</Text>
-        </View>
+        <StateCard
+          tone="empty"
+          title="NO RECOMMENDATIONS YET"
+          description="Register my and connected cupidates first in Network."
+        />
       ) : (
         recommendations.map((item) => {
           const key = pairKey(item.sourceCupidateId, item.targetCupidateId);
@@ -105,9 +116,7 @@ export function MatchingView({
 
       <Text style={styles.sectionTitle}>Match Request History</Text>
       {requests.length === 0 ? (
-        <View style={styles.emptyCard}>
-          <Text style={styles.emptyText}>No history yet.</Text>
-        </View>
+        <StateCard tone="empty" title="NO MATCH HISTORY" description="Requested matches will appear in this board." />
       ) : (
         requests.map((request) => (
           <View key={request.id} style={styles.listCard}>

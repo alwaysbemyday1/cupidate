@@ -1,8 +1,9 @@
-﻿import { ScrollView, Text, TextInput, View } from "react-native";
+import { ScrollView, Text, TextInput, View } from "react-native";
 
 import { PixelButton } from "../components/PixelButton";
-import { styles } from "../styles";
+import { StateCard } from "../components/StateCard";
 import type { CupidConnection, CupidateRecord, NetworkSegment, ValidationErrors } from "../model/types";
+import { styles } from "../styles";
 
 type ConnectionSearchResult = {
   cupidId: string;
@@ -41,6 +42,7 @@ type NetworkViewProps = {
   isNetworkLoading?: boolean;
   isSearchingCupids?: boolean;
   isMutatingNetwork?: boolean;
+  networkError?: string | null;
 };
 
 export function NetworkView({
@@ -74,11 +76,15 @@ export function NetworkView({
   onAddConnection,
   isNetworkLoading,
   isSearchingCupids,
-  isMutatingNetwork
+  isMutatingNetwork,
+  networkError
 }: NetworkViewProps) {
   return (
     <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
-      {isNetworkLoading && <Text style={styles.listMeta}>Syncing network data...</Text>}
+      {isNetworkLoading ? (
+        <StateCard tone="loading" title="SYNCING NETWORK ROSTER" description="Loading cupidates and connection map." />
+      ) : null}
+      {networkError ? <StateCard tone="error" title="NETWORK SYNC ERROR" description={networkError} /> : null}
 
       <View style={styles.buttonRow}>
         <PixelButton
@@ -169,9 +175,7 @@ export function NetworkView({
 
           <Text style={styles.sectionTitle}>Cupidate List</Text>
           {cupidates.length === 0 ? (
-            <View style={styles.emptyCard}>
-              <Text style={styles.emptyText}>No cupidates yet.</Text>
-            </View>
+            <StateCard tone="empty" title="NO CUPIDATES YET" description="Register your first cupidate profile." />
           ) : (
             cupidates.map((item) => (
               <View key={item.cupidateId} style={styles.listCard}>
@@ -198,13 +202,12 @@ export function NetworkView({
             style={styles.input}
           />
 
-          {isSearchingCupids ? <Text style={styles.listMeta}>Searching cupids...</Text> : null}
+          {isSearchingCupids ? (
+            <StateCard tone="loading" title="SEARCHING CUPIDS" description="Scanning available network candidates." />
+          ) : null}
 
           {connectionSearchQuery.trim().length > 0 && connectionSearchResults.length === 0 && !isSearchingCupids ? (
-            <View style={styles.emptyCard}>
-              <Text style={styles.emptyText}>No available cupid found for this query.</Text>
-              <Text style={styles.emptySubText}>Try a different nickname keyword.</Text>
-            </View>
+            <StateCard tone="empty" title="NO MATCHED CUPID" description="No available cupid found for this query." />
           ) : null}
 
           {connectionSearchResults.map((candidate) => {
@@ -232,13 +235,21 @@ export function NetworkView({
           />
 
           <Text style={styles.sectionTitle}>Connected Cupid List</Text>
-          {connections.map((connection) => (
-            <View key={connection.cupidId} style={styles.listCard}>
-              <Text style={styles.listName}>{connection.name}</Text>
-              <Text style={styles.listMeta}>Cupid ID: {connection.cupidId}</Text>
-              <Text style={styles.listMeta}>Status: {connection.status}</Text>
-            </View>
-          ))}
+          {connections.length === 0 ? (
+            <StateCard
+              tone="empty"
+              title="NO CONNECTIONS YET"
+              description="Send your first connection request from the search results."
+            />
+          ) : (
+            connections.map((connection) => (
+              <View key={connection.cupidId} style={styles.listCard}>
+                <Text style={styles.listName}>{connection.name}</Text>
+                <Text style={styles.listMeta}>Cupid ID: {connection.cupidId}</Text>
+                <Text style={styles.listMeta}>Status: {connection.status}</Text>
+              </View>
+            ))
+          )}
         </>
       )}
     </ScrollView>

@@ -242,6 +242,41 @@ export const styles = StyleSheet.create({
     fontWeight: "800",
     fontSize: f.section
   },
+  stateCard: {
+    borderWidth: b.heavy,
+    padding: s.md,
+    gap: s.xxs
+  },
+  stateCardLoading: {
+    borderColor: c.buttonPrimary,
+    backgroundColor: c.cardBgAccent
+  },
+  stateCardEmpty: {
+    borderColor: c.border,
+    backgroundColor: c.cardBg
+  },
+  stateCardError: {
+    borderColor: c.buttonDanger,
+    backgroundColor: c.bgAlt
+  },
+  stateCardTitle: {
+    fontFamily: "monospace",
+    fontWeight: "800",
+    fontSize: 13
+  },
+  stateCardTitleLoading: {
+    color: c.titleBlue
+  },
+  stateCardTitleEmpty: {
+    color: c.textPrimary
+  },
+  stateCardTitleError: {
+    color: c.error
+  },
+  stateCardDescription: {
+    color: c.textSecondary,
+    fontFamily: "monospace"
+  },
   emptyCard: {
     borderWidth: b.heavy,
     borderColor: c.border,

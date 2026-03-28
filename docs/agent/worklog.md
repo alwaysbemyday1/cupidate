@@ -226,3 +226,23 @@ Verification:
 
 Notes:
 - This closes a major S3 hardening gap for Network interaction reliability.
+
+### Task 2026-03-28-14 - View State Card Hardening
+Status: Completed
+
+Changes:
+- Added reusable `StateCard` component with semantic tones:
+  - `loading`, `empty`, `error`
+- Added token-aligned state-card styles in shared stylesheet.
+- Integrated state cards in Home/Network/Matching/My views to replace plain text placeholders.
+- Added app-state level error aggregation and loading flags for each view family:
+  - `homeError`, `networkError`, `matchingError`, `myError`
+  - `isHomeLoading`, `isMyLoading`
+- Wired App shell prop flow for the new view-state surfaces.
+
+Verification:
+- `npm.cmd test` passed.
+- `npx.cmd tsc --noEmit` passed.
+
+Notes:
+- Empty/loading/error experiences now follow the same pixel-console visual language as primary cards.

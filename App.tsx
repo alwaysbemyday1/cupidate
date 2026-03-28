@@ -101,6 +101,8 @@ function CupidateAppShell() {
             notifications={state.notifications}
             onGoNetwork={() => state.setActiveView("network")}
             onGoMatching={() => state.setActiveView("matching")}
+            isHomeLoading={state.isHomeLoading}
+            homeError={state.homeError}
           />
         )}
 
@@ -137,6 +139,7 @@ function CupidateAppShell() {
             isNetworkLoading={state.isNetworkLoading}
             isSearchingCupids={state.isSearchingCupids}
             isMutatingNetwork={state.isMutatingNetwork}
+            networkError={state.networkError}
           />
         )}
 
@@ -150,6 +153,7 @@ function CupidateAppShell() {
             onUpdateRequestStatus={state.onUpdateRequestStatus}
             isMatchingLoading={state.isMatchingLoading}
             isMutatingMatching={state.isMutatingMatching}
+            matchingError={state.matchingError}
           />
         )}
 
@@ -166,6 +170,8 @@ function CupidateAppShell() {
             connectionCount={state.connections.length}
             cupidateCount={state.cupidates.length}
             requestCount={state.requests.length}
+            isMyLoading={state.isMyLoading}
+            myError={state.myError}
           />
         )}
       </View>

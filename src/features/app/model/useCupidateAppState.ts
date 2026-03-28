@@ -66,6 +66,33 @@ function parseHobbies(input: string): string[] {
     .filter(Boolean);
 }
 
+function getErrorMessage(error: unknown): string | null {
+  if (!error) {
+    return null;
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (typeof error === "string") {
+    return error;
+  }
+
+  return "Unknown error";
+}
+
+function firstErrorMessage(errors: unknown[]): string | null {
+  for (const error of errors) {
+    const message = getErrorMessage(error);
+    if (message) {
+      return message;
+    }
+  }
+
+  return null;
+}
+
 function mapConnectionStatus(status: string): CupidConnection["status"] {
   if (status === "accepted") {
     return "connected";
@@ -265,6 +292,47 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     [connections, myCupidates.length, recommendations.length, requests]
   );
 
+  const networkError = useMemo(
+    () =>
+      firstErrorMessage([
+        currentCupidQuery.error,
+        cupidatesQuery.error,
+        connectionsQuery.error,
+        cupidSearchQuery.error,
+        createCupidateMutation.error,
+        createConnectionMutation.error
+      ]),
+    [
+      connectionsQuery.error,
+      createConnectionMutation.error,
+      createCupidateMutation.error,
+      currentCupidQuery.error,
+      cupidSearchQuery.error,
+      cupidatesQuery.error
+    ]
+  );
+
+  const matchingError = useMemo(
+    () =>
+      firstErrorMessage([
+        matchCandidatesQuery.error,
+        requestMatchMutation.error,
+        updateMatchStatusMutation.error,
+        markContactSharedMutation.error
+      ]),
+    [
+      markContactSharedMutation.error,
+      matchCandidatesQuery.error,
+      requestMatchMutation.error,
+      updateMatchStatusMutation.error
+    ]
+  );
+
+  const myError = useMemo(
+    () => firstErrorMessage([currentCupidQuery.error, upsertNicknameMutation.error]),
+    [currentCupidQuery.error, upsertNicknameMutation.error]
+  );
+
   const onRegisterCupidate = async () => {
     if (!isDataAccessEnabled) {
       return;
@@ -439,13 +507,23 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     requestByPair,
     notifications,
     homeSummary,
+    isHomeLoading:
+      currentCupidQuery.isLoading ||
+      cupidatesQuery.isLoading ||
+      connectionsQuery.isLoading ||
+      matchCandidatesQuery.isLoading,
+    homeError: firstErrorMessage([networkError, matchingError]),
     isNetworkLoading: cupidatesQuery.isLoading || connectionsQuery.isLoading,
     isSearchingCupids: cupidSearchQuery.isLoading,
     isMutatingNetwork: createCupidateMutation.isPending || createConnectionMutation.isPending,
+    networkError,
     isMatchingLoading: matchCandidatesQuery.isLoading,
     isMutatingMatching:
       requestMatchMutation.isPending || updateMatchStatusMutation.isPending || markContactSharedMutation.isPending,
+    matchingError,
     isSavingNickname: upsertNicknameMutation.isPending,
+    isMyLoading: currentCupidQuery.isLoading,
+    myError,
     isDataAccessEnabled,
     onRegisterCupidate,
     onAddConnection,
