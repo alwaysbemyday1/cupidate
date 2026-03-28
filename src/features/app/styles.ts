@@ -41,6 +41,9 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18
   },
+  gateForm: {
+    gap: s.xxs
+  },
   gateHint: {
     color: c.textMuted,
     fontFamily: "monospace",

@@ -38,7 +38,13 @@ function CupidateAppShell() {
             </View>
           </View>
 
-          <AuthRequiredView isLoading={authGate.isLoading} error={authGate.error} onRefresh={authGate.refresh} />
+          <AuthRequiredView
+            isLoading={authGate.isLoading}
+            error={authGate.error}
+            onRefresh={authGate.refresh}
+            onSignInWithPassword={authGate.signInWithPassword}
+            onSignUpWithPassword={authGate.signUpWithPassword}
+          />
         </View>
       </View>
     );

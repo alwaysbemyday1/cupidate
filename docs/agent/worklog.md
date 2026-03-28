@@ -187,3 +187,23 @@ Verification:
 
 Notes:
 - Hero strip now uses real visual identity and can be extended to frame-based animation in a follow-up task.
+
+### Task 2026-03-28-12 - Locked State Direct Auth CTA
+Status: Completed
+
+Changes:
+- Extended auth gate hook with interactive auth actions:
+  - `signInWithPassword(email, password)`
+  - `signUpWithPassword(email, password)`
+- Upgraded lock screen UI from refresh-only to direct auth form:
+  - email/password fields
+  - Sign In and Create Account CTAs
+  - inline input validation and auth feedback
+- Wired app shell to provide auth callbacks to `AuthRequiredView`.
+
+Verification:
+- `npm.cmd test` passed.
+- `npx.cmd tsc --noEmit` passed.
+
+Notes:
+- Users can now attempt login immediately from the lock state without leaving the app.

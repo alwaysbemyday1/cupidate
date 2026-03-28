@@ -1,5 +1,5 @@
-﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { isSupabaseConfigured, supabase } from "../../../lib/supabase";
 
@@ -13,6 +13,8 @@ type UseAuthSessionGateResult = {
   error: string | null;
   canAccessProtectedData: boolean;
   refresh: () => Promise<void>;
+  signInWithPassword: (email: string, password: string) => Promise<string>;
+  signUpWithPassword: (email: string, password: string) => Promise<string>;
 };
 
 async function fetchSession(): Promise<Session | null> {
@@ -55,6 +57,56 @@ export function useAuthSessionGate(): UseAuthSessionGateResult {
       setIsLoading(false);
     }
   }, [mode]);
+
+  const signInWithPassword = useCallback(
+    async (email: string, password: string) => {
+      if (mode !== "supabase" || !supabase) {
+        return "Auth gate is disabled in local mode.";
+      }
+
+      setError(null);
+
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (signInError) {
+        throw new Error(signInError.message);
+      }
+
+      await refresh();
+      return "Signed in successfully.";
+    },
+    [mode, refresh]
+  );
+
+  const signUpWithPassword = useCallback(
+    async (email: string, password: string) => {
+      if (mode !== "supabase" || !supabase) {
+        return "Auth gate is disabled in local mode.";
+      }
+
+      setError(null);
+
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password
+      });
+
+      if (signUpError) {
+        throw new Error(signUpError.message);
+      }
+
+      if (data.session?.user) {
+        await refresh();
+        return "Account created and signed in.";
+      }
+
+      return "Account created. Verify email, then sign in.";
+    },
+    [mode, refresh]
+  );
 
   useEffect(() => {
     if (mode !== "supabase" || !supabase) {
@@ -123,6 +175,8 @@ export function useAuthSessionGate(): UseAuthSessionGateResult {
     userId: session?.user?.id ?? null,
     error,
     canAccessProtectedData,
-    refresh
+    refresh,
+    signInWithPassword,
+    signUpWithPassword
   };
 }
