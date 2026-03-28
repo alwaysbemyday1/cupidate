@@ -122,10 +122,14 @@ function CupidateAppShell() {
             canSubmit={state.canSubmit}
             onSaveCupidate={state.onRegisterCupidate}
             currentCupidId={state.myCupidId}
-            newConnectionCupidId={state.newConnectionCupidId}
-            onChangeNewConnectionCupidId={state.setNewConnectionCupidId}
+            connectionSearchQuery={state.connectionSearchQuery}
+            onChangeConnectionSearchQuery={state.setConnectionSearchQuery}
+            connectionSearchResults={state.connectionSearchResults}
+            selectedConnectionCupidId={state.selectedConnectionCupidId}
+            onSelectConnectionCupid={state.setSelectedConnectionCupidId}
             onAddConnection={state.onAddConnection}
             isNetworkLoading={state.isNetworkLoading}
+            isSearchingCupids={state.isSearchingCupids}
             isMutatingNetwork={state.isMutatingNetwork}
           />
         )}

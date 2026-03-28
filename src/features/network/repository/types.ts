@@ -7,6 +7,11 @@ export type CurrentCupid = {
   nickname: string;
 };
 
+export type DiscoverableCupid = {
+  id: string;
+  nickname: string;
+};
+
 export type NetworkCupidate = {
   id: string;
   ownerCupidId: string;
@@ -51,6 +56,7 @@ export type UpdateConnectionStatusInput = {
 
 export interface NetworkRepository {
   getCurrentCupid(): Promise<CurrentCupid | null>;
+  searchCupids(query: string): Promise<DiscoverableCupid[]>;
   upsertCurrentCupidNickname(nickname: string): Promise<CurrentCupid>;
   listCupidates(): Promise<NetworkCupidate[]>;
   createCupidate(input: CreateCupidateInput): Promise<NetworkCupidate>;

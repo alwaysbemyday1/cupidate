@@ -11,7 +11,8 @@ export const networkQueryKeys = {
   root: ["network"] as const,
   currentCupid: () => [...networkQueryKeys.root, "currentCupid"] as const,
   cupidates: () => [...networkQueryKeys.root, "cupidates"] as const,
-  connections: () => [...networkQueryKeys.root, "connections"] as const
+  connections: () => [...networkQueryKeys.root, "connections"] as const,
+  cupidSearch: (query: string) => [...networkQueryKeys.root, "cupidSearch", query] as const
 };
 
 type QueryHookOptions = {
@@ -39,6 +40,14 @@ export function useConnectionsQuery(options?: QueryHookOptions) {
     queryKey: networkQueryKeys.connections(),
     queryFn: () => getNetworkRepository().listConnections(),
     enabled: options?.enabled ?? true
+  });
+}
+
+export function useSearchCupidsQuery(query: string, options?: QueryHookOptions) {
+  return useQuery({
+    queryKey: networkQueryKeys.cupidSearch(query),
+    queryFn: () => getNetworkRepository().searchCupids(query),
+    enabled: (options?.enabled ?? true) && query.trim().length > 0
   });
 }
 

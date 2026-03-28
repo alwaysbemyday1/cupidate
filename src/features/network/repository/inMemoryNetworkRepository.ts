@@ -2,6 +2,7 @@
   CreateConnectionInput,
   CreateCupidateInput,
   CurrentCupid,
+  DiscoverableCupid,
   NetworkConnection,
   NetworkCupidate,
   NetworkRepository,
@@ -45,6 +46,35 @@ export class InMemoryNetworkRepository implements NetworkRepository {
 
   async getCurrentCupid(): Promise<CurrentCupid | null> {
     return this.currentCupid;
+  }
+
+  async searchCupids(query: string): Promise<DiscoverableCupid[]> {
+    const normalized = query.trim().toLowerCase();
+
+    if (!normalized) {
+      return [];
+    }
+
+    const connectedCupidIds = new Set(
+      this.connections
+        .filter(
+          (item) => item.requesterCupidId === this.currentCupid.id || item.addresseeCupidId === this.currentCupid.id
+        )
+        .map((item) => (item.requesterCupidId === this.currentCupid.id ? item.addresseeCupidId : item.requesterCupidId))
+    );
+
+    return Array.from(this.cupidsById.values())
+      .filter((item) => item.id !== this.currentCupid.id)
+      .filter((item) => !connectedCupidIds.has(item.id))
+      .filter(
+        (item) => item.nickname.toLowerCase().includes(normalized) || item.id.toLowerCase().includes(normalized)
+      )
+      .sort((a, b) => a.nickname.localeCompare(b.nickname))
+      .slice(0, 20)
+      .map((item) => ({
+        id: item.id,
+        nickname: item.nickname
+      }));
   }
 
   async upsertCurrentCupidNickname(nickname: string): Promise<CurrentCupid> {

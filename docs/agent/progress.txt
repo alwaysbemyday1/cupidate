@@ -25,6 +25,7 @@ Completed Work
 - [x] Design direction setup from visual references (Task 2026-03-28-09)
 - [x] First-pass pixel-console theme implementation (Task 2026-03-28-10)
 - [x] Auth session bootstrap and protected data gate (Task 2026-03-28-07)
+- [x] Connected-cupid discovery/search flow (Task 2026-03-28-08)
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:
@@ -37,9 +38,9 @@ Task 2026-03-28-01 (Completed)
 - Verified with tests and TypeScript check.
 
 Next Tasks
- - Task 2026-03-28-08: implement connected-cupid discovery/search flow (ID input removal)
  - Task 2026-03-28-11: replace placeholder hero frames with actual cupid sprite assets
  - Task 2026-03-28-12: improve locked-state UX with direct login CTA
+ - Task 2026-03-28-13: add dedicated Network discovery interaction tests
 
 Task 2026-03-28-02 (Completed)
 - Added `src/features/network/repository` data layer:
@@ -121,3 +122,13 @@ Task 2026-03-28-07 (Completed)
   - `src/features/network/hooks/useNetworkData.ts`
   - `src/features/matching/hooks/useMatchingData.ts`
 - App state now accepts `isDataAccessEnabled` and safely no-ops protected mutations when access is blocked.
+
+Task 2026-03-28-08 (Completed)
+- Removed direct connected-cupid ID input in Network view.
+- Added connected-cupid discovery search flow:
+  - repository contract extended with `searchCupids(query)`
+  - in-memory/supabase implementations updated
+  - query hook added: `useSearchCupidsQuery`
+  - app-state now manages search query, result list, and selected cupid
+  - Network view now supports search -> select -> request UX
+- Added in-memory repository test coverage for discovery search behavior.

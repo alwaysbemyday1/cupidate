@@ -4,6 +4,11 @@ import { PixelButton } from "../components/PixelButton";
 import { styles } from "../styles";
 import type { CupidConnection, CupidateRecord, NetworkSegment, ValidationErrors } from "../model/types";
 
+type ConnectionSearchResult = {
+  cupidId: string;
+  nickname: string;
+};
+
 type NetworkViewProps = {
   networkSegment: NetworkSegment;
   onChangeNetworkSegment: (segment: NetworkSegment) => void;
@@ -27,10 +32,14 @@ type NetworkViewProps = {
   canSubmit: boolean;
   onSaveCupidate: () => void | Promise<void>;
   currentCupidId: string;
-  newConnectionCupidId: string;
-  onChangeNewConnectionCupidId: (value: string) => void;
+  connectionSearchQuery: string;
+  onChangeConnectionSearchQuery: (value: string) => void;
+  connectionSearchResults: ConnectionSearchResult[];
+  selectedConnectionCupidId: string | null;
+  onSelectConnectionCupid: (cupidId: string) => void;
   onAddConnection: () => void | Promise<void>;
   isNetworkLoading?: boolean;
+  isSearchingCupids?: boolean;
   isMutatingNetwork?: boolean;
 };
 
@@ -57,10 +66,14 @@ export function NetworkView({
   canSubmit,
   onSaveCupidate,
   currentCupidId,
-  newConnectionCupidId,
-  onChangeNewConnectionCupidId,
+  connectionSearchQuery,
+  onChangeConnectionSearchQuery,
+  connectionSearchResults,
+  selectedConnectionCupidId,
+  onSelectConnectionCupid,
   onAddConnection,
   isNetworkLoading,
+  isSearchingCupids,
   isMutatingNetwork
 }: NetworkViewProps) {
   return (
@@ -176,14 +189,42 @@ export function NetworkView({
         </>
       ) : (
         <>
-          <Text style={styles.fieldLabel}>Add Connected Cupid</Text>
+          <Text style={styles.fieldLabel}>Search Cupid by Nickname</Text>
           <TextInput
-            value={newConnectionCupidId}
-            onChangeText={onChangeNewConnectionCupidId}
-            placeholder="Connected Cupid ID (e.g. local-cupid-a)"
+            value={connectionSearchQuery}
+            onChangeText={onChangeConnectionSearchQuery}
+            placeholder="e.g. connected_a"
             placeholderTextColor="#6D4AFF"
             style={styles.input}
           />
+
+          {isSearchingCupids ? <Text style={styles.listMeta}>Searching cupids...</Text> : null}
+
+          {connectionSearchQuery.trim().length > 0 && connectionSearchResults.length === 0 && !isSearchingCupids ? (
+            <View style={styles.emptyCard}>
+              <Text style={styles.emptyText}>No available cupid found for this query.</Text>
+              <Text style={styles.emptySubText}>Try a different nickname keyword.</Text>
+            </View>
+          ) : null}
+
+          {connectionSearchResults.map((candidate) => {
+            const selected = selectedConnectionCupidId === candidate.cupidId;
+
+            return (
+              <View key={candidate.cupidId} style={styles.listCard}>
+                <Text style={styles.listName}>{candidate.nickname}</Text>
+                <Text style={styles.listMeta}>Cupid ID: {candidate.cupidId}</Text>
+                <View style={styles.buttonRow}>
+                  <PixelButton
+                    label={selected ? "Selected" : "Select"}
+                    variant={selected ? "success" : "neutral"}
+                    onPress={() => onSelectConnectionCupid(candidate.cupidId)}
+                  />
+                </View>
+              </View>
+            );
+          })}
+
           <PixelButton
             label={isMutatingNetwork ? "Adding..." : "Add Connection Request"}
             variant="warning"

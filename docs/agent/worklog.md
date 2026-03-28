@@ -149,3 +149,23 @@ Changes:
 Verification:
 - `npm.cmd test` passed.
 - `npx.cmd tsc --noEmit` passed.
+
+### Task 2026-03-28-08 - Connected Cupid Discovery/Search Flow
+Status: Completed
+
+Changes:
+- Replaced Network direct ID input with search-and-select flow for connected cupid requests.
+- Extended network repository contract with `searchCupids(query)`.
+- Implemented search on both backends:
+  - `inMemoryNetworkRepository.ts`
+  - `supabaseNetworkRepository.ts`
+- Added `useSearchCupidsQuery` hook and key.
+- Updated app-state and Network view props for:
+  - search query input
+  - result candidates
+  - selected candidate state
+- Added repository test for discovery search filtering behavior.
+
+Verification:
+- `npm.cmd test` passed (9 suites / 22 tests).
+- `npx.cmd tsc --noEmit` passed.

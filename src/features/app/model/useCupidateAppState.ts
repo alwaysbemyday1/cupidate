@@ -13,10 +13,10 @@ import {
   useCreateCupidateMutation,
   useCupidatesQuery,
   useCurrentCupidQuery,
+  useSearchCupidsQuery,
   useUpsertCurrentCupidNicknameMutation
 } from "../../network/hooks/useNetworkData";
 import {
-  CONNECTED_CUPID_ID,
   type AppView,
   type CupidConnection,
   type CupidateRecord,
@@ -114,7 +114,8 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
   const [locationInput, setLocationInput] = useState("seoul");
   const [ownerType, setOwnerType] = useState<"mine" | "connected">("mine");
   const [errors, setErrors] = useState<ValidationErrors>({});
-  const [newConnectionCupidId, setNewConnectionCupidId] = useState(CONNECTED_CUPID_ID);
+  const [connectionSearchQuery, setConnectionSearchQuery] = useState("");
+  const [selectedConnectionCupidId, setSelectedConnectionCupidId] = useState<string | null>(null);
   const [myNickname, setMyNickname] = useState("cupid_master");
   const [privacyNetworkOnly, setPrivacyNetworkOnly] = useState(true);
   const [notificationEnabled, setNotificationEnabled] = useState(true);
@@ -123,6 +124,9 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
   const currentCupidQuery = useCurrentCupidQuery({ enabled: isDataAccessEnabled });
   const cupidatesQuery = useCupidatesQuery({ enabled: isDataAccessEnabled });
   const connectionsQuery = useConnectionsQuery({ enabled: isDataAccessEnabled });
+  const cupidSearchQuery = useSearchCupidsQuery(connectionSearchQuery, {
+    enabled: isDataAccessEnabled && networkSegment === "cupids"
+  });
   const matchCandidatesQuery = useMatchCandidatesQuery({ enabled: isDataAccessEnabled });
 
   const createCupidateMutation = useCreateCupidateMutation();
@@ -172,6 +176,23 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
         status: mapConnectionStatus(item.status)
       })),
     [connectionsQuery.data]
+  );
+
+  const existingConnectionCupidIds = useMemo(
+    () => new Set(connections.map((item) => item.cupidId)),
+    [connections]
+  );
+
+  const connectionSearchResults = useMemo(
+    () =>
+      (cupidSearchQuery.data ?? [])
+        .filter((item) => item.id !== myCupidId)
+        .filter((item) => !existingConnectionCupidIds.has(item.id))
+        .map((item) => ({
+          cupidId: item.id,
+          nickname: item.nickname
+        })),
+    [cupidSearchQuery.data, existingConnectionCupidIds, myCupidId]
   );
 
   const myCupidates = useMemo(
@@ -286,15 +307,16 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       return;
     }
 
-    if (!newConnectionCupidId.trim()) {
+    if (!selectedConnectionCupidId) {
       return;
     }
 
     await createConnectionMutation.mutateAsync({
-      addresseeCupidId: newConnectionCupidId.trim()
+      addresseeCupidId: selectedConnectionCupidId
     });
 
-    setNewConnectionCupidId("");
+    setConnectionSearchQuery("");
+    setSelectedConnectionCupidId(null);
   };
 
   const onSaveNickname = async () => {
@@ -399,8 +421,11 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     errors,
     cupidates,
     connections,
-    newConnectionCupidId,
-    setNewConnectionCupidId,
+    connectionSearchQuery,
+    setConnectionSearchQuery,
+    selectedConnectionCupidId,
+    setSelectedConnectionCupidId,
+    connectionSearchResults,
     requests,
     myNickname,
     setMyNickname,
@@ -415,6 +440,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     notifications,
     homeSummary,
     isNetworkLoading: cupidatesQuery.isLoading || connectionsQuery.isLoading,
+    isSearchingCupids: cupidSearchQuery.isLoading,
     isMutatingNetwork: createCupidateMutation.isPending || createConnectionMutation.isPending,
     isMatchingLoading: matchCandidatesQuery.isLoading,
     isMutatingMatching:

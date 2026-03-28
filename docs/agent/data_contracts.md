@@ -8,6 +8,8 @@ Location: `src/features/network/repository/types.ts`
 ### Primary entities
 - `CurrentCupid`
   - `id`, `nickname`
+- `DiscoverableCupid`
+  - `id`, `nickname`
 - `NetworkCupidate`
   - `id`, `ownerCupidId`, `displayName`, `birthYear`, `gender`, `bio`, `preferences`, `createdAt`, `updatedAt`
 - `NetworkConnection`
@@ -16,6 +18,7 @@ Location: `src/features/network/repository/types.ts`
 
 ### Operations
 - `getCurrentCupid()`
+- `searchCupids(query)`
 - `upsertCurrentCupidNickname(nickname)`
 - `listCupidates()`
 - `createCupidate(input)`

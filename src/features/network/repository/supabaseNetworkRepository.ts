@@ -4,6 +4,7 @@ import type {
   CreateConnectionInput,
   CreateCupidateInput,
   CurrentCupid,
+  DiscoverableCupid,
   NetworkConnection,
   NetworkCupidate,
   NetworkRepository,
@@ -124,6 +125,32 @@ export class SupabaseNetworkRepository implements NetworkRepository {
       id: data.id,
       nickname: data.nickname
     };
+  }
+
+  async searchCupids(query: string): Promise<DiscoverableCupid[]> {
+    const trimmed = query.trim();
+    if (!trimmed) {
+      return [];
+    }
+
+    const userId = await getRequiredUserId(this.client);
+    const { data, error } = await this.client
+      .from("cupids")
+      .select("id,nickname")
+      .neq("id", userId)
+      .ilike("nickname", `%${trimmed}%`)
+      .order("nickname", { ascending: true })
+      .limit(20)
+      .returns<CupidRow[]>();
+
+    if (error) {
+      throw error;
+    }
+
+    return data.map((item) => ({
+      id: item.id,
+      nickname: item.nickname
+    }));
   }
 
   async upsertCurrentCupidNickname(nickname: string): Promise<CurrentCupid> {

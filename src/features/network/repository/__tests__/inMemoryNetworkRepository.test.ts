@@ -52,4 +52,29 @@ describe("InMemoryNetworkRepository", () => {
     expect(updated.status).toBe("accepted");
     expect(updated.respondedAt).toBeTruthy();
   });
+
+  it("searches discoverable cupids by nickname", async () => {
+    const repository = new InMemoryNetworkRepository({
+      cupids: [
+        { id: "local-cupid-c", nickname: "jupiter" },
+        { id: "local-cupid-d", nickname: "juno" }
+      ],
+      connections: [
+        {
+          id: "conn-existing",
+          requesterCupidId: "local-cupid-me",
+          addresseeCupidId: "local-cupid-a",
+          status: "accepted",
+          respondedAt: null,
+          createdAt: "2026-03-28T00:00:00.000Z",
+          updatedAt: "2026-03-28T00:00:00.000Z"
+        }
+      ]
+    });
+
+    const results = await repository.searchCupids("ju");
+
+    expect(results.map((item) => item.nickname)).toEqual(["juno", "jupiter"]);
+    expect(results.some((item) => item.id === "local-cupid-a")).toBe(false);
+  });
 });
