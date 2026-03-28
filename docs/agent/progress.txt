@@ -28,6 +28,7 @@ Completed Work
 - [x] Connected-cupid discovery/search flow (Task 2026-03-28-08)
 - [x] Hero sprite asset integration (Task 2026-03-28-11)
 - [x] Locked-state UX with direct auth CTA (Task 2026-03-28-12)
+- [x] Network discovery interaction test coverage (Task 2026-03-28-13)
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:
@@ -40,9 +41,9 @@ Task 2026-03-28-01 (Completed)
 - Verified with tests and TypeScript check.
 
 Next Tasks
- - Task 2026-03-28-13: add dedicated Network discovery interaction tests
  - Task 2026-03-28-14: add empty/loading/error state cards per view based on design direction
  - Task 2026-03-28-15: add lightweight sprite frame loop animation on Home hero strip
+ - Task 2026-03-28-16: add Auth gate UI interaction tests (validation/sign-in error/success messaging)
 
 Task 2026-03-28-02 (Completed)
 - Added `src/features/network/repository` data layer:
@@ -157,3 +158,13 @@ Task 2026-03-28-12 (Completed)
   - Create Account button
   - actionable auth feedback and errors
 - Wired App shell to pass auth action callbacks into gate view.
+
+Task 2026-03-28-13 (Completed)
+- Added dedicated app-level interaction tests for Network discovery flow.
+- New test file:
+  - `src/features/app/__tests__/networkDiscoveryFlow.test.tsx`
+- Covered scenarios:
+  - no-result empty state after nickname query
+  - search -> select -> add connection request flow
+  - post-request state update checks (`Connected Cupids (1)`, `Status: pending`)
+- Uses deterministic in-memory repositories for stable test behavior.

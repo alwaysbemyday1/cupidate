@@ -207,3 +207,22 @@ Verification:
 
 Notes:
 - Users can now attempt login immediately from the lock state without leaving the app.
+
+### Task 2026-03-28-13 - Network Discovery Interaction Tests
+Status: Completed
+
+Changes:
+- Added app-level Network discovery flow tests:
+  - `src/features/app/__tests__/networkDiscoveryFlow.test.tsx`
+- Covered two scenarios:
+  - empty discovery feedback when no cupid matches query
+  - full interaction path: search -> select -> add connection request
+- Assertions include UI state transitions for query reset and pending connection rendering.
+
+Verification:
+- `npm.cmd test -- networkDiscoveryFlow.test.tsx` passed.
+- `npm.cmd test` passed.
+- `npx.cmd tsc --noEmit` passed.
+
+Notes:
+- This closes a major S3 hardening gap for Network interaction reliability.
