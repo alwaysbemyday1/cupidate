@@ -467,6 +467,67 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     }
   };
 
+  const onRetryHome = async () => {
+    if (!isDataAccessEnabled) {
+      return;
+    }
+
+    createCupidateMutation.reset();
+    createConnectionMutation.reset();
+    requestMatchMutation.reset();
+    updateMatchStatusMutation.reset();
+    markContactSharedMutation.reset();
+
+    await Promise.all([
+      currentCupidQuery.refetch(),
+      cupidatesQuery.refetch(),
+      connectionsQuery.refetch(),
+      matchCandidatesQuery.refetch()
+    ]);
+  };
+
+  const onRetryNetwork = async () => {
+    if (!isDataAccessEnabled) {
+      return;
+    }
+
+    createCupidateMutation.reset();
+    createConnectionMutation.reset();
+
+    const tasks: Promise<unknown>[] = [
+      currentCupidQuery.refetch(),
+      cupidatesQuery.refetch(),
+      connectionsQuery.refetch()
+    ];
+
+    if (connectionSearchQuery.trim().length > 0 && networkSegment === "cupids") {
+      tasks.push(cupidSearchQuery.refetch());
+    }
+
+    await Promise.all(tasks);
+  };
+
+  const onRetryMatching = async () => {
+    if (!isDataAccessEnabled) {
+      return;
+    }
+
+    requestMatchMutation.reset();
+    updateMatchStatusMutation.reset();
+    markContactSharedMutation.reset();
+
+    await Promise.all([matchCandidatesQuery.refetch(), cupidatesQuery.refetch(), connectionsQuery.refetch()]);
+  };
+
+  const onRetryMy = async () => {
+    if (!isDataAccessEnabled) {
+      return;
+    }
+
+    upsertNicknameMutation.reset();
+    await currentCupidQuery.refetch();
+  };
+
   return {
     activeView,
     setActiveView,
@@ -529,6 +590,10 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     onAddConnection,
     onSaveNickname,
     onSendRequest,
-    onUpdateRequestStatus
+    onUpdateRequestStatus,
+    onRetryHome,
+    onRetryNetwork,
+    onRetryMatching,
+    onRetryMy
   };
 }

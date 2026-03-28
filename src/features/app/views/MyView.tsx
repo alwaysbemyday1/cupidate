@@ -18,6 +18,7 @@ type MyViewProps = {
   requestCount: number;
   isMyLoading?: boolean;
   myError?: string | null;
+  onRetryMyError?: () => void | Promise<void>;
 };
 
 export function MyView({
@@ -33,14 +34,24 @@ export function MyView({
   cupidateCount,
   requestCount,
   isMyLoading,
-  myError
+  myError,
+  onRetryMyError
 }: MyViewProps) {
   return (
     <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
       {isMyLoading ? (
         <StateCard tone="loading" title="SYNCING PROFILE TERMINAL" description="Loading my account and settings snapshot." />
       ) : null}
-      {myError ? <StateCard tone="error" title="PROFILE SYNC ERROR" description={myError} /> : null}
+      {myError ? (
+        <StateCard
+          tone="error"
+          title="PROFILE SYNC ERROR"
+          description={myError}
+          actionLabel="Retry Profile Sync"
+          actionVariant="warning"
+          onAction={onRetryMyError}
+        />
+      ) : null}
 
       <Text style={styles.fieldLabel}>Nickname</Text>
       <TextInput value={myNickname} onChangeText={onChangeMyNickname} style={styles.input} />

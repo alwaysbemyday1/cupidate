@@ -43,6 +43,7 @@ type NetworkViewProps = {
   isSearchingCupids?: boolean;
   isMutatingNetwork?: boolean;
   networkError?: string | null;
+  onRetryNetworkError?: () => void | Promise<void>;
 };
 
 export function NetworkView({
@@ -77,14 +78,24 @@ export function NetworkView({
   isNetworkLoading,
   isSearchingCupids,
   isMutatingNetwork,
-  networkError
+  networkError,
+  onRetryNetworkError
 }: NetworkViewProps) {
   return (
     <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
       {isNetworkLoading ? (
         <StateCard tone="loading" title="SYNCING NETWORK ROSTER" description="Loading cupidates and connection map." />
       ) : null}
-      {networkError ? <StateCard tone="error" title="NETWORK SYNC ERROR" description={networkError} /> : null}
+      {networkError ? (
+        <StateCard
+          tone="error"
+          title="NETWORK SYNC ERROR"
+          description={networkError}
+          actionLabel="Retry Network Sync"
+          actionVariant="warning"
+          onAction={onRetryNetworkError}
+        />
+      ) : null}
 
       <View style={styles.buttonRow}>
         <PixelButton

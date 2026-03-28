@@ -295,6 +295,11 @@ export const styles = StyleSheet.create({
     color: c.textSecondary,
     fontFamily: "monospace"
   },
+  stateCardActionRow: {
+    marginTop: s.xxs,
+    flexDirection: "row",
+    gap: s.xs
+  },
   emptyCard: {
     borderWidth: b.heavy,
     borderColor: c.border,

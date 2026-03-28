@@ -286,3 +286,22 @@ Verification:
 
 Notes:
 - Auth lock-screen flow now has direct behavior coverage before adding retry actions.
+
+### Task 2026-03-28-17/18 - Retry Action Wiring
+Status: Completed
+
+Changes:
+- Extended `StateCard` with optional action button support.
+- Added per-view retry CTA on error cards:
+  - Home, Network, Matching, My
+- Added app-state retry handlers for each view domain:
+  - `onRetryHome`, `onRetryNetwork`, `onRetryMatching`, `onRetryMy`
+- Retry handlers reset mutation errors and refetch relevant queries.
+- Wired retry callbacks through `App.tsx` into each view.
+
+Verification:
+- `npm.cmd test` passed.
+- `npx.cmd tsc --noEmit` passed.
+
+Notes:
+- Recoverable sync failures now have immediate in-context recovery actions.

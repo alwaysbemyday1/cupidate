@@ -32,6 +32,8 @@ Completed Work
 - [x] View-level empty/loading/error state cards (Task 2026-03-28-14)
 - [x] Home hero sprite loop animation (Task 2026-03-28-15)
 - [x] Auth gate interaction test coverage (Task 2026-03-28-16)
+- [x] Retry action CTA on error states (Task 2026-03-28-17)
+- [x] App-state retry wiring for view state cards (Task 2026-03-28-18)
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:
@@ -44,9 +46,9 @@ Task 2026-03-28-01 (Completed)
 - Verified with tests and TypeScript check.
 
 Next Tasks
- - Task 2026-03-28-17: add per-view retry actions for recoverable sync errors
- - Task 2026-03-28-18: wire retry handlers from app-state into state cards for network/matching/my
  - Task 2026-03-28-19: add retry interaction tests for network/matching/my error states
+ - Task 2026-03-28-20: add loading-state action lock to prevent duplicate retry presses
+ - Task 2026-03-28-21: add retry telemetry hooks for sync error observability
 
 Task 2026-03-28-02 (Completed)
 - Added `src/features/network/repository` data layer:
@@ -204,3 +206,22 @@ Task 2026-03-28-16 (Completed)
   - loading-state action blocking
 - Stabilized Network discovery test timeout under full suite run:
   - `src/features/app/__tests__/networkDiscoveryFlow.test.tsx` set to `15_000ms`
+
+Task 2026-03-28-17 (Completed)
+- Added retry CTA support to designed error state cards across views.
+- `StateCard` now supports optional action button (`actionLabel`, `actionVariant`, `onAction`).
+- Applied error retry buttons in all core views:
+  - Home: `Retry Home Sync`
+  - Network: `Retry Network Sync`
+  - Matching: `Retry Match Sync`
+  - My: `Retry Profile Sync`
+
+Task 2026-03-28-18 (Completed)
+- Wired retry handlers from app-state into view state cards.
+- Added retry callbacks in `useCupidateAppState`:
+  - `onRetryHome`
+  - `onRetryNetwork`
+  - `onRetryMatching`
+  - `onRetryMy`
+- Retry behavior resets relevant mutation error states and refetches related query data.
+- App shell now passes retry handlers into Home/Network/Matching/My views.

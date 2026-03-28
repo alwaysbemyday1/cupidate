@@ -20,6 +20,7 @@ type MatchingViewProps = {
   isMatchingLoading?: boolean;
   isMutatingMatching?: boolean;
   matchingError?: string | null;
+  onRetryMatchingError?: () => void | Promise<void>;
 };
 
 export function MatchingView({
@@ -31,7 +32,8 @@ export function MatchingView({
   onUpdateRequestStatus,
   isMatchingLoading,
   isMutatingMatching,
-  matchingError
+  matchingError,
+  onRetryMatchingError
 }: MatchingViewProps) {
   return (
     <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
@@ -42,7 +44,16 @@ export function MatchingView({
           description="Refreshing recommendation and request lifecycle data."
         />
       ) : null}
-      {matchingError ? <StateCard tone="error" title="MATCH BOARD ERROR" description={matchingError} /> : null}
+      {matchingError ? (
+        <StateCard
+          tone="error"
+          title="MATCH BOARD ERROR"
+          description={matchingError}
+          actionLabel="Retry Match Sync"
+          actionVariant="warning"
+          onAction={onRetryMatchingError}
+        />
+      ) : null}
 
       <Text style={styles.sectionTitle}>Recommendation Board</Text>
       {recommendations.length === 0 ? (

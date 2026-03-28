@@ -103,6 +103,7 @@ function CupidateAppShell() {
             onGoMatching={() => state.setActiveView("matching")}
             isHomeLoading={state.isHomeLoading}
             homeError={state.homeError}
+            onRetryHomeError={state.onRetryHome}
           />
         )}
 
@@ -140,6 +141,7 @@ function CupidateAppShell() {
             isSearchingCupids={state.isSearchingCupids}
             isMutatingNetwork={state.isMutatingNetwork}
             networkError={state.networkError}
+            onRetryNetworkError={state.onRetryNetwork}
           />
         )}
 
@@ -154,6 +156,7 @@ function CupidateAppShell() {
             isMatchingLoading={state.isMatchingLoading}
             isMutatingMatching={state.isMutatingMatching}
             matchingError={state.matchingError}
+            onRetryMatchingError={state.onRetryMatching}
           />
         )}
 
@@ -172,6 +175,7 @@ function CupidateAppShell() {
             requestCount={state.requests.length}
             isMyLoading={state.isMyLoading}
             myError={state.myError}
+            onRetryMyError={state.onRetryMy}
           />
         )}
       </View>

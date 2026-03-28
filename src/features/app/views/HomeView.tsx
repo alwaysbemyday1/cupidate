@@ -17,6 +17,7 @@ type HomeViewProps = {
   onGoMatching: () => void;
   isHomeLoading?: boolean;
   homeError?: string | null;
+  onRetryHomeError?: () => void | Promise<void>;
 };
 
 export function HomeView({
@@ -25,7 +26,8 @@ export function HomeView({
   onGoNetwork,
   onGoMatching,
   isHomeLoading,
-  homeError
+  homeError,
+  onRetryHomeError
 }: HomeViewProps) {
   const [activeFrameIndex, setActiveFrameIndex] = useState(0);
 
@@ -81,7 +83,16 @@ export function HomeView({
           description="Refreshing network counters and matching activity."
         />
       ) : null}
-      {homeError ? <StateCard tone="error" title="HOME FEED ERROR" description={homeError} /> : null}
+      {homeError ? (
+        <StateCard
+          tone="error"
+          title="HOME FEED ERROR"
+          description={homeError}
+          actionLabel="Retry Home Sync"
+          actionVariant="warning"
+          onAction={onRetryHomeError}
+        />
+      ) : null}
 
       <Text style={styles.sectionTitle}>Notification Feed</Text>
       {notifications.length === 0 ? (
