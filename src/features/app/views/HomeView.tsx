@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { Image, ScrollView, View, type ImageStyle } from "react-native";
 
+import { PixelBox } from "../components/PixelBox";
 import { PixelButton } from "../components/PixelButton";
+import { PixelText } from "../components/PixelText";
 import { StateCard } from "../components/StateCard";
 import { SummaryCard } from "../components/SummaryCard";
 import type { HomeSummary } from "../model/types";
 import { styles } from "../styles";
 import { cupidHeroSprites } from "../theme/sprites";
+import { designTokens } from "../theme/tokens";
 
 const SPRITE_FRAME_INTERVAL_MS = 180;
 
@@ -45,14 +48,19 @@ export function HomeView({
 
   return (
     <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
-      <View style={styles.heroCard}>
-        <Text style={styles.heroTitle}>
-          CUPID <Text style={styles.heroTitleAccent}>MODE</Text>
-        </Text>
-        <Text style={styles.heroSubtitle}>PRESS START TO MATCH</Text>
-        <Text style={styles.heroFrameMeta}>
-          FRAME {activeFrameIndex + 1}/{cupidHeroSprites.length}
-        </Text>
+      <PixelBox style={styles.heroCard} contentStyle={styles.heroCardContent}>
+        <PixelText variant="screenTitle" style={styles.heroTitle}>
+          {"CUPID "}
+          <PixelText variant="screenTitle" style={styles.heroTitleAccent}>
+            MODE
+          </PixelText>
+        </PixelText>
+        <PixelText variant="body" style={styles.heroSubtitle}>
+          PRESS START TO MATCH
+        </PixelText>
+        <PixelText variant="caption" style={styles.heroFrameMeta}>
+          {`FRAME ${activeFrameIndex + 1}/${cupidHeroSprites.length}`}
+        </PixelText>
         <View style={styles.spriteRow}>
           {cupidHeroSprites.map((source, index) => (
             <View
@@ -61,13 +69,16 @@ export function HomeView({
             >
               <Image
                 source={source}
-                style={[styles.spriteImage, activeFrameIndex === index ? styles.spriteImageActive : null]}
+                style={[
+                  styles.spriteImage as ImageStyle,
+                  activeFrameIndex === index ? (styles.spriteImageActive as ImageStyle) : null
+                ]}
                 resizeMode="contain"
               />
             </View>
           ))}
         </View>
-      </View>
+      </PixelBox>
 
       <View style={styles.summaryGrid}>
         <SummaryCard label="My Cupidates" value={homeSummary.myCupidates} />
@@ -94,7 +105,9 @@ export function HomeView({
         />
       ) : null}
 
-      <Text style={styles.sectionTitle}>Notification Feed</Text>
+      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+        Notification Feed
+      </PixelText>
       {notifications.length === 0 ? (
         <StateCard
           tone="empty"
@@ -103,16 +116,24 @@ export function HomeView({
         />
       ) : (
         notifications.map((item) => (
-          <View key={item} style={styles.listCard}>
-            <Text style={styles.listMeta}>{item}</Text>
-          </View>
+          <PixelBox
+            key={item}
+            style={styles.listCard}
+            contentStyle={[styles.listCardContent, { backgroundColor: designTokens.color.surfaceAlt }]}
+          >
+            <PixelText variant="body" style={styles.listMeta}>
+              {item}
+            </PixelText>
+          </PixelBox>
         ))
       )}
 
-      <Text style={styles.sectionTitle}>Quick Actions</Text>
+      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+        Quick Actions
+      </PixelText>
       <View style={styles.buttonRow}>
-        <PixelButton label="Go to Network" variant="primary" onPress={onGoNetwork} />
-        <PixelButton label="Go to Matching" variant="warning" onPress={onGoMatching} />
+        <PixelButton label="Go to Network" variant="secondary" onPress={onGoNetwork} />
+        <PixelButton label="Go to Matching" variant="primary" onPress={onGoMatching} />
       </View>
     </ScrollView>
   );

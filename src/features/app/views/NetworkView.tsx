@@ -1,9 +1,12 @@
-import { ScrollView, Text, TextInput, View } from "react-native";
+import { ScrollView, TextInput, View } from "react-native";
 
+import { PixelBox } from "../components/PixelBox";
 import { PixelButton } from "../components/PixelButton";
+import { PixelText } from "../components/PixelText";
 import { StateCard } from "../components/StateCard";
 import type { CupidConnection, CupidateRecord, NetworkSegment, ValidationErrors } from "../model/types";
 import { styles } from "../styles";
+import { designTokens } from "../theme/tokens";
 
 type ConnectionSearchResult = {
   cupidId: string;
@@ -69,6 +72,8 @@ type NetworkViewProps = {
   networkError?: string | null;
   onRetryNetworkError?: () => void | Promise<void>;
 };
+
+const placeholderTextColor = designTokens.color.inkMuted;
 
 export function NetworkView({
   networkSegment,
@@ -154,7 +159,7 @@ export function NetworkView({
         />
         <PixelButton
           label={`Connected Cupids (${connections.length})`}
-          variant="neutral"
+          variant="secondary"
           active={networkSegment === "cupids"}
           onPress={() => onChangeNetworkSegment("cupids")}
         />
@@ -162,76 +167,108 @@ export function NetworkView({
 
       {networkSegment === "cupidates" ? (
         <>
-          <Text style={styles.fieldLabel}>Owner Type</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Owner Type
+          </PixelText>
           <View style={styles.buttonRow}>
             <PixelButton label="My Cupidate" active={ownerType === "mine"} onPress={() => onChangeOwnerType("mine")} />
             <PixelButton
               label="Connected Cupidate"
-              variant="warning"
+              variant="secondary"
               active={ownerType === "connected"}
               onPress={() => onChangeOwnerType("connected")}
             />
           </View>
 
-          <Text style={styles.fieldLabel}>Name</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Name
+          </PixelText>
           <TextInput
             value={displayName}
             onChangeText={onChangeDisplayName}
             placeholder="e.g. Mina"
-            placeholderTextColor="#7f8ca8"
+            placeholderTextColor={placeholderTextColor}
             style={styles.input}
           />
-          {!!errors.displayName && <Text style={styles.errorText}>{errors.displayName}</Text>}
+          {!!errors.displayName && (
+            <PixelText variant="body" style={styles.errorText}>
+              {errors.displayName}
+            </PixelText>
+          )}
 
-          <Text style={styles.fieldLabel}>Birth Year</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Birth Year
+          </PixelText>
           <TextInput
             value={birthYearInput}
             onChangeText={onChangeBirthYearInput}
             keyboardType="numeric"
             placeholder="e.g. 1998"
-            placeholderTextColor="#7f8ca8"
+            placeholderTextColor={placeholderTextColor}
             style={styles.input}
           />
-          {!!errors.birthYear && <Text style={styles.errorText}>{errors.birthYear}</Text>}
+          {!!errors.birthYear && (
+            <PixelText variant="body" style={styles.errorText}>
+              {errors.birthYear}
+            </PixelText>
+          )}
 
-          <Text style={styles.fieldLabel}>Gender</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Gender
+          </PixelText>
           <View style={styles.buttonRow}>
             <PixelButton label="Male" active={gender === "male"} onPress={() => onChangeGender("male")} />
             <PixelButton label="Female" active={gender === "female"} onPress={() => onChangeGender("female")} />
             <PixelButton label="Other" active={gender === "other"} onPress={() => onChangeGender("other")} />
           </View>
-          {!!errors.gender && <Text style={styles.errorText}>{errors.gender}</Text>}
+          {!!errors.gender && (
+            <PixelText variant="body" style={styles.errorText}>
+              {errors.gender}
+            </PixelText>
+          )}
 
-          <Text style={styles.fieldLabel}>Region</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Region
+          </PixelText>
           <TextInput
             value={locationInput}
             onChangeText={onChangeLocationInput}
             placeholder="e.g. seoul"
-            placeholderTextColor="#7f8ca8"
+            placeholderTextColor={placeholderTextColor}
             style={styles.input}
           />
 
-          <Text style={styles.fieldLabel}>Job Title</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Job Title
+          </PixelText>
           <TextInput
             value={jobTitleInput}
             onChangeText={onChangeJobTitleInput}
             placeholder="e.g. Product Designer"
-            placeholderTextColor="#7f8ca8"
+            placeholderTextColor={placeholderTextColor}
             style={styles.input}
           />
 
-          <Text style={styles.fieldLabel}>Height (cm)</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Height (cm)
+          </PixelText>
           <TextInput
             value={heightInput}
             onChangeText={onChangeHeightInput}
             keyboardType="numeric"
             placeholder="e.g. 168"
-            placeholderTextColor="#7f8ca8"
+            placeholderTextColor={placeholderTextColor}
             style={styles.input}
           />
-          {!!errors.height && <Text style={styles.errorText}>{errors.height}</Text>}
+          {!!errors.height && (
+            <PixelText variant="body" style={styles.errorText}>
+              {errors.height}
+            </PixelText>
+          )}
 
-          <Text style={styles.fieldLabel}>Smoking Habit</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Smoking Habit
+          </PixelText>
           <View style={styles.buttonRow}>
             <PixelButton label="None" active={smokingHabit === "none"} onPress={() => onChangeSmokingHabit("none")} />
             <PixelButton
@@ -242,30 +279,36 @@ export function NetworkView({
             <PixelButton label="Often" active={smokingHabit === "often"} onPress={() => onChangeSmokingHabit("often")} />
           </View>
 
-          <Text style={styles.fieldLabel}>Drinking Habit</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Drinking Habit
+          </PixelText>
           <View style={styles.buttonRow}>
             <PixelButton label="Never" active={drinkingHabit === "never"} onPress={() => onChangeDrinkingHabit("never")} />
             <PixelButton label="Social" active={drinkingHabit === "social"} onPress={() => onChangeDrinkingHabit("social")} />
             <PixelButton label="Often" active={drinkingHabit === "often"} onPress={() => onChangeDrinkingHabit("often")} />
           </View>
 
-          <Text style={styles.fieldLabel}>Hobbies (comma separated)</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Hobbies (comma separated)
+          </PixelText>
           <TextInput
             value={hobbiesInput}
             onChangeText={onChangeHobbiesInput}
             placeholder="hiking,music,coffee"
-            placeholderTextColor="#7f8ca8"
+            placeholderTextColor={placeholderTextColor}
             style={styles.input}
           />
 
-          <Text style={styles.fieldLabel}>Preferred Age Range</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Preferred Age Range
+          </PixelText>
           <View style={styles.buttonRow}>
             <TextInput
               value={preferredAgeMinInput}
               onChangeText={onChangePreferredAgeMinInput}
               keyboardType="numeric"
               placeholder="min"
-              placeholderTextColor="#7f8ca8"
+              placeholderTextColor={placeholderTextColor}
               style={[styles.input, styles.halfInput]}
             />
             <TextInput
@@ -273,22 +316,30 @@ export function NetworkView({
               onChangeText={onChangePreferredAgeMaxInput}
               keyboardType="numeric"
               placeholder="max"
-              placeholderTextColor="#7f8ca8"
+              placeholderTextColor={placeholderTextColor}
               style={[styles.input, styles.halfInput]}
             />
           </View>
-          {!!errors.preferredAgeRange && <Text style={styles.errorText}>{errors.preferredAgeRange}</Text>}
+          {!!errors.preferredAgeRange && (
+            <PixelText variant="body" style={styles.errorText}>
+              {errors.preferredAgeRange}
+            </PixelText>
+          )}
 
-          <Text style={styles.fieldLabel}>Preferred Regions (comma separated)</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Preferred Regions (comma separated)
+          </PixelText>
           <TextInput
             value={preferredRegionsInput}
             onChangeText={onChangePreferredRegionsInput}
             placeholder="seoul,busan"
-            placeholderTextColor="#7f8ca8"
+            placeholderTextColor={placeholderTextColor}
             style={styles.input}
           />
 
-          <Text style={styles.fieldLabel}>Preferred Smoking</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Preferred Smoking
+          </PixelText>
           <View style={styles.buttonRow}>
             <PixelButton
               label="Non-smoker"
@@ -299,7 +350,9 @@ export function NetworkView({
             <PixelButton label="Any" active={preferredSmoking === "any"} onPress={() => onChangePreferredSmoking("any")} />
           </View>
 
-          <Text style={styles.fieldLabel}>Preferred Drinking</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Preferred Drinking
+          </PixelText>
           <View style={styles.buttonRow}>
             <PixelButton
               label="Never"
@@ -319,7 +372,9 @@ export function NetworkView({
             <PixelButton label="Any" active={preferredDrinking === "any"} onPress={() => onChangePreferredDrinking("any")} />
           </View>
 
-          <Text style={styles.fieldLabel}>Preferred Gender</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Preferred Gender
+          </PixelText>
           <View style={styles.buttonRow}>
             <PixelButton label="Any" active={preferredGender === "any"} onPress={() => onChangePreferredGender("any")} />
             <PixelButton label="Male" active={preferredGender === "male"} onPress={() => onChangePreferredGender("male")} />
@@ -331,14 +386,16 @@ export function NetworkView({
             <PixelButton label="Other" active={preferredGender === "other"} onPress={() => onChangePreferredGender("other")} />
           </View>
 
-          <Text style={styles.fieldLabel}>Preferred Height Range (optional)</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Preferred Height Range (optional)
+          </PixelText>
           <View style={styles.buttonRow}>
             <TextInput
               value={preferredHeightMinInput}
               onChangeText={onChangePreferredHeightMinInput}
               keyboardType="numeric"
               placeholder="min cm"
-              placeholderTextColor="#7f8ca8"
+              placeholderTextColor={placeholderTextColor}
               style={[styles.input, styles.halfInput]}
             />
             <TextInput
@@ -346,61 +403,79 @@ export function NetworkView({
               onChangeText={onChangePreferredHeightMaxInput}
               keyboardType="numeric"
               placeholder="max cm"
-              placeholderTextColor="#7f8ca8"
+              placeholderTextColor={placeholderTextColor}
               style={[styles.input, styles.halfInput]}
             />
           </View>
-          {!!errors.preferredHeightRange && <Text style={styles.errorText}>{errors.preferredHeightRange}</Text>}
+          {!!errors.preferredHeightRange && (
+            <PixelText variant="body" style={styles.errorText}>
+              {errors.preferredHeightRange}
+            </PixelText>
+          )}
 
-          <Text style={styles.fieldLabel}>Bio</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Bio
+          </PixelText>
           <TextInput
             value={bio}
             onChangeText={onChangeBio}
             multiline
             numberOfLines={3}
             placeholder="A short profile summary"
-            placeholderTextColor="#7f8ca8"
+            placeholderTextColor={placeholderTextColor}
             style={[styles.input, styles.multilineInput]}
           />
 
           <PixelButton
             label={isMutatingNetwork ? "Saving..." : "Save Cupidate"}
-            variant="primary"
+            variant={canSubmit ? "primary" : "warning"}
             onPress={onSaveCupidate}
             active={canSubmit}
           />
 
-          <Text style={styles.sectionTitle}>Cupidate List</Text>
+          <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+            Cupidate List
+          </PixelText>
           {cupidates.length === 0 ? (
             <StateCard tone="empty" title="NO CUPIDATES YET" description="Register your first cupidate profile." />
           ) : (
             cupidates.map((item) => (
-              <View key={item.cupidateId} style={styles.listCard}>
-                <Text style={styles.listName}>
-                  {item.displayName} ({item.gender})
-                </Text>
-                <Text style={styles.listMeta}>Birth Year: {item.birthYear ?? "-"}</Text>
-                <Text style={styles.listMeta}>
-                  Owner: {item.ownerCupidId === currentCupidId ? "My Cupidate" : "Connected Cupidate"}
-                </Text>
-                <Text style={styles.listMeta}>Region: {item.preferences.region ?? "-"}</Text>
-                <Text style={styles.listMeta}>Job: {item.preferences.jobTitle ?? "-"}</Text>
-                <Text style={styles.listMeta}>
-                  Lifestyle: {item.preferences.smokingHabit ?? "-"} / {item.preferences.drinkingHabit ?? "-"}
-                </Text>
-                <Text style={styles.listMeta}>Bio: {item.bio || "-"}</Text>
-              </View>
+              <PixelBox key={item.cupidateId} style={styles.listCard} contentStyle={styles.listCardContent}>
+                <PixelText variant="sectionTitle" style={styles.listName}>
+                  {`${item.displayName} (${item.gender})`}
+                </PixelText>
+                <PixelText variant="body" style={styles.listMeta}>
+                  {`Birth Year: ${item.birthYear ?? "-"}`}
+                </PixelText>
+                <PixelText variant="body" style={styles.listMeta}>
+                  {`Owner: ${item.ownerCupidId === currentCupidId ? "My Cupidate" : "Connected Cupidate"}`}
+                </PixelText>
+                <PixelText variant="body" style={styles.listMeta}>
+                  {`Region: ${item.preferences.region ?? "-"}`}
+                </PixelText>
+                <PixelText variant="body" style={styles.listMeta}>
+                  {`Job: ${item.preferences.jobTitle ?? "-"}`}
+                </PixelText>
+                <PixelText variant="body" style={styles.listMeta}>
+                  {`Lifestyle: ${item.preferences.smokingHabit ?? "-"} / ${item.preferences.drinkingHabit ?? "-"}`}
+                </PixelText>
+                <PixelText variant="body" style={styles.listMeta}>
+                  {`Bio: ${item.bio || "-"}`}
+                </PixelText>
+              </PixelBox>
             ))
           )}
         </>
       ) : (
         <>
-          <Text style={styles.fieldLabel}>Search Cupid by Nickname</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Search Cupid by Nickname
+          </PixelText>
           <TextInput
             value={connectionSearchQuery}
             onChangeText={onChangeConnectionSearchQuery}
             placeholder="e.g. connected_a"
-            placeholderTextColor="#7f8ca8"
+            placeholderTextColor={placeholderTextColor}
             style={styles.input}
           />
 
@@ -416,17 +491,21 @@ export function NetworkView({
             const selected = selectedConnectionCupidId === candidate.cupidId;
 
             return (
-              <View key={candidate.cupidId} style={styles.listCard}>
-                <Text style={styles.listName}>{candidate.nickname}</Text>
-                <Text style={styles.listMeta}>Cupid ID: {candidate.cupidId}</Text>
+              <PixelBox key={candidate.cupidId} style={styles.listCard} contentStyle={styles.listCardContent}>
+                <PixelText variant="sectionTitle" style={styles.listName}>
+                  {candidate.nickname}
+                </PixelText>
+                <PixelText variant="body" style={styles.listMeta}>
+                  {`Cupid ID: ${candidate.cupidId}`}
+                </PixelText>
                 <View style={styles.buttonRow}>
                   <PixelButton
                     label={selected ? "Selected" : "Select"}
-                    variant={selected ? "success" : "neutral"}
+                    variant={selected ? "success" : "secondary"}
                     onPress={() => onSelectConnectionCupid(candidate.cupidId)}
                   />
                 </View>
-              </View>
+              </PixelBox>
             );
           })}
 
@@ -436,7 +515,9 @@ export function NetworkView({
             onPress={onAddConnection}
           />
 
-          <Text style={styles.sectionTitle}>Connected Cupid List</Text>
+          <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+            Connected Cupid List
+          </PixelText>
           {connections.length === 0 ? (
             <StateCard
               tone="empty"
@@ -445,11 +526,17 @@ export function NetworkView({
             />
           ) : (
             connections.map((connection) => (
-              <View key={connection.cupidId} style={styles.listCard}>
-                <Text style={styles.listName}>{connection.name}</Text>
-                <Text style={styles.listMeta}>Cupid ID: {connection.cupidId}</Text>
-                <Text style={styles.listMeta}>Status: {connection.status}</Text>
-              </View>
+              <PixelBox key={connection.cupidId} style={styles.listCard} contentStyle={styles.listCardContent}>
+                <PixelText variant="sectionTitle" style={styles.listName}>
+                  {connection.name}
+                </PixelText>
+                <PixelText variant="body" style={styles.listMeta}>
+                  {`Cupid ID: ${connection.cupidId}`}
+                </PixelText>
+                <PixelText variant="body" style={styles.listMeta}>
+                  {`Status: ${connection.status}`}
+                </PixelText>
+              </PixelBox>
             ))
           )}
         </>

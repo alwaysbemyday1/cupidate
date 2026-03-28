@@ -1,6 +1,8 @@
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
+import { PixelBox } from "./PixelBox";
 import { PixelButton } from "./PixelButton";
+import { PixelText } from "./PixelText";
 import { styles } from "../styles";
 import type { ButtonVariant } from "../theme/tokens";
 
@@ -39,16 +41,29 @@ function toneTitleStyle(tone: StateTone) {
   }
 }
 
-export function StateCard({ tone, title, description, actionLabel, actionVariant = "primary", onAction }: StateCardProps) {
+export function StateCard({
+  tone,
+  title,
+  description,
+  actionLabel,
+  actionVariant = "primary",
+  onAction
+}: StateCardProps) {
   return (
-    <View style={[styles.stateCard, toneContainerStyle(tone)]}>
-      <Text style={[styles.stateCardTitle, toneTitleStyle(tone)]}>{title}</Text>
-      {description ? <Text style={styles.stateCardDescription}>{description}</Text> : null}
+    <PixelBox style={styles.stateCard} contentStyle={[styles.stateCardContent, toneContainerStyle(tone)]}>
+      <PixelText variant="sectionTitle" style={[styles.stateCardTitle, toneTitleStyle(tone)]}>
+        {title}
+      </PixelText>
+      {description ? (
+        <PixelText variant="body" style={styles.stateCardDescription}>
+          {description}
+        </PixelText>
+      ) : null}
       {actionLabel && onAction ? (
         <View style={styles.stateCardActionRow}>
           <PixelButton label={actionLabel} variant={actionVariant} onPress={() => void onAction()} />
         </View>
       ) : null}
-    </View>
+    </PixelBox>
   );
 }

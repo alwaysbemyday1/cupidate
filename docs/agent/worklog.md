@@ -453,3 +453,55 @@ Changes:
 
 Verification:
 - UTF-8 read check passed for `docs/agent/codexrules.md`.
+
+### Task 2026-03-29-02 - Pixel Primitives + App Shell Rebuild
+Status: Completed
+
+Changes:
+- Added shared pixel UI primitives:
+  - `src/features/app/components/PixelText.tsx`
+  - `src/features/app/components/PixelBox.tsx`
+  - `src/features/app/components/PixelTabBar.tsx`
+- Rebuilt `PixelButton` around hard-shadow/bevel rules from the design system.
+- Reworked app-wide tokens and shared styles for the pink/navy/beige system:
+  - `src/features/app/theme/tokens.ts`
+  - `src/features/app/styles.ts`
+- Rebuilt the root shell/header/tab bar composition in `App.tsx`.
+- Updated shared cards and all major views to use the new primitives:
+  - `SummaryCard`, `StateCard`
+  - `HomeView`, `NetworkView`, `MatchingView`, `MyView`, `AuthRequiredView`
+- Stabilized navigation test selectors by adding explicit tab test IDs.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test` passed.
+
+Notes:
+- Jest still reports the React Native `SafeAreaView` deprecation warning; this is queued as a follow-up cleanup task rather than a blocker.
+
+### Task 2026-03-29-03 - My View Vertical Slice + Auth Metadata Wiring
+Status: Completed
+
+Changes:
+- Rebuilt `src/features/app/views/MyView.tsx` into prototype-aligned sections:
+  - `Profile Overview`
+  - `Account Details`
+  - `Matching Preferences`
+  - `Account Summary`
+- Added profile avatar seed rendering from nickname and compact account summary cards.
+- Wired Supabase/local auth session metadata into the screen through `App.tsx`:
+  - account email
+  - join date
+  - auth mode
+  - manual session refresh action
+- Kept existing profile/settings behavior intact:
+  - nickname save
+  - visibility toggle
+  - notification toggle
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test` passed.
+
+Notes:
+- This is a visual/data-structure upgrade for My view; full self-profile preference persistence remains a separate follow-up task.

@@ -1,10 +1,13 @@
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
 
+import { PixelBox } from "../components/PixelBox";
 import { PixelButton } from "../components/PixelButton";
+import { PixelText } from "../components/PixelText";
 import { StateCard } from "../components/StateCard";
 import { pairKey } from "../model/useCupidateAppState";
 import type { CupidateRecord, MatchRequest, MatchRequestStatus, RecommendationItem } from "../model/types";
 import { styles } from "../styles";
+import { designTokens } from "../theme/tokens";
 
 type MatchingViewProps = {
   recommendations: RecommendationItem[];
@@ -55,7 +58,9 @@ export function MatchingView({
         />
       ) : null}
 
-      <Text style={styles.sectionTitle}>Recommendation Board</Text>
+      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+        Recommendation Board
+      </PixelText>
       {recommendations.length === 0 ? (
         <StateCard
           tone="empty"
@@ -74,20 +79,26 @@ export function MatchingView({
             item.targetCupidateId;
 
           return (
-            <View key={key} style={styles.listCard}>
-              <Text style={styles.listName}>
-                {sourceName} x {targetName}
-              </Text>
-              <Text style={styles.listMeta}>Match Rate: {item.matchScore}%</Text>
-              <Text style={styles.listMeta}>
-                Breakdown: AGE {item.reason.breakdown.age} / HOBBY {item.reason.breakdown.hobbies} / LIFE{" "}
-                {item.reason.breakdown.lifestyle} / LOC {item.reason.breakdown.location} / PROFILE{" "}
-                {item.reason.breakdown.profile}
-              </Text>
-              <Text style={styles.listMeta}>
-                Shared Hobbies: {item.reason.matchedHobbies.length ? item.reason.matchedHobbies.join(", ") : "-"}
-              </Text>
-              <Text style={styles.listMeta}>Status: {request?.status ?? "none"}</Text>
+            <PixelBox
+              key={key}
+              style={styles.listCard}
+              contentStyle={[styles.listCardContent, { backgroundColor: designTokens.color.surfaceAlt }]}
+            >
+              <PixelText variant="sectionTitle" style={styles.listName}>
+                {`${sourceName} x ${targetName}`}
+              </PixelText>
+              <PixelText variant="body" style={styles.listMeta}>
+                {`Match Rate: ${item.matchScore}%`}
+              </PixelText>
+              <PixelText variant="body" style={styles.listMeta}>
+                {`Breakdown: AGE ${item.reason.breakdown.age} / HOBBY ${item.reason.breakdown.hobbies} / LIFE ${item.reason.breakdown.lifestyle} / LOC ${item.reason.breakdown.location} / PROFILE ${item.reason.breakdown.profile}`}
+              </PixelText>
+              <PixelText variant="body" style={styles.listMeta}>
+                {`Shared Hobbies: ${item.reason.matchedHobbies.length ? item.reason.matchedHobbies.join(", ") : "-"}`}
+              </PixelText>
+              <PixelText variant="body" style={styles.listMeta}>
+                {`Status: ${request?.status ?? "none"}`}
+              </PixelText>
 
               <View style={styles.buttonRow}>
                 {!request && (
@@ -125,25 +136,29 @@ export function MatchingView({
                   />
                 )}
               </View>
-            </View>
+            </PixelBox>
           );
         })
       )}
 
-      <Text style={styles.sectionTitle}>Match Request History</Text>
+      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+        Match Request History
+      </PixelText>
       {requests.length === 0 ? (
         <StateCard tone="empty" title="NO MATCH HISTORY" description="Requested matches will appear in this board." />
       ) : (
         requests.map((request) => (
-          <View key={request.id} style={styles.listCard}>
-            <Text style={styles.listMeta}>
-              {request.sourceCupidateId}
-              {" -> "}
-              {request.targetCupidateId}
-            </Text>
-            <Text style={styles.listMeta}>Status: {request.status}</Text>
-            <Text style={styles.listMeta}>Created: {request.createdAt.slice(0, 10)}</Text>
-          </View>
+          <PixelBox key={request.id} style={styles.listCard} contentStyle={styles.listCardContent}>
+            <PixelText variant="body" style={styles.listMeta}>
+              {`${request.sourceCupidateId} -> ${request.targetCupidateId}`}
+            </PixelText>
+            <PixelText variant="body" style={styles.listMeta}>
+              {`Status: ${request.status}`}
+            </PixelText>
+            <PixelText variant="body" style={styles.listMeta}>
+              {`Created: ${request.createdAt.slice(0, 10)}`}
+            </PixelText>
+          </PixelBox>
         ))
       )}
     </ScrollView>

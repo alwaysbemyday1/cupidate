@@ -1,5 +1,5 @@
-﻿import { Text, View } from "react-native";
-
+import { PixelBox } from "./PixelBox";
+import { PixelText } from "./PixelText";
 import { styles } from "../styles";
 
 type SummaryCardProps = {
@@ -9,9 +9,13 @@ type SummaryCardProps = {
 
 export function SummaryCard({ label, value }: SummaryCardProps) {
   return (
-    <View style={styles.summaryCard}>
-      <Text style={styles.summaryLabel}>{label}</Text>
-      <Text style={styles.summaryValue}>{value}</Text>
-    </View>
+    <PixelBox style={styles.summaryCard} contentStyle={styles.summaryCardContent}>
+      <PixelText variant="label" style={styles.summaryLabel}>
+        {label}
+      </PixelText>
+      <PixelText variant="screenTitle" style={styles.summaryValue}>
+        {value}
+      </PixelText>
+    </PixelBox>
   );
 }

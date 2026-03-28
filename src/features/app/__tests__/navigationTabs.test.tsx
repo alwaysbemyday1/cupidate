@@ -24,28 +24,28 @@ describe("App navigation tabs", () => {
       expect(screen.getByText("Notification Feed")).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText("NETWORK"));
+    fireEvent.press(screen.getByTestId("tab-network"));
 
     await waitFor(() => {
       expect(screen.getByText(/My Cupidates \(/)).toBeTruthy();
       expect(screen.getByText("Save Cupidate")).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText("MATCHING"));
+    fireEvent.press(screen.getByTestId("tab-matching"));
 
     await waitFor(() => {
       expect(screen.getByText("Recommendation Board")).toBeTruthy();
       expect(screen.getByText("Match Request History")).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText("MY"));
+    fireEvent.press(screen.getByTestId("tab-my"));
 
     await waitFor(() => {
       expect(screen.getByText("Nickname")).toBeTruthy();
       expect(screen.getByText("Account Summary")).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText("HOME"));
+    fireEvent.press(screen.getByTestId("tab-home"));
 
     await waitFor(() => {
       expect(screen.getByText("Quick Actions")).toBeTruthy();

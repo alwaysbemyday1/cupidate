@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { Text, TextInput, View } from "react-native";
+import { TextInput, View } from "react-native";
 
+import { PixelBox } from "../components/PixelBox";
 import { PixelButton } from "../components/PixelButton";
+import { PixelText } from "../components/PixelText";
 import { styles } from "../styles";
+import { designTokens } from "../theme/tokens";
 
 type AuthRequiredViewProps = {
   isLoading: boolean;
@@ -13,6 +16,7 @@ type AuthRequiredViewProps = {
 };
 
 const emailPattern = /^\S+@\S+\.\S+$/;
+const placeholderTextColor = designTokens.color.inkMuted;
 
 export function AuthRequiredView({
   isLoading,
@@ -66,14 +70,18 @@ export function AuthRequiredView({
 
   return (
     <View style={styles.centerPanel}>
-      <View style={styles.gateCard}>
-        <Text style={styles.gateTitle}>AUTH REQUIRED</Text>
-        <Text style={styles.gateText}>
+      <PixelBox style={styles.gateCard} contentStyle={styles.gateCardContent}>
+        <PixelText variant="screenTitle" style={styles.gateTitle}>
+          AUTH REQUIRED
+        </PixelText>
+        <PixelText variant="body" style={styles.gateText}>
           This app is connected to Supabase. Sign in here to unlock Network and Matching data.
-        </Text>
+        </PixelText>
 
         <View style={styles.gateForm}>
-          <Text style={styles.fieldLabel}>Email</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Email
+          </PixelText>
           <TextInput
             value={email}
             onChangeText={setEmail}
@@ -81,12 +89,14 @@ export function AuthRequiredView({
             autoCorrect={false}
             keyboardType="email-address"
             placeholder="you@example.com"
-            placeholderTextColor="#7f8ca8"
+            placeholderTextColor={placeholderTextColor}
             style={styles.input}
             editable={!isSubmitting}
           />
 
-          <Text style={styles.fieldLabel}>Password</Text>
+          <PixelText variant="label" style={styles.fieldLabel}>
+            Password
+          </PixelText>
           <TextInput
             value={password}
             onChangeText={setPassword}
@@ -94,7 +104,7 @@ export function AuthRequiredView({
             autoCorrect={false}
             secureTextEntry
             placeholder="at least 6 chars"
-            placeholderTextColor="#7f8ca8"
+            placeholderTextColor={placeholderTextColor}
             style={styles.input}
             editable={!isSubmitting}
           />
@@ -114,14 +124,30 @@ export function AuthRequiredView({
         </View>
 
         <View style={styles.buttonRow}>
-          <PixelButton label="Refresh Session" variant="neutral" onPress={() => void onRefresh()} />
+          <PixelButton label="Refresh Session" variant="secondary" onPress={() => void onRefresh()} />
         </View>
 
-        {isLoading ? <Text style={styles.listMeta}>Checking session...</Text> : null}
-        {actionMessage ? <Text style={styles.gateHint}>{actionMessage}</Text> : null}
-        {error ? <Text style={styles.errorText}>Error: {error}</Text> : null}
-        {actionError ? <Text style={styles.errorText}>Auth: {actionError}</Text> : null}
-      </View>
+        {isLoading ? (
+          <PixelText variant="body" style={styles.listMeta}>
+            Checking session...
+          </PixelText>
+        ) : null}
+        {actionMessage ? (
+          <PixelText variant="body" style={styles.gateHint}>
+            {actionMessage}
+          </PixelText>
+        ) : null}
+        {error ? (
+          <PixelText variant="body" style={styles.errorText}>
+            {`Error: ${error}`}
+          </PixelText>
+        ) : null}
+        {actionError ? (
+          <PixelText variant="body" style={styles.errorText}>
+            {`Auth: ${actionError}`}
+          </PixelText>
+        ) : null}
+      </PixelBox>
     </View>
   );
 }

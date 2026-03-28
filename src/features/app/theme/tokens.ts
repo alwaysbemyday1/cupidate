@@ -1,49 +1,69 @@
-﻿export const designTokens = {
+export const designTokens = {
   color: {
-    bg: "#131A2D",
-    bgAlt: "#1A2440",
-    shell: "#0A0E1D",
-    border: "#080B14",
-    panel: "#222F4F",
-    panelAlt: "#2A3A61",
-    surface: "#334875",
-    textPrimary: "#F3F6FF",
-    textSecondary: "#B8C3E0",
-    textMuted: "#8EA0C7",
-    titleBlue: "#49A9FF",
-    titleOrange: "#FF9A3C",
-    statusOnlineBg: "#2FB66F",
-    statusOnlineText: "#0A3A22",
-    buttonNeutral: "#566387",
-    buttonPrimary: "#3E9DFF",
-    buttonSuccess: "#58C96A",
-    buttonWarning: "#F68B30",
-    buttonDanger: "#DF4D4D",
-    inputBg: "#1A2544",
-    inputText: "#F0F4FF",
-    cardBg: "#1B2848",
-    cardBgAccent: "#202F54",
-    error: "#FF7A7A"
+    background: "#1F2A44",
+    backgroundAlt: "#2A3C66",
+    backgroundPanel: "#3B5998",
+    surface: "#F4E8D1",
+    surfaceAlt: "#EADBC2",
+    surfaceRaised: "#FFF6E4",
+    border: "#000000",
+    shadow: "#000000",
+    shadowSoft: "#1F1F1F",
+    ink: "#111111",
+    inkMuted: "#5A5144",
+    inkInverse: "#FFFFFF",
+    pink: "#D84C73",
+    pinkDark: "#BC3D62",
+    blue: "#4A76A8",
+    blueDark: "#3B5998",
+    navyDark: "#2A3C66",
+    gold: "#E8B649",
+    goldDark: "#B88020",
+    success: "#6FAE63",
+    successDark: "#45753D",
+    warning: "#D8B46A",
+    warningDark: "#96722A",
+    danger: "#B8576F",
+    dangerDark: "#7A3144",
+    inputFill: "#FFF8EB",
+    inputBorder: "#8E7E64",
+    error: "#9D223E",
+    switchTrack: "#CDBA93"
   },
   border: {
-    heavy: 3,
-    normal: 2
+    thin: 1,
+    normal: 2,
+    heavy: 3
   },
   spacing: {
     xxs: 4,
     xs: 8,
-    sm: 10,
-    md: 12,
-    lg: 14,
-    xl: 18
+    sm: 12,
+    md: 16,
+    lg: 20,
+    xl: 24,
+    xxl: 32
   },
   font: {
-    title: 26,
-    subtitle: 12,
-    body: 13,
-    section: 14,
-    metric: 22
+    family: "PixelFont",
+    title: 20,
+    section: 18,
+    body: 14,
+    label: 13,
+    caption: 12,
+    metric: 24
+  },
+  size: {
+    headerHeight: 56,
+    tabBarHeight: 76,
+    tabBarInset: 8,
+    pixelShadow: 4,
+    buttonHeight: 42,
+    buttonHeightSmall: 34,
+    avatarSm: 32,
+    avatarMd: 48,
+    avatarLg: 96
   }
 } as const;
 
-export type ButtonVariant = "neutral" | "primary" | "success" | "warning" | "danger";
+export type ButtonVariant = "neutral" | "primary" | "secondary" | "success" | "warning" | "danger";
