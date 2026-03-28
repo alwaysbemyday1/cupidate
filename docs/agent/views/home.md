@@ -1,55 +1,62 @@
-# Home View Spec
+﻿# Home View Spec (Prototype Rebuild)
 
-## 1. 목적/KPI
-- 목적: 사용자가 앱 접속 직후 매칭/주선 관련 핵심 상태를 빠르게 파악하고 즉시 액션하도록 유도
-- KPI:
-  - 홈 진입 후 액션 버튼 클릭률
-  - 추천 카드 상세 진입률
-  - 알림 확인률
+Last Updated: 2026-03-29
 
-## 2. 사용자 시나리오
-- Cupid가 홈에 진입한다.
-- 오늘의 추천과 알림을 확인한다.
-- 빠른 액션으로 매칭 요청 또는 수락을 수행한다.
-- 최근 활동 요약과 공지를 확인한다.
+## 1. 화면 목적
+- 앱 진입 즉시 "알림/추천/요약"을 확인하고 다음 액션으로 이동시키는 관제형 홈.
 
-## 3. UI 구성
-- 상단:
-  - 사용자/네트워크 상태 배지
-  - 공지 배너
-- 본문:
-  - 오늘의 추천 카드 섹션
-  - 실시간 알림 피드
-  - 최근 활동 요약 카드
-  - 빠른 액션 버튼 그룹
+## 2. 핵심 구성
+1) 상단 헤더
+- 타이틀: `Cupidate: Home`
+- 브랜드 포인트 단어 색상 강조(골드)
+
+2) Alarm Feed 섹션
+- 최신 알림 3~5건
+- 아이콘 + 텍스트 1행 구조
+- 읽지 않음 상태 강조
+
+3) Today's Rec's 섹션
+- 추천 카드 2열
+- 카드당 `프로필 2인 + 매칭률(%)`
+- 탭 시 Matching 상세로 이동
+
+4) Recent Summary 섹션
+- 총 Cupidate 수
+- 활성 매칭 수
+- 주선 성공 수 배지
+
+5) 빠른 액션 버튼
+- `지인 추가하기`
+- `내 프로필 업데이트`
+
+6) 하단 고정 탭바
+- `HOME / NETWORK / MATCH / MY INFO`
+- Home 활성 상태
+
+## 3. 디자인 규칙
+- 컨테이너는 모두 `PixelBox` 사용
+- 배경: 네이비 계열(`bg.navy.*`) 또는 아트 배경 에셋
+- 카드: `#F4E8D1`
+- 버튼 기본: `#3B5998` (secondary)
+- 강조 CTA: `#D84C73` (primary)
 
 ## 4. 데이터 계약
-- Query:
-  - `home_notifications` (최근 N개)
-  - `home_recommendations` (점수 상위 N개)
-  - `home_activity_summary` (요청/수락/완료 지표)
-  - `home_announcements`
-- Mutation:
-  - `accept_match_request`
-  - `send_match_request`
-  - `mark_notification_read`
+Queries:
+- `home_notifications`
+- `home_recommendations`
+- `home_activity_summary`
 
-## 5. 권한/프라이버시
-- RLS 기준으로 본인 및 연결된 Cupid 네트워크 범위만 노출
-- 차단 관계 데이터는 추천/알림에서 제외
+Actions:
+- 알림 클릭 -> 해당 화면 딥링크
+- 추천 카드 클릭 -> Matching 상세
+- 빠른 액션 -> Network/My 라우팅
 
-## 6. 상태 정의
-- Loading: 스켈레톤 카드/리스트
-- Empty: 추천/알림 없음 상태 문구 + CTA
-- Error: 재시도 버튼 + 오류 메시지
+## 5. 상태 정의
+- Loading: 픽셀 스켈레톤 카드
+- Empty: "표시할 알림/추천이 없습니다" + 액션 버튼
+- Error: 재시도 버튼 포함 오류 카드
 
-## 7. 이벤트 트래킹
-- `home_viewed`
-- `home_recommendation_clicked`
-- `home_quick_action_clicked`
-- `home_notification_clicked`
-
-## 8. 완료 기준
-- 홈에서 추천/알림/요약/빠른액션이 정상 렌더링
-- 액션 수행 후 상태가 즉시 반영
-- 연결되지 않은 사용자 데이터 노출 없음
+## 6. 완료 기준
+- 홈 1화면에서 오늘의 핵심 상태 인지 가능
+- 추천 카드/알림/버튼 라우팅 정상
+- 픽셀 톤이 다른 뷰와 일관됨
