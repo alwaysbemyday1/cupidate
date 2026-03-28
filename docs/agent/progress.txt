@@ -26,6 +26,7 @@ Completed Work
 - [x] First-pass pixel-console theme implementation (Task 2026-03-28-10)
 - [x] Auth session bootstrap and protected data gate (Task 2026-03-28-07)
 - [x] Connected-cupid discovery/search flow (Task 2026-03-28-08)
+- [x] Hero sprite asset integration (Task 2026-03-28-11)
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:
@@ -38,9 +39,9 @@ Task 2026-03-28-01 (Completed)
 - Verified with tests and TypeScript check.
 
 Next Tasks
- - Task 2026-03-28-11: replace placeholder hero frames with actual cupid sprite assets
  - Task 2026-03-28-12: improve locked-state UX with direct login CTA
  - Task 2026-03-28-13: add dedicated Network discovery interaction tests
+ - Task 2026-03-28-14: add empty/loading/error state cards per view based on design direction
 
 Task 2026-03-28-02 (Completed)
 - Added `src/features/network/repository` data layer:
@@ -132,3 +133,14 @@ Task 2026-03-28-08 (Completed)
   - app-state now manages search query, result list, and selected cupid
   - Network view now supports search -> select -> request UX
 - Added in-memory repository test coverage for discovery search behavior.
+
+Task 2026-03-28-11 (Completed)
+- Replaced Home hero placeholder blocks with real cupid sprite assets.
+- Added local sprite asset bundle:
+  - assets/sprites/cupid/cupid-01-idle.png
+  - assets/sprites/cupid/cupid-02-walk-a.png
+  - assets/sprites/cupid/cupid-03-walk-b.png
+  - assets/sprites/cupid/cupid-04-fly.png
+  - assets/sprites/cupid/cupid-05-fly-up.png
+  - assets/sprites/cupid/cupid-06-dive.png
+- Added `src/features/app/theme/sprites.ts` and updated `HomeView`/styles to render real `Image` sprites.

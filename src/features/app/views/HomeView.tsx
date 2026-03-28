@@ -1,9 +1,10 @@
-﻿import { ScrollView, Text, View } from "react-native";
+import { Image, ScrollView, Text, View } from "react-native";
 
 import { PixelButton } from "../components/PixelButton";
 import { SummaryCard } from "../components/SummaryCard";
-import { styles } from "../styles";
 import type { HomeSummary } from "../model/types";
+import { styles } from "../styles";
+import { cupidHeroSprites } from "../theme/sprites";
 
 type HomeViewProps = {
   homeSummary: HomeSummary;
@@ -21,8 +22,10 @@ export function HomeView({ homeSummary, notifications, onGoNetwork, onGoMatching
         </Text>
         <Text style={styles.heroSubtitle}>PRESS START TO MATCH</Text>
         <View style={styles.spriteRow}>
-          {[0, 1, 2, 3, 4, 5].map((frame) => (
-            <View key={frame} style={styles.spriteFrame} />
+          {cupidHeroSprites.map((source, index) => (
+            <View key={`cupid-sprite-${index}`} style={styles.spriteFrame}>
+              <Image source={source} style={styles.spriteImage} resizeMode="contain" />
+            </View>
           ))}
         </View>
       </View>

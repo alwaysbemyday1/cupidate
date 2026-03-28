@@ -1,4 +1,4 @@
-﻿import { StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
 import { designTokens } from "./theme/tokens";
 
@@ -136,11 +136,17 @@ export const styles = StyleSheet.create({
     flexWrap: "wrap"
   },
   spriteFrame: {
-    width: 22,
-    height: 22,
+    width: 34,
+    height: 34,
     borderWidth: b.normal,
     borderColor: c.border,
-    backgroundColor: c.bgAlt
+    backgroundColor: c.bgAlt,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  spriteImage: {
+    width: 28,
+    height: 28
   },
   fieldLabel: {
     color: c.textPrimary,
@@ -277,3 +283,4 @@ export const styles = StyleSheet.create({
     paddingVertical: s.xs
   }
 });
+

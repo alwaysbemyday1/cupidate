@@ -169,3 +169,21 @@ Changes:
 Verification:
 - `npm.cmd test` passed (9 suites / 22 tests).
 - `npx.cmd tsc --noEmit` passed.
+
+### Task 2026-03-28-11 - Hero Sprite Asset Integration
+Status: Completed
+
+Changes:
+- Generated a local cupid sprite sequence and added six PNG assets under `assets/sprites/cupid/`.
+- Added sprite asset module:
+  - `src/features/app/theme/sprites.ts`
+- Updated Home hero strip to render actual sprites with `Image` instead of placeholder boxes:
+  - `src/features/app/views/HomeView.tsx`
+  - `src/features/app/styles.ts`
+
+Verification:
+- `npm.cmd test` passed.
+- `npx.cmd tsc --noEmit` passed.
+
+Notes:
+- Hero strip now uses real visual identity and can be extended to frame-based animation in a follow-up task.
