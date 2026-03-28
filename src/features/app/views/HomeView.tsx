@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Image, ScrollView, Text, View } from "react-native";
 
 import { PixelButton } from "../components/PixelButton";
@@ -6,6 +7,8 @@ import { SummaryCard } from "../components/SummaryCard";
 import type { HomeSummary } from "../model/types";
 import { styles } from "../styles";
 import { cupidHeroSprites } from "../theme/sprites";
+
+const SPRITE_FRAME_INTERVAL_MS = 180;
 
 type HomeViewProps = {
   homeSummary: HomeSummary;
@@ -24,6 +27,20 @@ export function HomeView({
   isHomeLoading,
   homeError
 }: HomeViewProps) {
+  const [activeFrameIndex, setActiveFrameIndex] = useState(0);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === "test") {
+      return;
+    }
+
+    const timerId = setInterval(() => {
+      setActiveFrameIndex((previous) => (previous + 1) % cupidHeroSprites.length);
+    }, SPRITE_FRAME_INTERVAL_MS);
+
+    return () => clearInterval(timerId);
+  }, []);
+
   return (
     <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
       <View style={styles.heroCard}>
@@ -31,10 +48,20 @@ export function HomeView({
           CUPID <Text style={styles.heroTitleAccent}>MODE</Text>
         </Text>
         <Text style={styles.heroSubtitle}>PRESS START TO MATCH</Text>
+        <Text style={styles.heroFrameMeta}>
+          FRAME {activeFrameIndex + 1}/{cupidHeroSprites.length}
+        </Text>
         <View style={styles.spriteRow}>
           {cupidHeroSprites.map((source, index) => (
-            <View key={`cupid-sprite-${index}`} style={styles.spriteFrame}>
-              <Image source={source} style={styles.spriteImage} resizeMode="contain" />
+            <View
+              key={`cupid-sprite-${index}`}
+              style={[styles.spriteFrame, activeFrameIndex === index ? styles.spriteFrameActive : null]}
+            >
+              <Image
+                source={source}
+                style={[styles.spriteImage, activeFrameIndex === index ? styles.spriteImageActive : null]}
+                resizeMode="contain"
+              />
             </View>
           ))}
         </View>

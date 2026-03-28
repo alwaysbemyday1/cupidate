@@ -30,6 +30,7 @@ Completed Work
 - [x] Locked-state UX with direct auth CTA (Task 2026-03-28-12)
 - [x] Network discovery interaction test coverage (Task 2026-03-28-13)
 - [x] View-level empty/loading/error state cards (Task 2026-03-28-14)
+- [x] Home hero sprite loop animation (Task 2026-03-28-15)
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:
@@ -42,9 +43,9 @@ Task 2026-03-28-01 (Completed)
 - Verified with tests and TypeScript check.
 
 Next Tasks
- - Task 2026-03-28-15: add lightweight sprite frame loop animation on Home hero strip
  - Task 2026-03-28-16: add Auth gate UI interaction tests (validation/sign-in error/success messaging)
  - Task 2026-03-28-17: add per-view retry actions for recoverable sync errors
+ - Task 2026-03-28-18: wire retry handlers from app-state into state cards for network/matching/my
 
 Task 2026-03-28-02 (Completed)
 - Added `src/features/network/repository` data layer:
@@ -183,3 +184,9 @@ Task 2026-03-28-14 (Completed)
   - `homeError`, `networkError`, `matchingError`, `myError`
   - plus `isHomeLoading`, `isMyLoading`
 - Wired App shell to pass new state props into each view.
+
+Task 2026-03-28-15 (Completed)
+- Added lightweight step-loop animation to Home hero sprite strip.
+- Home view now cycles active frame every 180ms and highlights the current sprite frame.
+- Added frame meta label (`FRAME x/6`) and active frame visual treatment.
+- Added test-safe guard to disable animation interval while running Jest.

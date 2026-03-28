@@ -246,3 +246,20 @@ Verification:
 
 Notes:
 - Empty/loading/error experiences now follow the same pixel-console visual language as primary cards.
+
+### Task 2026-03-28-15 - Home Hero Sprite Loop Animation
+Status: Completed
+
+Changes:
+- Added lightweight frame-loop behavior to Home hero sprite strip.
+- Implemented active-frame cycle (`180ms`) in `HomeView` with interval cleanup.
+- Added current frame indicator text (`FRAME x/6`).
+- Added active/inactive sprite visual states in styles for step-like motion feel.
+- Added test-mode guard so loop timer is disabled during Jest runs.
+
+Verification:
+- `npm.cmd test` passed.
+- `npx.cmd tsc --noEmit` passed.
+
+Notes:
+- This gives the home command center a living sprite identity while keeping implementation lightweight.

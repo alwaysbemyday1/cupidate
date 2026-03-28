@@ -132,6 +132,13 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: s.xxs
   },
+  heroFrameMeta: {
+    color: c.textMuted,
+    fontFamily: "monospace",
+    fontWeight: "700",
+    fontSize: 11,
+    marginTop: s.xxs
+  },
   spriteRow: {
     marginTop: s.sm,
     flexDirection: "row",
@@ -145,11 +152,22 @@ export const styles = StyleSheet.create({
     borderColor: c.border,
     backgroundColor: c.bgAlt,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    opacity: 0.7
+  },
+  spriteFrameActive: {
+    borderColor: c.titleBlue,
+    backgroundColor: c.cardBgAccent,
+    opacity: 1
   },
   spriteImage: {
     width: 28,
-    height: 28
+    height: 28,
+    opacity: 0.75
+  },
+  spriteImageActive: {
+    opacity: 1,
+    transform: [{ translateY: -1 }]
   },
   fieldLabel: {
     color: c.textPrimary,
