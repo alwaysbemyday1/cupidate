@@ -1,8 +1,8 @@
 [Cupidate Progress Tracker]
-Last Updated: 2026-03-28
+Last Updated: 2026-03-29
 
 Current Track: Service Build (Post-POC)
-Current Phase: S3 Auth Gate + View Hardening
+Current Phase: S3 Pixel UI Rebuild (D0 Spec Lock)
 Overall Status: in_progress
 
 Architecture Decision
@@ -37,6 +37,14 @@ Completed Work
 - [x] Navigation tab interaction coverage (Task 2026-03-28-22)
 - [x] Expanded profile/preference capture + Supabase persistence path (Task 2026-03-28-23)
 - [x] Match-rate algorithm v2 (lifestyle/location/profile aware) (Task 2026-03-28-24)
+- [x] Prototype-based UI rebuild spec lock (Task 2026-03-29-01)
+- [x] Palette correction (remove ocean assumption, pink/navy lock) (Task 2026-03-29-01A)
+- [x] Agent docs consolidation (Task 2026-03-29-01B)
+
+Next Tasks (Rebuild Track)
+ - Task 2026-03-29-02: Pixel primitives refactor (`PixelText`, `PixelBox`, `PixelButton`, `PixelTabBar`)
+ - Task 2026-03-29-03: My View vertical slice rebuild + Supabase preference binding verification
+ - Task 2026-03-29-04: Home/Network/Matching sequential rebuild with shared component reuse
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:
@@ -251,3 +259,42 @@ Task 2026-03-28-24 (Completed)
   - region preference fit
   - profile fit (preferred gender/height)
 - `reason.breakdown` now includes `profile` sub-score and is rendered in Matching cards.
+
+Task 2026-03-29-01 (Completed)
+- Re-analyzed prototype images and rebuilt design docs for service-wide UI migration.
+- Added design-system docs:
+  - `docs/agent/design_tokens.md`
+  - `docs/agent/component_spec.md`
+  - `docs/agent/design_assets.md`
+  - `docs/agent/rebuild_plan.md`
+- Rewrote view specs to clean UTF-8 and aligned each to prototype IA:
+  - `docs/agent/views/home.md`
+  - `docs/agent/views/network.md`
+  - `docs/agent/views/matching.md`
+  - `docs/agent/views/my.md`
+- Updated design direction and docs index:
+  - `docs/agent/design_direction.md`
+  - `docs/agent/README.md`
+- Extended `feature_list.json` design_system references for rebuild-phase governance.
+
+Task 2026-03-29-01A (Completed)
+- Removed ocean-fixed background assumptions from design docs.
+- Locked UI palette direction to pink/navy + beige panel contrast.
+- Strengthened PixelButton spec with explicit CTA semantics and bevel/button-size rules.
+- Synced related docs:
+  - `docs/agent/design_direction.md`
+  - `docs/agent/design_tokens.md`
+  - `docs/agent/component_spec.md`
+  - `docs/agent/views/home.md`
+  - `docs/agent/design_assets.md`
+  - `docs/agent/feature_list.json`
+
+Task 2026-03-29-01B (Completed)
+- Consolidated design docs into one source:
+  - `docs/agent/design_system.md`
+- Consolidated domain + data-contract docs into one source:
+  - `docs/agent/domain_data.md`
+- Kept view docs separated (`views/*`) per current product decision.
+- Updated agent index and feature metadata references:
+  - `docs/agent/README.md`
+  - `docs/agent/feature_list.json`

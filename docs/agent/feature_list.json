@@ -30,7 +30,7 @@
   "critical_focus": {
     "title": "Match-rate correctness and explainability",
     "reason": "Product success depends on trustworthy match quality and transparent recommendation reasons.",
-    "source_of_truth": "docs/agent/matching_data_spec.md"
+    "source_of_truth": "docs/agent/domain_data.md"
   },
   "service_views": [
     {
@@ -112,12 +112,13 @@
     },
     {
       "id": "S3",
-      "title": "View-Level Hardening",
+      "title": "View Hardening + Pixel UI Rebuild",
       "status": "in_progress",
       "deliverables": [
         "UI interaction tests",
         "Error/loading UX hardening",
-        "Supabase auth-flow alignment"
+        "Supabase auth-flow alignment",
+        "Prototype-based pixel UI rebuilding"
       ]
     },
     {
@@ -133,16 +134,18 @@
   ],
   "design_system": {
     "reference_docs": [
-      "docs/agent/design_direction.md"
+      "docs/agent/design_system.md"
     ],
     "style_keywords": [
-      "retro-pixel-console",
-      "sprite-first-identity",
-      "beveled-heavy-borders",
-      "navy-cyan-orange-palette"
+      "pink-navy-pixel-console",
+      "hard-pixel-shadow",
+      "beige-panel-strong-contrast",
+      "korean-pixel-typography"
     ],
     "mandatory_rules": [
       "no-rounded-corners-default",
+      "pixelText-wrapper-only",
+      "pixelBox-hard-shadow-only",
       "semantic-button-variants",
       "state-visible-ui",
       "designed-empty-loading-error"

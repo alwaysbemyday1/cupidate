@@ -329,3 +329,77 @@ Verification:
 
 Notes:
 - This closes the requested path from user input profile/preference data to match-rate computation and Supabase persistence.
+
+## 2026-03-29
+
+### Task 2026-03-29-01 - Prototype-Based UI Rebuild Spec Lock
+Status: Completed
+
+Changes:
+- Re-analyzed latest visual prototypes:
+  - `docs/design/pt_home_network_260329.png`
+  - `docs/design/pt_info_260329.png`
+  - `docs/design/pt_matching_260329.png`
+- Rebuilt design governance docs for the new visual baseline:
+  - `docs/agent/design_direction.md`
+  - `docs/agent/design_tokens.md`
+  - `docs/agent/component_spec.md`
+  - `docs/agent/design_assets.md`
+  - `docs/agent/rebuild_plan.md`
+- Rewrote view-level specs in clean UTF-8 and aligned to Home/Network/Matching/My IA:
+  - `docs/agent/views/home.md`
+  - `docs/agent/views/network.md`
+  - `docs/agent/views/matching.md`
+  - `docs/agent/views/my.md`
+- Updated agent docs index and feature metadata:
+  - `docs/agent/README.md`
+  - `docs/agent/feature_list.json`
+  - `docs/agent/progress.txt`
+
+Verification:
+- `Get-Content -Raw` check for all updated docs.
+- `feature_list.json` validated via `ConvertFrom-Json`.
+
+Notes:
+- Next implementation starts with D1 primitives, then D2(My view vertical slice), then Home/Network/Matching.
+
+### Task 2026-03-29-01A - Palette Correction (Pink/Navy Lock)
+Status: Completed
+
+Changes:
+- Removed ocean-specific assumptions from design direction and home spec.
+- Updated color rules to pink/navy centered palette:
+  - primary pink `#D84C73`
+  - secondary navy `#3B5998`
+  - deep navy base `#1F2A44`, `#2A3C66`
+  - beige panel `#F4E8D1`
+- Refined token map and style keywords to match the corrected direction.
+- Extended PixelButton spec:
+  - CTA semantics (`primary` pink / `secondary` navy)
+  - bevel rule
+  - minimum size guidance
+
+Verification:
+- `rg -n "ocean|오션|#4A90E2|blue-ocean|tropical" docs/agent` returned no matches.
+- `feature_list.json` schema sanity rechecked.
+
+### Task 2026-03-29-01B - Agent Docs Consolidation
+Status: Completed
+
+Changes:
+- Consolidated fragmented design references into a single doc:
+  - `docs/agent/design_system.md`
+- Consolidated matching data spec + repository contracts into a single doc:
+  - `docs/agent/domain_data.md`
+- Updated docs entry points and metadata references:
+  - `docs/agent/README.md`
+  - `docs/agent/feature_list.json`
+- Kept per-view spec docs separate as requested:
+  - `docs/agent/views/home.md`
+  - `docs/agent/views/network.md`
+  - `docs/agent/views/matching.md`
+  - `docs/agent/views/my.md`
+
+Verification:
+- `feature_list.json` parse check passed.
+- consolidated docs read check passed.
