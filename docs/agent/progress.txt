@@ -42,6 +42,7 @@ Completed Work
 - [x] Agent docs consolidation (Task 2026-03-29-01B)
 - [x] Design system fidelity hardening (Task 2026-03-29-01C)
 - [x] Prototype source/fidelity clarification (Task 2026-03-29-01D)
+- [x] Codexrules document routing guide (Task 2026-03-29-01E)
 
 Next Tasks (Rebuild Track)
  - Task 2026-03-29-02: Pixel primitives refactor (`PixelText`, `PixelBox`, `PixelButton`, `PixelTabBar`)
@@ -319,3 +320,14 @@ Task 2026-03-29-01D (Completed)
 - Updated:
   - `docs/agent/design_system.md`
   - `docs/agent/README.md`
+
+Task 2026-03-29-01E (Completed)
+- Added document routing guidance into `docs/agent/codexrules.md`.
+- Clarified that `codexrules.md` remains the top-level rulebook.
+- Added situation-based reading map for:
+  - project scope / phase
+  - design implementation
+  - prototype image source
+  - domain data / preference / scoring rules
+  - view-specific PRD
+  - recent implementation history

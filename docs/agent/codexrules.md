@@ -47,3 +47,34 @@
 - **Micro-Commits:** 한 번에 하나의 컴포넌트 또는 로직만 작성하고 검토를 요청할 것.
 - **State Tracking:** 작업 시작 시 반드시 `docs/agent/feature_list.json`과 `docs/agent/progress.txt`를 읽고 현재 컨텍스트를 파악할 것. 작업 완료 후 진행 상태를 업데이트할 것.
 - **No Assumptions:** 매칭 알고리즘이나 RLS 정책 작성 시, 추측하지 말고 `docs/agent/codexrules.md`의 도메인 룰을 최우선으로 따를 것.
+
+## 6. Document Routing (What To Read When)
+
+- **Top-level rulebook:** `docs/agent/codexrules.md`
+  - 가장 먼저 읽는 문서다.
+  - 도메인 불변 규칙, 디자인 원칙, 에이전트 작업 방식의 최상위 기준이다.
+- **Project scope / current phase:** `docs/agent/feature_list.json`, `docs/agent/progress.txt`
+  - 현재 서비스 범위, 뷰 구조, 진행 단계, 다음 작업 우선순위를 확인할 때 읽는다.
+- **Design implementation guide:** `docs/agent/design_system.md`
+  - 색상, 버튼, 그림자, 픽셀 폰트, 탭바, 컴포넌트 규칙, QA 체크포인트를 확인할 때 읽는다.
+- **Prototype source images:** `docs/design/`
+  - 디자인 레퍼런스 원본 이미지가 위치한 폴더다.
+  - `docs/design/pt_home_network_260329.png`
+  - `docs/design/pt_info_260329.png`
+  - `docs/design/pt_matching_260329.png`
+- **Domain / preference / match-rate / repository contracts:** `docs/agent/domain_data.md`
+  - 선호도 데이터 구조, 프로필 입력 모델, 매칭률 계산 기준, 저장소 계약을 확인할 때 읽는다.
+- **View-specific PRD:** `docs/agent/views/home.md`, `docs/agent/views/network.md`, `docs/agent/views/matching.md`, `docs/agent/views/my.md`
+  - 특정 화면의 구성, 섹션 순서, 상태 정의, 완료 기준을 확인할 때 읽는다.
+- **Recent implementation history:** `docs/agent/worklog.md`
+  - 최근에 무엇을 바꿨는지, 어떤 의사결정이 있었는지 추적할 때 읽는다.
+
+읽기 우선순위:
+1. `docs/agent/codexrules.md`
+2. `docs/agent/feature_list.json`
+3. `docs/agent/progress.txt`
+4. 필요한 경우 아래로 분기
+5. 디자인 작업이면 `docs/agent/design_system.md` + `docs/design/`
+6. 도메인/데이터 작업이면 `docs/agent/domain_data.md`
+7. 특정 화면 작업이면 해당 `docs/agent/views/*.md`
+8. 직전 변경 맥락이 필요하면 `docs/agent/worklog.md`

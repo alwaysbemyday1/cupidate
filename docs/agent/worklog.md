@@ -436,3 +436,20 @@ Changes:
 
 Verification:
 - UTF-8 read check passed for updated docs.
+
+### Task 2026-03-29-01E - Codexrules Document Routing Guide
+Status: Completed
+
+Changes:
+- Updated `docs/agent/codexrules.md` to explicitly document which file to read by task type.
+- Added routing guidance for:
+  - top-level rules
+  - project scope / current phase
+  - design implementation
+  - prototype image source folder
+  - domain data / preference / scoring rules
+  - view-specific PRD
+  - recent implementation history
+
+Verification:
+- UTF-8 read check passed for `docs/agent/codexrules.md`.
