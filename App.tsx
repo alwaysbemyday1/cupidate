@@ -4,15 +4,45 @@ import { useState } from "react";
 import { Text, View } from "react-native";
 
 import { PixelButton } from "./src/features/app/components/PixelButton";
+import { useAuthSessionGate } from "./src/features/auth/hooks/useAuthSessionGate";
 import { useCupidateAppState } from "./src/features/app/model/useCupidateAppState";
 import { styles } from "./src/features/app/styles";
+import { AuthRequiredView } from "./src/features/app/views/AuthRequiredView";
 import { HomeView } from "./src/features/app/views/HomeView";
 import { MatchingView } from "./src/features/app/views/MatchingView";
 import { MyView } from "./src/features/app/views/MyView";
 import { NetworkView } from "./src/features/app/views/NetworkView";
 
 function CupidateAppShell() {
-  const state = useCupidateAppState();
+  const authGate = useAuthSessionGate();
+  const state = useCupidateAppState({
+    isDataAccessEnabled: authGate.canAccessProtectedData
+  });
+
+  if (authGate.mode === "supabase" && !authGate.canAccessProtectedData) {
+    return (
+      <View style={styles.safeArea}>
+        <StatusBar style="light" />
+        <View style={styles.container}>
+          <View style={styles.headerFrame}>
+            <View style={styles.headerRow}>
+              <View>
+                <Text style={styles.title}>
+                  CUPIDATE <Text style={styles.titleAccent}>ARCADE</Text>
+                </Text>
+                <Text style={styles.subtitle}>PIXEL MATCH NETWORK</Text>
+              </View>
+              <View style={styles.statusBadge}>
+                <Text style={styles.statusText}>LOCKED</Text>
+              </View>
+            </View>
+          </View>
+
+          <AuthRequiredView isLoading={authGate.isLoading} error={authGate.error} onRefresh={authGate.refresh} />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.safeArea}>

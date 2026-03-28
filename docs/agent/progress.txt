@@ -2,7 +2,7 @@
 Last Updated: 2026-03-28
 
 Current Track: Service Build (Post-POC)
-Current Phase: S3 Design Token Rollout
+Current Phase: S3 Auth Gate + View Hardening
 Overall Status: in_progress
 
 Architecture Decision
@@ -24,6 +24,7 @@ Completed Work
 - [x] Matching UI interaction flow tests (Task 2026-03-28-06)
 - [x] Design direction setup from visual references (Task 2026-03-28-09)
 - [x] First-pass pixel-console theme implementation (Task 2026-03-28-10)
+- [x] Auth session bootstrap and protected data gate (Task 2026-03-28-07)
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:
@@ -36,9 +37,9 @@ Task 2026-03-28-01 (Completed)
 - Verified with tests and TypeScript check.
 
 Next Tasks
- - Task 2026-03-28-07: add auth session bootstrap and protected data gate
  - Task 2026-03-28-08: implement connected-cupid discovery/search flow (ID input removal)
  - Task 2026-03-28-11: replace placeholder hero frames with actual cupid sprite assets
+ - Task 2026-03-28-12: improve locked-state UX with direct login CTA
 
 Task 2026-03-28-02 (Completed)
 - Added `src/features/network/repository` data layer:
@@ -109,3 +110,14 @@ Task 2026-03-28-10 (Completed)
   - Home now includes signature hero board (`CUPID MODE`) and sprite-frame strip
   - action buttons mapped to semantic color roles across Network/Matching/My
 - Updated header branding and tests for new title variant (`CUPIDATE ARCADE`).
+
+Task 2026-03-28-07 (Completed)
+- Added auth-session bootstrap hook:
+  - `src/features/auth/hooks/useAuthSessionGate.ts`
+- Added protected-data gate UI:
+  - `src/features/app/views/AuthRequiredView.tsx`
+- App shell now blocks Network/Matching data views when Supabase is configured but no valid session exists.
+- Query hooks now support `enabled` toggling to prevent protected requests before auth readiness:
+  - `src/features/network/hooks/useNetworkData.ts`
+  - `src/features/matching/hooks/useMatchingData.ts`
+- App state now accepts `isDataAccessEnabled` and safely no-ops protected mutations when access is blocked.

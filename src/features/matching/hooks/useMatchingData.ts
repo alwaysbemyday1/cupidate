@@ -12,10 +12,15 @@ export const matchingQueryKeys = {
   candidates: () => [...matchingQueryKeys.root, "candidates"] as const
 };
 
-export function useMatchCandidatesQuery() {
+type QueryHookOptions = {
+  enabled?: boolean;
+};
+
+export function useMatchCandidatesQuery(options?: QueryHookOptions) {
   return useQuery({
     queryKey: matchingQueryKeys.candidates(),
-    queryFn: () => getMatchingRepository().listCandidates()
+    queryFn: () => getMatchingRepository().listCandidates(),
+    enabled: options?.enabled ?? true
   });
 }
 

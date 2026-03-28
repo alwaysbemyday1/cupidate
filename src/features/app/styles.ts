@@ -17,6 +17,35 @@ export const styles = StyleSheet.create({
     paddingHorizontal: s.lg,
     paddingBottom: s.lg
   },
+  centerPanel: {
+    flex: 1,
+    justifyContent: "center",
+    paddingHorizontal: s.lg
+  },
+  gateCard: {
+    borderWidth: b.heavy,
+    borderColor: c.border,
+    backgroundColor: c.cardBg,
+    padding: s.md,
+    gap: s.xs
+  },
+  gateTitle: {
+    color: c.titleOrange,
+    fontFamily: "monospace",
+    fontWeight: "800",
+    fontSize: 20
+  },
+  gateText: {
+    color: c.textPrimary,
+    fontFamily: "monospace",
+    fontSize: 13,
+    lineHeight: 18
+  },
+  gateHint: {
+    color: c.textMuted,
+    fontFamily: "monospace",
+    fontSize: 12
+  },
   headerFrame: {
     marginTop: s.md,
     marginBottom: s.xs,

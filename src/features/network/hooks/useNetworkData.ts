@@ -14,24 +14,31 @@ export const networkQueryKeys = {
   connections: () => [...networkQueryKeys.root, "connections"] as const
 };
 
-export function useCurrentCupidQuery() {
+type QueryHookOptions = {
+  enabled?: boolean;
+};
+
+export function useCurrentCupidQuery(options?: QueryHookOptions) {
   return useQuery({
     queryKey: networkQueryKeys.currentCupid(),
-    queryFn: () => getNetworkRepository().getCurrentCupid()
+    queryFn: () => getNetworkRepository().getCurrentCupid(),
+    enabled: options?.enabled ?? true
   });
 }
 
-export function useCupidatesQuery() {
+export function useCupidatesQuery(options?: QueryHookOptions) {
   return useQuery({
     queryKey: networkQueryKeys.cupidates(),
-    queryFn: () => getNetworkRepository().listCupidates()
+    queryFn: () => getNetworkRepository().listCupidates(),
+    enabled: options?.enabled ?? true
   });
 }
 
-export function useConnectionsQuery() {
+export function useConnectionsQuery(options?: QueryHookOptions) {
   return useQuery({
     queryKey: networkQueryKeys.connections(),
-    queryFn: () => getNetworkRepository().listConnections()
+    queryFn: () => getNetworkRepository().listConnections(),
+    enabled: options?.enabled ?? true
   });
 }
 

@@ -133,3 +133,19 @@ Changes:
 Verification:
 - `npm.cmd test` passed.
 - `npx.cmd tsc --noEmit` passed.
+
+### Task 2026-03-28-07 - Auth Session Bootstrap + Protected Data Gate
+Status: Completed
+
+Changes:
+- Added auth session bootstrap hook:
+  - `src/features/auth/hooks/useAuthSessionGate.ts`
+- Added lock screen view for unauthenticated Supabase mode:
+  - `src/features/app/views/AuthRequiredView.tsx`
+- Updated app shell to enforce gate before protected views are rendered.
+- Added `enabled` options to network/matching query hooks so protected queries do not run pre-auth.
+- Updated app state hook to consume access flag and guard protected mutations.
+
+Verification:
+- `npm.cmd test` passed.
+- `npx.cmd tsc --noEmit` passed.

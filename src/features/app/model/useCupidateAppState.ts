@@ -98,7 +98,12 @@ export function pairKey(sourceCupidateId: string, targetCupidateId: string) {
   return `${sourceCupidateId}:${targetCupidateId}`;
 }
 
-export function useCupidateAppState() {
+type UseCupidateAppStateOptions = {
+  isDataAccessEnabled?: boolean;
+};
+
+export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
+  const isDataAccessEnabled = options?.isDataAccessEnabled ?? true;
   const [activeView, setActiveView] = useState<AppView>("home");
   const [networkSegment, setNetworkSegment] = useState<NetworkSegment>("cupidates");
   const [displayName, setDisplayName] = useState("");
@@ -115,10 +120,10 @@ export function useCupidateAppState() {
   const [notificationEnabled, setNotificationEnabled] = useState(true);
   const [nicknameHydrated, setNicknameHydrated] = useState(false);
 
-  const currentCupidQuery = useCurrentCupidQuery();
-  const cupidatesQuery = useCupidatesQuery();
-  const connectionsQuery = useConnectionsQuery();
-  const matchCandidatesQuery = useMatchCandidatesQuery();
+  const currentCupidQuery = useCurrentCupidQuery({ enabled: isDataAccessEnabled });
+  const cupidatesQuery = useCupidatesQuery({ enabled: isDataAccessEnabled });
+  const connectionsQuery = useConnectionsQuery({ enabled: isDataAccessEnabled });
+  const matchCandidatesQuery = useMatchCandidatesQuery({ enabled: isDataAccessEnabled });
 
   const createCupidateMutation = useCreateCupidateMutation();
   const createConnectionMutation = useCreateConnectionMutation();
@@ -240,6 +245,10 @@ export function useCupidateAppState() {
   );
 
   const onRegisterCupidate = async () => {
+    if (!isDataAccessEnabled) {
+      return;
+    }
+
     const formErrors = validateForm(displayName, birthYearInput, gender);
     setErrors(formErrors);
 
@@ -273,6 +282,10 @@ export function useCupidateAppState() {
   };
 
   const onAddConnection = async () => {
+    if (!isDataAccessEnabled) {
+      return;
+    }
+
     if (!newConnectionCupidId.trim()) {
       return;
     }
@@ -285,6 +298,10 @@ export function useCupidateAppState() {
   };
 
   const onSaveNickname = async () => {
+    if (!isDataAccessEnabled) {
+      return;
+    }
+
     if (!myNickname.trim()) {
       return;
     }
@@ -294,6 +311,10 @@ export function useCupidateAppState() {
   };
 
   const onSendRequest = async (sourceCupidateId: string, targetCupidateId: string) => {
+    if (!isDataAccessEnabled) {
+      return;
+    }
+
     const key = pairKey(sourceCupidateId, targetCupidateId);
     if (requestByPair.get(key)) {
       return;
@@ -324,6 +345,10 @@ export function useCupidateAppState() {
     targetCupidateId: string,
     status: MatchRequestStatus
   ) => {
+    if (!isDataAccessEnabled) {
+      return;
+    }
+
     const request = requestByPair.get(pairKey(sourceCupidateId, targetCupidateId));
     if (!request) {
       return;
@@ -395,6 +420,7 @@ export function useCupidateAppState() {
     isMutatingMatching:
       requestMatchMutation.isPending || updateMatchStatusMutation.isPending || markContactSharedMutation.isPending,
     isSavingNickname: upsertNicknameMutation.isPending,
+    isDataAccessEnabled,
     onRegisterCupidate,
     onAddConnection,
     onSaveNickname,
