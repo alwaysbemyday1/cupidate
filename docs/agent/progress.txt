@@ -34,6 +34,9 @@ Completed Work
 - [x] Auth gate interaction test coverage (Task 2026-03-28-16)
 - [x] Retry action CTA on error states (Task 2026-03-28-17)
 - [x] App-state retry wiring for view state cards (Task 2026-03-28-18)
+- [x] Navigation tab interaction coverage (Task 2026-03-28-22)
+- [x] Expanded profile/preference capture + Supabase persistence path (Task 2026-03-28-23)
+- [x] Match-rate algorithm v2 (lifestyle/location/profile aware) (Task 2026-03-28-24)
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:
@@ -225,3 +228,26 @@ Task 2026-03-28-18 (Completed)
   - `onRetryMy`
 - Retry behavior resets relevant mutation error states and refetches related query data.
 - App shell now passes retry handlers into Home/Network/Matching/My views.
+
+Task 2026-03-28-22 (Completed)
+- Added dedicated 4-tab navigation interaction test:
+  - `src/features/app/__tests__/navigationTabs.test.tsx`
+- Covered Home -> Network -> Matching -> My -> Home round-trip flow using user-level tab presses.
+
+Task 2026-03-28-23 (Completed)
+- Expanded cupidate registration data capture for profile/preference fields in Network view.
+- Added persisted inputs:
+  - profile: region, job title, height, smoking habit, drinking habit, hobbies
+  - preference: preferred age range, preferred regions, preferred smoking/drinking,
+    preferred gender, preferred height range
+- App-state now serializes these fields into `preferences` json and persists via existing Supabase repository path.
+
+Task 2026-03-28-24 (Completed)
+- Upgraded `calculateMatchScore` and normalization contracts for richer matching signals.
+- New score factors:
+  - age fit
+  - hobby overlap
+  - lifestyle preference fit (smoking/drinking)
+  - region preference fit
+  - profile fit (preferred gender/height)
+- `reason.breakdown` now includes `profile` sub-score and is rendered in Matching cards.

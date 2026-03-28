@@ -305,3 +305,27 @@ Verification:
 
 Notes:
 - Recoverable sync failures now have immediate in-context recovery actions.
+
+### Task 2026-03-28-22/23/24 - Navigation + Profile/Preference + Match-Rate Upgrade
+Status: Completed
+
+Changes:
+- Added app-level 4-tab navigation test:
+  - `src/features/app/__tests__/navigationTabs.test.tsx`
+- Expanded Network cupidate form and app-state with profile/preference inputs:
+  - profile: region, job title, height, smoking/drinking habit, hobbies
+  - preference: preferred age range/regions/smoking/drinking/gender/height range
+- Persisted the expanded payload through the existing Network repository `preferences` json path (Supabase + in-memory).
+- Upgraded matching domain contracts and scoring logic:
+  - `normalizePreferences.ts` now supports richer fields + legacy compatibility
+  - `calculateMatchScore.ts` now computes `age/hobbies/lifestyle/location/profile`
+  - score breakdown includes `profile` category
+- Matching cards now render detailed breakdown lines in UI.
+
+Verification:
+- `npm.cmd test -- navigationTabs.test.tsx` passed.
+- `npm.cmd test` passed.
+- `npx.cmd tsc --noEmit` passed.
+
+Notes:
+- This closes the requested path from user input profile/preference data to match-rate computation and Supabase persistence.

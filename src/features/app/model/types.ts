@@ -32,6 +32,9 @@ export type ValidationErrors = {
   displayName?: string;
   birthYear?: string;
   gender?: string;
+  preferredAgeRange?: string;
+  height?: string;
+  preferredHeightRange?: string;
 };
 
 export type HomeSummary = {

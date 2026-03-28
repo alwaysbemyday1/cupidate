@@ -27,6 +27,30 @@ type NetworkViewProps = {
   onChangeHobbiesInput: (value: string) => void;
   locationInput: string;
   onChangeLocationInput: (value: string) => void;
+  jobTitleInput: string;
+  onChangeJobTitleInput: (value: string) => void;
+  heightInput: string;
+  onChangeHeightInput: (value: string) => void;
+  smokingHabit: "none" | "sometimes" | "often";
+  onChangeSmokingHabit: (value: "none" | "sometimes" | "often") => void;
+  drinkingHabit: "never" | "social" | "often";
+  onChangeDrinkingHabit: (value: "never" | "social" | "often") => void;
+  preferredAgeMinInput: string;
+  onChangePreferredAgeMinInput: (value: string) => void;
+  preferredAgeMaxInput: string;
+  onChangePreferredAgeMaxInput: (value: string) => void;
+  preferredRegionsInput: string;
+  onChangePreferredRegionsInput: (value: string) => void;
+  preferredSmoking: "none_only" | "ok" | "any";
+  onChangePreferredSmoking: (value: "none_only" | "ok" | "any") => void;
+  preferredDrinking: "never" | "social" | "often" | "any";
+  onChangePreferredDrinking: (value: "never" | "social" | "often" | "any") => void;
+  preferredGender: "any" | "male" | "female" | "other";
+  onChangePreferredGender: (value: "any" | "male" | "female" | "other") => void;
+  preferredHeightMinInput: string;
+  onChangePreferredHeightMinInput: (value: string) => void;
+  preferredHeightMaxInput: string;
+  onChangePreferredHeightMaxInput: (value: string) => void;
   bio: string;
   onChangeBio: (value: string) => void;
   errors: ValidationErrors;
@@ -63,6 +87,30 @@ export function NetworkView({
   onChangeHobbiesInput,
   locationInput,
   onChangeLocationInput,
+  jobTitleInput,
+  onChangeJobTitleInput,
+  heightInput,
+  onChangeHeightInput,
+  smokingHabit,
+  onChangeSmokingHabit,
+  drinkingHabit,
+  onChangeDrinkingHabit,
+  preferredAgeMinInput,
+  onChangePreferredAgeMinInput,
+  preferredAgeMaxInput,
+  onChangePreferredAgeMaxInput,
+  preferredRegionsInput,
+  onChangePreferredRegionsInput,
+  preferredSmoking,
+  onChangePreferredSmoking,
+  preferredDrinking,
+  onChangePreferredDrinking,
+  preferredGender,
+  onChangePreferredGender,
+  preferredHeightMinInput,
+  onChangePreferredHeightMinInput,
+  preferredHeightMaxInput,
+  onChangePreferredHeightMaxInput,
   bio,
   onChangeBio,
   errors,
@@ -130,7 +178,7 @@ export function NetworkView({
             value={displayName}
             onChangeText={onChangeDisplayName}
             placeholder="e.g. Mina"
-            placeholderTextColor="#6D4AFF"
+            placeholderTextColor="#7f8ca8"
             style={styles.input}
           />
           {!!errors.displayName && <Text style={styles.errorText}>{errors.displayName}</Text>}
@@ -141,7 +189,7 @@ export function NetworkView({
             onChangeText={onChangeBirthYearInput}
             keyboardType="numeric"
             placeholder="e.g. 1998"
-            placeholderTextColor="#6D4AFF"
+            placeholderTextColor="#7f8ca8"
             style={styles.input}
           />
           {!!errors.birthYear && <Text style={styles.errorText}>{errors.birthYear}</Text>}
@@ -150,26 +198,159 @@ export function NetworkView({
           <View style={styles.buttonRow}>
             <PixelButton label="Male" active={gender === "male"} onPress={() => onChangeGender("male")} />
             <PixelButton label="Female" active={gender === "female"} onPress={() => onChangeGender("female")} />
+            <PixelButton label="Other" active={gender === "other"} onPress={() => onChangeGender("other")} />
           </View>
           {!!errors.gender && <Text style={styles.errorText}>{errors.gender}</Text>}
+
+          <Text style={styles.fieldLabel}>Region</Text>
+          <TextInput
+            value={locationInput}
+            onChangeText={onChangeLocationInput}
+            placeholder="e.g. seoul"
+            placeholderTextColor="#7f8ca8"
+            style={styles.input}
+          />
+
+          <Text style={styles.fieldLabel}>Job Title</Text>
+          <TextInput
+            value={jobTitleInput}
+            onChangeText={onChangeJobTitleInput}
+            placeholder="e.g. Product Designer"
+            placeholderTextColor="#7f8ca8"
+            style={styles.input}
+          />
+
+          <Text style={styles.fieldLabel}>Height (cm)</Text>
+          <TextInput
+            value={heightInput}
+            onChangeText={onChangeHeightInput}
+            keyboardType="numeric"
+            placeholder="e.g. 168"
+            placeholderTextColor="#7f8ca8"
+            style={styles.input}
+          />
+          {!!errors.height && <Text style={styles.errorText}>{errors.height}</Text>}
+
+          <Text style={styles.fieldLabel}>Smoking Habit</Text>
+          <View style={styles.buttonRow}>
+            <PixelButton label="None" active={smokingHabit === "none"} onPress={() => onChangeSmokingHabit("none")} />
+            <PixelButton
+              label="Sometimes"
+              active={smokingHabit === "sometimes"}
+              onPress={() => onChangeSmokingHabit("sometimes")}
+            />
+            <PixelButton label="Often" active={smokingHabit === "often"} onPress={() => onChangeSmokingHabit("often")} />
+          </View>
+
+          <Text style={styles.fieldLabel}>Drinking Habit</Text>
+          <View style={styles.buttonRow}>
+            <PixelButton label="Never" active={drinkingHabit === "never"} onPress={() => onChangeDrinkingHabit("never")} />
+            <PixelButton label="Social" active={drinkingHabit === "social"} onPress={() => onChangeDrinkingHabit("social")} />
+            <PixelButton label="Often" active={drinkingHabit === "often"} onPress={() => onChangeDrinkingHabit("often")} />
+          </View>
 
           <Text style={styles.fieldLabel}>Hobbies (comma separated)</Text>
           <TextInput
             value={hobbiesInput}
             onChangeText={onChangeHobbiesInput}
             placeholder="hiking,music,coffee"
-            placeholderTextColor="#6D4AFF"
+            placeholderTextColor="#7f8ca8"
             style={styles.input}
           />
 
-          <Text style={styles.fieldLabel}>Location</Text>
+          <Text style={styles.fieldLabel}>Preferred Age Range</Text>
+          <View style={styles.buttonRow}>
+            <TextInput
+              value={preferredAgeMinInput}
+              onChangeText={onChangePreferredAgeMinInput}
+              keyboardType="numeric"
+              placeholder="min"
+              placeholderTextColor="#7f8ca8"
+              style={[styles.input, styles.halfInput]}
+            />
+            <TextInput
+              value={preferredAgeMaxInput}
+              onChangeText={onChangePreferredAgeMaxInput}
+              keyboardType="numeric"
+              placeholder="max"
+              placeholderTextColor="#7f8ca8"
+              style={[styles.input, styles.halfInput]}
+            />
+          </View>
+          {!!errors.preferredAgeRange && <Text style={styles.errorText}>{errors.preferredAgeRange}</Text>}
+
+          <Text style={styles.fieldLabel}>Preferred Regions (comma separated)</Text>
           <TextInput
-            value={locationInput}
-            onChangeText={onChangeLocationInput}
-            placeholder="seoul"
-            placeholderTextColor="#6D4AFF"
+            value={preferredRegionsInput}
+            onChangeText={onChangePreferredRegionsInput}
+            placeholder="seoul,busan"
+            placeholderTextColor="#7f8ca8"
             style={styles.input}
           />
+
+          <Text style={styles.fieldLabel}>Preferred Smoking</Text>
+          <View style={styles.buttonRow}>
+            <PixelButton
+              label="Non-smoker"
+              active={preferredSmoking === "none_only"}
+              onPress={() => onChangePreferredSmoking("none_only")}
+            />
+            <PixelButton label="OK" active={preferredSmoking === "ok"} onPress={() => onChangePreferredSmoking("ok")} />
+            <PixelButton label="Any" active={preferredSmoking === "any"} onPress={() => onChangePreferredSmoking("any")} />
+          </View>
+
+          <Text style={styles.fieldLabel}>Preferred Drinking</Text>
+          <View style={styles.buttonRow}>
+            <PixelButton
+              label="Never"
+              active={preferredDrinking === "never"}
+              onPress={() => onChangePreferredDrinking("never")}
+            />
+            <PixelButton
+              label="Social"
+              active={preferredDrinking === "social"}
+              onPress={() => onChangePreferredDrinking("social")}
+            />
+            <PixelButton
+              label="Often"
+              active={preferredDrinking === "often"}
+              onPress={() => onChangePreferredDrinking("often")}
+            />
+            <PixelButton label="Any" active={preferredDrinking === "any"} onPress={() => onChangePreferredDrinking("any")} />
+          </View>
+
+          <Text style={styles.fieldLabel}>Preferred Gender</Text>
+          <View style={styles.buttonRow}>
+            <PixelButton label="Any" active={preferredGender === "any"} onPress={() => onChangePreferredGender("any")} />
+            <PixelButton label="Male" active={preferredGender === "male"} onPress={() => onChangePreferredGender("male")} />
+            <PixelButton
+              label="Female"
+              active={preferredGender === "female"}
+              onPress={() => onChangePreferredGender("female")}
+            />
+            <PixelButton label="Other" active={preferredGender === "other"} onPress={() => onChangePreferredGender("other")} />
+          </View>
+
+          <Text style={styles.fieldLabel}>Preferred Height Range (optional)</Text>
+          <View style={styles.buttonRow}>
+            <TextInput
+              value={preferredHeightMinInput}
+              onChangeText={onChangePreferredHeightMinInput}
+              keyboardType="numeric"
+              placeholder="min cm"
+              placeholderTextColor="#7f8ca8"
+              style={[styles.input, styles.halfInput]}
+            />
+            <TextInput
+              value={preferredHeightMaxInput}
+              onChangeText={onChangePreferredHeightMaxInput}
+              keyboardType="numeric"
+              placeholder="max cm"
+              placeholderTextColor="#7f8ca8"
+              style={[styles.input, styles.halfInput]}
+            />
+          </View>
+          {!!errors.preferredHeightRange && <Text style={styles.errorText}>{errors.preferredHeightRange}</Text>}
 
           <Text style={styles.fieldLabel}>Bio</Text>
           <TextInput
@@ -178,11 +359,16 @@ export function NetworkView({
             multiline
             numberOfLines={3}
             placeholder="A short profile summary"
-            placeholderTextColor="#6D4AFF"
+            placeholderTextColor="#7f8ca8"
             style={[styles.input, styles.multilineInput]}
           />
 
-          <PixelButton label="Save Cupidate" variant="primary" onPress={onSaveCupidate} active={canSubmit} />
+          <PixelButton
+            label={isMutatingNetwork ? "Saving..." : "Save Cupidate"}
+            variant="primary"
+            onPress={onSaveCupidate}
+            active={canSubmit}
+          />
 
           <Text style={styles.sectionTitle}>Cupidate List</Text>
           {cupidates.length === 0 ? (
@@ -197,6 +383,11 @@ export function NetworkView({
                 <Text style={styles.listMeta}>
                   Owner: {item.ownerCupidId === currentCupidId ? "My Cupidate" : "Connected Cupidate"}
                 </Text>
+                <Text style={styles.listMeta}>Region: {item.preferences.region ?? "-"}</Text>
+                <Text style={styles.listMeta}>Job: {item.preferences.jobTitle ?? "-"}</Text>
+                <Text style={styles.listMeta}>
+                  Lifestyle: {item.preferences.smokingHabit ?? "-"} / {item.preferences.drinkingHabit ?? "-"}
+                </Text>
                 <Text style={styles.listMeta}>Bio: {item.bio || "-"}</Text>
               </View>
             ))
@@ -209,7 +400,7 @@ export function NetworkView({
             value={connectionSearchQuery}
             onChangeText={onChangeConnectionSearchQuery}
             placeholder="e.g. connected_a"
-            placeholderTextColor="#6D4AFF"
+            placeholderTextColor="#7f8ca8"
             style={styles.input}
           />
 

@@ -184,6 +184,9 @@ export const styles = StyleSheet.create({
     paddingVertical: s.xs,
     fontFamily: "monospace"
   },
+  halfInput: {
+    width: "48%"
+  },
   multilineInput: {
     minHeight: 88,
     textAlignVertical: "top"

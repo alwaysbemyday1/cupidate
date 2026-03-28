@@ -12,6 +12,10 @@ Location: `src/features/network/repository/types.ts`
   - `id`, `nickname`
 - `NetworkCupidate`
   - `id`, `ownerCupidId`, `displayName`, `birthYear`, `gender`, `bio`, `preferences`, `createdAt`, `updatedAt`
+  - `preferences` now carries richer profile/preference payload (jsonb passthrough):
+    - profile-side: `region`, `jobTitle`, `heightCm`, `smokingHabit`, `drinkingHabit`, `hobbies`
+    - ideal-side: `ageRange`, `preferredRegions`, `preferredSmoking`, `preferredDrinking`,
+      `preferredGenders`, `preferredHeightRange`
 - `NetworkConnection`
   - `id`, `requesterCupidId`, `addresseeCupidId`, `status`, `respondedAt`, `createdAt`, `updatedAt`
   - perspective fields: `direction`, `counterpartCupidId`, `counterpartNickname`
@@ -62,6 +66,10 @@ Location: `src/features/app/model/useCupidateAppState.ts`
 - `accepted` -> `accepted`
 - `dismissed` -> `rejected`
 - `accepted + reason.contactSharedAt` -> `completed`
+
+### Match-score breakdown shape
+- `reason.breakdown` now includes:
+  - `age`, `hobbies`, `lifestyle`, `location`, `profile`
 
 ## 4) Query Keys
 - Network: `src/features/network/hooks/useNetworkData.ts`

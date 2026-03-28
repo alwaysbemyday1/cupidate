@@ -66,6 +66,47 @@ function parseHobbies(input: string): string[] {
     .filter(Boolean);
 }
 
+function parseOptionalNumber(input: string): number | undefined {
+  const trimmed = input.trim();
+  if (!trimmed) {
+    return undefined;
+  }
+
+  const parsed = Number(trimmed);
+  if (Number.isNaN(parsed)) {
+    return undefined;
+  }
+
+  return parsed;
+}
+
+function parseClampedRange(
+  minInput: string,
+  maxInput: string,
+  minBoundary: number,
+  maxBoundary: number
+): [number, number] | undefined {
+  const min = parseOptionalNumber(minInput);
+  const max = parseOptionalNumber(maxInput);
+
+  if (min === undefined && max === undefined) {
+    return undefined;
+  }
+
+  if (min === undefined || max === undefined) {
+    return undefined;
+  }
+
+  const normalizedMin = Math.min(min, max);
+  const normalizedMax = Math.max(min, max);
+
+  if (normalizedMin < minBoundary || normalizedMax > maxBoundary) {
+    return undefined;
+  }
+
+  return [normalizedMin, normalizedMax];
+}
+
 function getErrorMessage(error: unknown): string | null {
   if (!error) {
     return null;
@@ -139,6 +180,18 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
   const [bio, setBio] = useState("");
   const [hobbiesInput, setHobbiesInput] = useState("");
   const [locationInput, setLocationInput] = useState("seoul");
+  const [jobTitleInput, setJobTitleInput] = useState("");
+  const [heightInput, setHeightInput] = useState("");
+  const [smokingHabit, setSmokingHabit] = useState<"none" | "sometimes" | "often">("none");
+  const [drinkingHabit, setDrinkingHabit] = useState<"never" | "social" | "often">("social");
+  const [preferredAgeMinInput, setPreferredAgeMinInput] = useState("24");
+  const [preferredAgeMaxInput, setPreferredAgeMaxInput] = useState("35");
+  const [preferredRegionsInput, setPreferredRegionsInput] = useState("seoul");
+  const [preferredSmoking, setPreferredSmoking] = useState<"none_only" | "ok" | "any">("any");
+  const [preferredDrinking, setPreferredDrinking] = useState<"never" | "social" | "often" | "any">("any");
+  const [preferredGender, setPreferredGender] = useState<"any" | "male" | "female" | "other">("any");
+  const [preferredHeightMinInput, setPreferredHeightMinInput] = useState("");
+  const [preferredHeightMaxInput, setPreferredHeightMaxInput] = useState("");
   const [ownerType, setOwnerType] = useState<"mine" | "connected">("mine");
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [connectionSearchQuery, setConnectionSearchQuery] = useState("");
@@ -339,6 +392,22 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     }
 
     const formErrors = validateForm(displayName, birthYearInput, gender);
+
+    const preferredAgeRange = parseClampedRange(preferredAgeMinInput, preferredAgeMaxInput, 19, 100);
+    if (!preferredAgeRange) {
+      formErrors.preferredAgeRange = "Preferred age range must be within 19-100.";
+    }
+
+    const parsedHeight = parseOptionalNumber(heightInput);
+    if (heightInput.trim() && (parsedHeight === undefined || parsedHeight < 120 || parsedHeight > 230)) {
+      formErrors.height = "Height must be within 120-230 cm.";
+    }
+
+    const preferredHeightRange = parseClampedRange(preferredHeightMinInput, preferredHeightMaxInput, 120, 230);
+    if ((preferredHeightMinInput.trim() || preferredHeightMaxInput.trim()) && !preferredHeightRange) {
+      formErrors.preferredHeightRange = "Preferred height range must be within 120-230 cm.";
+    }
+
     setErrors(formErrors);
 
     if (Object.keys(formErrors).length > 0) {
@@ -346,6 +415,8 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     }
 
     const parsedBirthYear = birthYearInput ? Number(birthYearInput) : null;
+    const region = locationInput.trim().toLowerCase() || "seoul";
+    const preferredRegions = parseHobbies(preferredRegionsInput);
 
     await createCupidateMutation.mutateAsync({
       displayName: displayName.trim(),
@@ -353,11 +424,19 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       gender,
       bio: bio.trim(),
       preferences: {
-        ageRange: [24, 35],
+        ageRange: preferredAgeRange,
         hobbies: parseHobbies(hobbiesInput),
-        smoking: "any",
-        drinking: "any",
-        location: locationInput.trim() || "seoul"
+        region,
+        location: region,
+        preferredRegions: preferredRegions.length ? preferredRegions : [region],
+        jobTitle: jobTitleInput.trim() || undefined,
+        heightCm: parsedHeight,
+        smokingHabit,
+        drinkingHabit,
+        preferredSmoking,
+        preferredDrinking,
+        preferredGenders: preferredGender === "any" ? [] : [preferredGender],
+        preferredHeightRange
       } as CupidateRecord["preferences"]
     });
 
@@ -367,6 +446,18 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     setBio("");
     setHobbiesInput("");
     setLocationInput("seoul");
+    setJobTitleInput("");
+    setHeightInput("");
+    setSmokingHabit("none");
+    setDrinkingHabit("social");
+    setPreferredAgeMinInput("24");
+    setPreferredAgeMaxInput("35");
+    setPreferredRegionsInput("seoul");
+    setPreferredSmoking("any");
+    setPreferredDrinking("any");
+    setPreferredGender("any");
+    setPreferredHeightMinInput("");
+    setPreferredHeightMaxInput("");
     setErrors({});
   };
 
@@ -541,12 +632,36 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     setGender,
     bio,
     setBio,
-    hobbiesInput,
-    setHobbiesInput,
-    locationInput,
-    setLocationInput,
-    ownerType,
-    setOwnerType,
+      hobbiesInput,
+      setHobbiesInput,
+      locationInput,
+      setLocationInput,
+      jobTitleInput,
+      setJobTitleInput,
+      heightInput,
+      setHeightInput,
+      smokingHabit,
+      setSmokingHabit,
+      drinkingHabit,
+      setDrinkingHabit,
+      preferredAgeMinInput,
+      setPreferredAgeMinInput,
+      preferredAgeMaxInput,
+      setPreferredAgeMaxInput,
+      preferredRegionsInput,
+      setPreferredRegionsInput,
+      preferredSmoking,
+      setPreferredSmoking,
+      preferredDrinking,
+      setPreferredDrinking,
+      preferredGender,
+      setPreferredGender,
+      preferredHeightMinInput,
+      setPreferredHeightMinInput,
+      preferredHeightMaxInput,
+      setPreferredHeightMaxInput,
+      ownerType,
+      setOwnerType,
     errors,
     cupidates,
     connections,

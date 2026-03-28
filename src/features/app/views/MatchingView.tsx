@@ -80,6 +80,11 @@ export function MatchingView({
               </Text>
               <Text style={styles.listMeta}>Match Rate: {item.matchScore}%</Text>
               <Text style={styles.listMeta}>
+                Breakdown: AGE {item.reason.breakdown.age} / HOBBY {item.reason.breakdown.hobbies} / LIFE{" "}
+                {item.reason.breakdown.lifestyle} / LOC {item.reason.breakdown.location} / PROFILE{" "}
+                {item.reason.breakdown.profile}
+              </Text>
+              <Text style={styles.listMeta}>
                 Shared Hobbies: {item.reason.matchedHobbies.length ? item.reason.matchedHobbies.join(", ") : "-"}
               </Text>
               <Text style={styles.listMeta}>Status: {request?.status ?? "none"}</Text>
