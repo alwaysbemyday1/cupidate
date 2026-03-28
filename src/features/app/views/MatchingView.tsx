@@ -66,6 +66,7 @@ export function MatchingView({
                 {!request && (
                   <PixelButton
                     label={isMutatingMatching ? "Processing..." : "Request Match"}
+                    variant="warning"
                     onPress={() => onSendRequest(item.sourceCupidateId, item.targetCupidateId)}
                   />
                 )}
@@ -73,12 +74,14 @@ export function MatchingView({
                   <>
                     <PixelButton
                       label="Accept"
+                      variant="success"
                       onPress={() =>
                         onUpdateRequestStatus(item.sourceCupidateId, item.targetCupidateId, "accepted")
                       }
                     />
                     <PixelButton
                       label="Reject"
+                      variant="danger"
                       onPress={() =>
                         onUpdateRequestStatus(item.sourceCupidateId, item.targetCupidateId, "rejected")
                       }
@@ -88,6 +91,7 @@ export function MatchingView({
                 {request?.status === "accepted" && (
                   <PixelButton
                     label="Mark Contact Shared"
+                    variant="primary"
                     onPress={() =>
                       onUpdateRequestStatus(item.sourceCupidateId, item.targetCupidateId, "completed")
                     }

@@ -34,7 +34,11 @@ export function MyView({
     <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
       <Text style={styles.fieldLabel}>Nickname</Text>
       <TextInput value={myNickname} onChangeText={onChangeMyNickname} style={styles.input} />
-      <PixelButton label={isSavingNickname ? "Saving..." : "Save Nickname"} onPress={onSaveMyNickname} />
+      <PixelButton
+        label={isSavingNickname ? "Saving..." : "Save Nickname"}
+        variant="primary"
+        onPress={onSaveMyNickname}
+      />
 
       <View style={styles.settingRow}>
         <Text style={styles.fieldLabel}>Network-only profile visibility</Text>

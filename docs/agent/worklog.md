@@ -115,3 +115,21 @@ Changes:
 
 Verification:
 - JSON parse check for `feature_list.json` after metadata extension.
+
+### Task 2026-03-28-10 - First-Pass Theme Application
+Status: Completed
+
+Changes:
+- Added app design token module:
+  - `src/features/app/theme/tokens.ts`
+- Refactored `src/features/app/styles.ts` to token-driven pixel-console style.
+- Upgraded `PixelButton` to semantic variants:
+  - `neutral`, `primary`, `success`, `warning`, `danger`
+- Applied visual hierarchy updates to all main views:
+  - Home hero board and sprite-strip placeholder frames
+  - semantic action coloring in Network/Matching/My
+  - updated top header branding (`CUPIDATE ARCADE`)
+
+Verification:
+- `npm.cmd test` passed.
+- `npx.cmd tsc --noEmit` passed.

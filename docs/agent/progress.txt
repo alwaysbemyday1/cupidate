@@ -2,7 +2,7 @@
 Last Updated: 2026-03-28
 
 Current Track: Service Build (Post-POC)
-Current Phase: S3 View Hardening + Docs Alignment
+Current Phase: S3 Design Token Rollout
 Overall Status: in_progress
 
 Architecture Decision
@@ -23,6 +23,7 @@ Completed Work
 - [x] Docs/data-contract alignment (Task 2026-03-28-05)
 - [x] Matching UI interaction flow tests (Task 2026-03-28-06)
 - [x] Design direction setup from visual references (Task 2026-03-28-09)
+- [x] First-pass pixel-console theme implementation (Task 2026-03-28-10)
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:
@@ -35,9 +36,9 @@ Task 2026-03-28-01 (Completed)
 - Verified with tests and TypeScript check.
 
 Next Tasks
- - Task 2026-03-28-10: apply design tokens/components to 4 views
  - Task 2026-03-28-07: add auth session bootstrap and protected data gate
  - Task 2026-03-28-08: implement connected-cupid discovery/search flow (ID input removal)
+ - Task 2026-03-28-11: replace placeholder hero frames with actual cupid sprite assets
 
 Task 2026-03-28-02 (Completed)
 - Added `src/features/network/repository` data layer:
@@ -98,3 +99,13 @@ Task 2026-03-28-09 (Completed)
 - Updated agent docs index and feature metadata to include design-system direction:
   - `docs/agent/README.md`
   - `docs/agent/feature_list.json` (`design_system` section)
+
+Task 2026-03-28-10 (Completed)
+- Applied first-pass visual system based on new design direction:
+  - added design token module: `src/features/app/theme/tokens.ts`
+  - rebuilt app style map: `src/features/app/styles.ts`
+  - upgraded button component with semantic variants
+- Updated all 4 views to use design variants and stronger hierarchy:
+  - Home now includes signature hero board (`CUPID MODE`) and sprite-frame strip
+  - action buttons mapped to semantic color roles across Network/Matching/My
+- Updated header branding and tests for new title variant (`CUPIDATE ARCADE`).

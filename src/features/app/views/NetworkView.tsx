@@ -70,11 +70,13 @@ export function NetworkView({
       <View style={styles.buttonRow}>
         <PixelButton
           label={`My Cupidates (${cupidates.length})`}
+          variant="primary"
           active={networkSegment === "cupidates"}
           onPress={() => onChangeNetworkSegment("cupidates")}
         />
         <PixelButton
           label={`Connected Cupids (${connections.length})`}
+          variant="neutral"
           active={networkSegment === "cupids"}
           onPress={() => onChangeNetworkSegment("cupids")}
         />
@@ -87,6 +89,7 @@ export function NetworkView({
             <PixelButton label="My Cupidate" active={ownerType === "mine"} onPress={() => onChangeOwnerType("mine")} />
             <PixelButton
               label="Connected Cupidate"
+              variant="warning"
               active={ownerType === "connected"}
               onPress={() => onChangeOwnerType("connected")}
             />
@@ -149,7 +152,7 @@ export function NetworkView({
             style={[styles.input, styles.multilineInput]}
           />
 
-          <PixelButton label="Save Cupidate" onPress={onSaveCupidate} active={canSubmit} />
+          <PixelButton label="Save Cupidate" variant="primary" onPress={onSaveCupidate} active={canSubmit} />
 
           <Text style={styles.sectionTitle}>Cupidate List</Text>
           {cupidates.length === 0 ? (
@@ -183,6 +186,7 @@ export function NetworkView({
           />
           <PixelButton
             label={isMutatingNetwork ? "Adding..." : "Add Connection Request"}
+            variant="warning"
             onPress={onAddConnection}
           />
 

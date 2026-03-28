@@ -15,6 +15,18 @@ type HomeViewProps = {
 export function HomeView({ homeSummary, notifications, onGoNetwork, onGoMatching }: HomeViewProps) {
   return (
     <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
+      <View style={styles.heroCard}>
+        <Text style={styles.heroTitle}>
+          CUPID <Text style={styles.heroTitleAccent}>MODE</Text>
+        </Text>
+        <Text style={styles.heroSubtitle}>PRESS START TO MATCH</Text>
+        <View style={styles.spriteRow}>
+          {[0, 1, 2, 3, 4, 5].map((frame) => (
+            <View key={frame} style={styles.spriteFrame} />
+          ))}
+        </View>
+      </View>
+
       <View style={styles.summaryGrid}>
         <SummaryCard label="My Cupidates" value={homeSummary.myCupidates} />
         <SummaryCard label="Connected Cupids" value={homeSummary.connectedCupids} />
@@ -38,8 +50,8 @@ export function HomeView({ homeSummary, notifications, onGoNetwork, onGoMatching
 
       <Text style={styles.sectionTitle}>Quick Actions</Text>
       <View style={styles.buttonRow}>
-        <PixelButton label="Go to Network" onPress={onGoNetwork} />
-        <PixelButton label="Go to Matching" onPress={onGoMatching} />
+        <PixelButton label="Go to Network" variant="primary" onPress={onGoNetwork} />
+        <PixelButton label="Go to Matching" variant="warning" onPress={onGoMatching} />
       </View>
     </ScrollView>
   );

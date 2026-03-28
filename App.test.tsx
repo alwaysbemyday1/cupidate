@@ -21,7 +21,7 @@ describe("App", () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText("CUPIDATE REGISTRY")).toBeTruthy();
+      expect(screen.getByText("CUPIDATE ARCADE")).toBeTruthy();
       expect(screen.getByText("PIXEL MATCH NETWORK")).toBeTruthy();
     });
   });

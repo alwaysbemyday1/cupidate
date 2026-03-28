@@ -18,29 +18,45 @@ function CupidateAppShell() {
     <View style={styles.safeArea}>
       <StatusBar style="light" />
       <View style={styles.container}>
-        <View style={styles.headerRow}>
-          <View>
-            <Text style={styles.title}>CUPIDATE REGISTRY</Text>
-            <Text style={styles.subtitle}>PIXEL MATCH NETWORK</Text>
-          </View>
-          <View style={styles.statusBadge}>
-            <Text style={styles.statusText}>ONLINE</Text>
+        <View style={styles.headerFrame}>
+          <View style={styles.headerRow}>
+            <View>
+              <Text style={styles.title}>
+                CUPIDATE <Text style={styles.titleAccent}>ARCADE</Text>
+              </Text>
+              <Text style={styles.subtitle}>PIXEL MATCH NETWORK</Text>
+            </View>
+            <View style={styles.statusBadge}>
+              <Text style={styles.statusText}>ONLINE</Text>
+            </View>
           </View>
         </View>
 
         <View style={styles.tabRow}>
-          <PixelButton label="HOME" active={state.activeView === "home"} onPress={() => state.setActiveView("home")} />
+          <PixelButton
+            label="HOME"
+            variant="primary"
+            active={state.activeView === "home"}
+            onPress={() => state.setActiveView("home")}
+          />
           <PixelButton
             label="NETWORK"
+            variant="neutral"
             active={state.activeView === "network"}
             onPress={() => state.setActiveView("network")}
           />
           <PixelButton
             label="MATCHING"
+            variant="warning"
             active={state.activeView === "matching"}
             onPress={() => state.setActiveView("matching")}
           />
-          <PixelButton label="MY" active={state.activeView === "my"} onPress={() => state.setActiveView("my")} />
+          <PixelButton
+            label="MY"
+            variant="success"
+            active={state.activeView === "my"}
+            onPress={() => state.setActiveView("my")}
+          />
         </View>
 
         {state.activeView === "home" && (

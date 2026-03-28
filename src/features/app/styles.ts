@@ -1,77 +1,131 @@
 ﻿import { StyleSheet } from "react-native";
 
+import { designTokens } from "./theme/tokens";
+
+const c = designTokens.color;
+const b = designTokens.border;
+const s = designTokens.spacing;
+const f = designTokens.font;
+
 export const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#111827"
+    backgroundColor: c.bg
   },
   container: {
     flex: 1,
-    paddingHorizontal: 14,
-    paddingBottom: 14
+    paddingHorizontal: s.lg,
+    paddingBottom: s.lg
+  },
+  headerFrame: {
+    marginTop: s.md,
+    marginBottom: s.xs,
+    borderWidth: b.heavy,
+    borderColor: c.border,
+    backgroundColor: c.panel,
+    paddingHorizontal: s.md,
+    paddingVertical: s.sm
   },
   headerRow: {
-    marginTop: 12,
-    marginBottom: 8,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start"
   },
   title: {
-    color: "#FDE047",
+    color: c.titleBlue,
     fontFamily: "monospace",
-    fontSize: 26,
+    fontSize: f.title,
     fontWeight: "800",
     letterSpacing: 1
   },
+  titleAccent: {
+    color: c.titleOrange
+  },
   subtitle: {
-    color: "#60A5FA",
+    color: c.textSecondary,
     fontFamily: "monospace",
-    fontSize: 12,
-    marginTop: 4
+    fontSize: f.subtitle,
+    marginTop: s.xxs
   },
   statusBadge: {
-    borderWidth: 3,
-    borderColor: "#000000",
-    backgroundColor: "#34D399",
-    paddingHorizontal: 8,
-    paddingVertical: 4
+    borderWidth: b.heavy,
+    borderColor: c.border,
+    backgroundColor: c.statusOnlineBg,
+    paddingHorizontal: s.xs,
+    paddingVertical: s.xxs
   },
   statusText: {
-    color: "#064E3B",
+    color: c.statusOnlineText,
     fontFamily: "monospace",
     fontWeight: "800",
     fontSize: 11
   },
   tabRow: {
     flexDirection: "row",
-    gap: 8,
-    marginBottom: 10,
+    gap: s.xs,
+    marginBottom: s.sm,
     flexWrap: "wrap"
   },
   panel: {
     flex: 1,
-    borderWidth: 3,
-    borderColor: "#000000",
-    backgroundColor: "#93C5FD"
+    borderWidth: b.heavy,
+    borderColor: c.border,
+    backgroundColor: c.panelAlt
   },
   panelContent: {
-    padding: 12,
-    gap: 8
+    padding: s.md,
+    gap: s.xs
+  },
+  heroCard: {
+    borderWidth: b.heavy,
+    borderColor: c.border,
+    backgroundColor: c.surface,
+    padding: s.md,
+    marginBottom: s.xs
+  },
+  heroTitle: {
+    color: c.titleBlue,
+    fontFamily: "monospace",
+    fontWeight: "800",
+    fontSize: 24,
+    letterSpacing: 1
+  },
+  heroTitleAccent: {
+    color: c.titleOrange
+  },
+  heroSubtitle: {
+    color: c.textPrimary,
+    fontFamily: "monospace",
+    fontWeight: "700",
+    fontSize: 13,
+    marginTop: s.xxs
+  },
+  spriteRow: {
+    marginTop: s.sm,
+    flexDirection: "row",
+    gap: s.xs,
+    flexWrap: "wrap"
+  },
+  spriteFrame: {
+    width: 22,
+    height: 22,
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.bgAlt
   },
   fieldLabel: {
-    color: "#111827",
+    color: c.textPrimary,
     fontFamily: "monospace",
     fontWeight: "700",
     marginTop: 2
   },
   input: {
-    borderWidth: 3,
-    borderColor: "#000000",
-    backgroundColor: "#E0E7FF",
-    color: "#111827",
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    borderWidth: b.heavy,
+    borderColor: c.border,
+    backgroundColor: c.inputBg,
+    color: c.inputText,
+    paddingHorizontal: s.sm,
+    paddingVertical: s.xs,
     fontFamily: "monospace"
   },
   multilineInput: {
@@ -80,103 +134,117 @@ export const styles = StyleSheet.create({
   },
   buttonRow: {
     flexDirection: "row",
-    gap: 8,
+    gap: s.xs,
     flexWrap: "wrap"
   },
   pixelButton: {
-    borderWidth: 3,
-    borderColor: "#000000",
-    paddingHorizontal: 10,
-    paddingVertical: 8
+    borderWidth: b.heavy,
+    borderColor: c.border,
+    paddingHorizontal: s.sm,
+    paddingVertical: s.xs,
+    minWidth: 92
   },
-  pixelButtonIdle: {
-    backgroundColor: "#BFDBFE"
+  pixelButtonNeutral: {
+    backgroundColor: c.buttonNeutral
   },
-  pixelButtonActive: {
-    backgroundColor: "#FDE047"
+  pixelButtonPrimary: {
+    backgroundColor: c.buttonPrimary
+  },
+  pixelButtonSuccess: {
+    backgroundColor: c.buttonSuccess
+  },
+  pixelButtonWarning: {
+    backgroundColor: c.buttonWarning
+  },
+  pixelButtonDanger: {
+    backgroundColor: c.buttonDanger
+  },
+  pixelButtonActiveOutline: {
+    borderColor: c.textPrimary
   },
   pixelButtonText: {
-    color: "#111827",
+    color: c.textPrimary,
     fontFamily: "monospace",
     fontWeight: "800"
   },
   errorText: {
-    color: "#B91C1C",
+    color: c.error,
     fontFamily: "monospace",
     fontWeight: "700"
   },
   summaryGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8
+    gap: s.xs
   },
   summaryCard: {
     width: "48%",
-    borderWidth: 3,
-    borderColor: "#000000",
-    backgroundColor: "#FEF08A",
-    padding: 10
+    borderWidth: b.heavy,
+    borderColor: c.border,
+    backgroundColor: c.cardBgAccent,
+    padding: s.sm
   },
   summaryLabel: {
-    color: "#92400E",
+    color: c.textSecondary,
     fontFamily: "monospace",
     fontWeight: "700",
     fontSize: 12
   },
   summaryValue: {
-    color: "#7C2D12",
+    color: c.textPrimary,
     fontFamily: "monospace",
     fontWeight: "800",
-    fontSize: 20,
-    marginTop: 4
+    fontSize: f.metric,
+    marginTop: s.xxs
   },
   sectionTitle: {
-    marginTop: 8,
-    color: "#111827",
+    marginTop: s.xs,
+    color: c.textPrimary,
     fontFamily: "monospace",
-    fontWeight: "800"
+    fontWeight: "800",
+    fontSize: f.section
   },
   emptyCard: {
-    borderWidth: 3,
-    borderColor: "#000000",
-    backgroundColor: "#E0F2FE",
-    padding: 12
+    borderWidth: b.heavy,
+    borderColor: c.border,
+    backgroundColor: c.cardBg,
+    padding: s.md
   },
   emptyText: {
-    color: "#111827",
+    color: c.textPrimary,
     fontFamily: "monospace",
     fontWeight: "700"
   },
   emptySubText: {
-    color: "#334155",
+    color: c.textMuted,
     fontFamily: "monospace",
-    marginTop: 4
+    marginTop: s.xxs
   },
   listCard: {
-    borderWidth: 3,
-    borderColor: "#000000",
-    backgroundColor: "#E0E7FF",
-    padding: 12,
-    marginBottom: 10
+    borderWidth: b.heavy,
+    borderColor: c.border,
+    backgroundColor: c.cardBg,
+    padding: s.md,
+    marginBottom: s.sm
   },
   listName: {
-    color: "#111827",
+    color: c.textPrimary,
     fontFamily: "monospace",
     fontWeight: "800"
   },
   listMeta: {
-    color: "#334155",
+    color: c.textSecondary,
     fontFamily: "monospace",
-    marginTop: 4
+    marginTop: s.xxs
   },
   settingRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderWidth: 3,
-    borderColor: "#000000",
-    backgroundColor: "#E0E7FF",
-    paddingHorizontal: 10,
-    paddingVertical: 8
+    borderWidth: b.heavy,
+    borderColor: c.border,
+    backgroundColor: c.cardBg,
+    paddingHorizontal: s.sm,
+    paddingVertical: s.xs
   }
 });
