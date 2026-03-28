@@ -1,139 +1,224 @@
-import { useEffect, useState } from "react";
-import { Image, ScrollView, View, type ImageStyle } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 
 import { PixelBox } from "../components/PixelBox";
 import { PixelButton } from "../components/PixelButton";
 import { PixelText } from "../components/PixelText";
 import { StateCard } from "../components/StateCard";
-import { SummaryCard } from "../components/SummaryCard";
-import type { HomeSummary } from "../model/types";
+import type { CupidateRecord, HomeNotification, HomeSummary, RecommendationItem } from "../model/types";
 import { styles } from "../styles";
-import { cupidHeroSprites } from "../theme/sprites";
-import { designTokens } from "../theme/tokens";
-
-const SPRITE_FRAME_INTERVAL_MS = 180;
+import { useI18n } from "../../i18n/context";
 
 type HomeViewProps = {
   homeSummary: HomeSummary;
-  notifications: string[];
+  notifications: HomeNotification[];
+  recommendations: RecommendationItem[];
+  cupidates: CupidateRecord[];
   onGoNetwork: () => void;
+  onGoMy: () => void;
   onGoMatching: () => void;
   isHomeLoading?: boolean;
   homeError?: string | null;
   onRetryHomeError?: () => void | Promise<void>;
 };
 
+function notificationBadgeStyle(status: HomeNotification["status"]) {
+  if (status === "accepted") {
+    return styles.feedBadgeAccepted;
+  }
+
+  if (status === "rejected") {
+    return styles.feedBadgeRejected;
+  }
+
+  if (status === "completed") {
+    return styles.feedBadgeCompleted;
+  }
+
+  return null;
+}
+
+function notificationStatusKey(status: HomeNotification["status"]) {
+  return `home.notification.status.${status}`;
+}
+
+function notificationTextKey(status: HomeNotification["status"]) {
+  return `home.notification.${status}`;
+}
+
+function notificationBadgeKey(status: HomeNotification["status"]) {
+  return `home.notification.badge.${status}`;
+}
+
 export function HomeView({
   homeSummary,
   notifications,
+  recommendations,
+  cupidates,
   onGoNetwork,
+  onGoMy,
   onGoMatching,
   isHomeLoading,
   homeError,
   onRetryHomeError
 }: HomeViewProps) {
-  const [activeFrameIndex, setActiveFrameIndex] = useState(0);
-
-  useEffect(() => {
-    if (process.env.NODE_ENV === "test") {
-      return;
-    }
-
-    const timerId = setInterval(() => {
-      setActiveFrameIndex((previous) => (previous + 1) % cupidHeroSprites.length);
-    }, SPRITE_FRAME_INTERVAL_MS);
-
-    return () => clearInterval(timerId);
-  }, []);
+  const { t } = useI18n();
+  const cupidateMap = new Map(cupidates.map((item) => [item.cupidateId, item]));
+  const topRecommendations = recommendations.slice(0, 2);
 
   return (
     <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
-      <PixelBox style={styles.heroCard} contentStyle={styles.heroCardContent}>
-        <PixelText variant="screenTitle" style={styles.heroTitle}>
-          {"CUPID "}
-          <PixelText variant="screenTitle" style={styles.heroTitleAccent}>
-            MODE
-          </PixelText>
-        </PixelText>
-        <PixelText variant="body" style={styles.heroSubtitle}>
-          PRESS START TO MATCH
-        </PixelText>
-        <PixelText variant="caption" style={styles.heroFrameMeta}>
-          {`FRAME ${activeFrameIndex + 1}/${cupidHeroSprites.length}`}
-        </PixelText>
-        <View style={styles.spriteRow}>
-          {cupidHeroSprites.map((source, index) => (
-            <View
-              key={`cupid-sprite-${index}`}
-              style={[styles.spriteFrame, activeFrameIndex === index ? styles.spriteFrameActive : null]}
-            >
-              <Image
-                source={source}
-                style={[
-                  styles.spriteImage as ImageStyle,
-                  activeFrameIndex === index ? (styles.spriteImageActive as ImageStyle) : null
-                ]}
-                resizeMode="contain"
-              />
-            </View>
-          ))}
-        </View>
-      </PixelBox>
-
-      <View style={styles.summaryGrid}>
-        <SummaryCard label="My Cupidates" value={homeSummary.myCupidates} />
-        <SummaryCard label="Connected Cupids" value={homeSummary.connectedCupids} />
-        <SummaryCard label="Recommendations" value={homeSummary.recommendations} />
-        <SummaryCard label="Pending Requests" value={homeSummary.pendingRequests} />
-      </View>
-
       {isHomeLoading ? (
-        <StateCard
-          tone="loading"
-          title="SYNCING HOME FEED"
-          description="Refreshing network counters and matching activity."
-        />
+        <StateCard title={t("home.loading.title")} description={t("home.loading.description")} tone="loading" />
       ) : null}
       {homeError ? (
         <StateCard
           tone="error"
-          title="HOME FEED ERROR"
+          title={t("home.error.title")}
           description={homeError}
-          actionLabel="Retry Home Sync"
+          actionLabel={t("home.error.retry")}
           actionVariant="warning"
           onAction={onRetryHomeError}
         />
       ) : null}
 
       <PixelText variant="sectionTitle" style={styles.sectionTitle}>
-        Notification Feed
+        {t("home.sections.alarmFeed")}
       </PixelText>
-      {notifications.length === 0 ? (
+      <PixelBox style={styles.sectionCard} contentStyle={styles.sectionCardContent}>
+        {notifications.length === 0 ? (
+          <StateCard
+            tone="empty"
+            title={t("home.empty.feedTitle")}
+            description={t("home.empty.feedDescription")}
+          />
+        ) : (
+          notifications.map((item) => (
+            <View key={item.id} style={styles.feedRow}>
+              <View style={[styles.feedBadge, notificationBadgeStyle(item.status)]}>
+                <PixelText variant="caption" style={styles.feedBadgeText}>
+                  {t(notificationBadgeKey(item.status))}
+                </PixelText>
+              </View>
+              <View style={styles.feedBody}>
+                <PixelText variant="body" style={styles.textBody}>
+                  {t(notificationTextKey(item.status), {
+                    source: item.sourceLabel,
+                    target: item.targetLabel
+                  })}
+                </PixelText>
+                <PixelText variant="caption" style={styles.feedDescription}>
+                  {t(notificationStatusKey(item.status))}
+                </PixelText>
+              </View>
+            </View>
+          ))
+        )}
+      </PixelBox>
+
+      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+        {t("home.sections.todaysRecs")}
+      </PixelText>
+      {topRecommendations.length === 0 ? (
         <StateCard
           tone="empty"
-          title="NO NOTIFICATIONS YET"
-          description="Actions in Network and Matching will appear here."
+          title={t("home.empty.recommendationTitle")}
+          description={t("home.empty.recommendationDescription")}
         />
       ) : (
-        notifications.map((item) => (
-          <PixelBox
-            key={item}
-            style={styles.listCard}
-            contentStyle={[styles.listCardContent, { backgroundColor: designTokens.color.surfaceAlt }]}
-          >
-            <PixelText variant="body" style={styles.listMeta}>
-              {item}
-            </PixelText>
-          </PixelBox>
-        ))
+        <View style={styles.recommendationRow}>
+          {topRecommendations.map((item) => {
+            const source = cupidateMap.get(item.sourceCupidateId);
+            const target = cupidateMap.get(item.targetCupidateId);
+
+            return (
+              <Pressable
+                key={`${item.sourceCupidateId}-${item.targetCupidateId}`}
+                onPress={onGoMatching}
+                style={styles.recommendationPressable}
+              >
+                <PixelBox style={styles.recommendationCard} contentStyle={styles.recommendationCardContent}>
+                  <PixelText variant="label" style={styles.summaryLabel}>
+                    {t("home.recommendation.title")}
+                  </PixelText>
+                  <View style={styles.recommendationHeader}>
+                    <View style={styles.recommendationMiniCard}>
+                      <PixelText variant="body" style={styles.recommendationMiniName}>
+                        {source?.displayName ?? item.sourceCupidateId}
+                      </PixelText>
+                      <PixelText variant="caption" style={styles.recommendationMiniMeta}>
+                        {t("home.recommendation.profileLabel")}
+                      </PixelText>
+                    </View>
+                    <PixelText variant="screenTitle" style={styles.recommendationHeart}>
+                      VS
+                    </PixelText>
+                    <View style={styles.recommendationMiniCard}>
+                      <PixelText variant="body" style={styles.recommendationMiniName}>
+                        {target?.displayName ?? item.targetCupidateId}
+                      </PixelText>
+                      <PixelText variant="caption" style={styles.recommendationMiniMeta}>
+                        {t("home.recommendation.profileLabel")}
+                      </PixelText>
+                    </View>
+                  </View>
+                  <View style={styles.recommendationRateChip}>
+                    <PixelText variant="caption" style={styles.recommendationRateText}>
+                      {t("home.recommendation.score", { rate: item.matchScore })}
+                    </PixelText>
+                  </View>
+                </PixelBox>
+              </Pressable>
+            );
+          })}
+        </View>
       )}
 
       <PixelText variant="sectionTitle" style={styles.sectionTitle}>
-        Quick Actions
+        {t("home.sections.recentSummary")}
+      </PixelText>
+      <PixelBox style={styles.sectionCard} contentStyle={styles.sectionCardContent}>
+        <View style={styles.metricRow}>
+          <View style={styles.metricPill}>
+            <PixelText variant="screenTitle" style={styles.metricValue}>
+              {homeSummary.myCupidates}
+            </PixelText>
+            <PixelText variant="caption" style={styles.metricLabel}>
+              {t("home.metrics.cupidates")}
+            </PixelText>
+          </View>
+          <View style={styles.metricPill}>
+            <PixelText variant="screenTitle" style={styles.metricValue}>
+              {homeSummary.connectedCupids}
+            </PixelText>
+            <PixelText variant="caption" style={styles.metricLabel}>
+              {t("home.metrics.connected")}
+            </PixelText>
+          </View>
+          <View style={styles.metricPill}>
+            <PixelText variant="screenTitle" style={styles.metricValue}>
+              {homeSummary.recommendations}
+            </PixelText>
+            <PixelText variant="caption" style={styles.metricLabel}>
+              {t("home.metrics.recommendations")}
+            </PixelText>
+          </View>
+          <View style={styles.metricPill}>
+            <PixelText variant="screenTitle" style={styles.metricValue}>
+              {homeSummary.pendingRequests}
+            </PixelText>
+            <PixelText variant="caption" style={styles.metricLabel}>
+              {t("home.metrics.requests")}
+            </PixelText>
+          </View>
+        </View>
+      </PixelBox>
+
+      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+        {t("home.sections.quickActions")}
       </PixelText>
       <View style={styles.buttonRow}>
-        <PixelButton label="Go to Network" variant="secondary" onPress={onGoNetwork} />
-        <PixelButton label="Go to Matching" variant="primary" onPress={onGoMatching} />
+        <PixelButton label={t("home.actions.addNetwork")} variant="secondary" onPress={onGoNetwork} />
+        <PixelButton label={t("home.actions.updateProfile")} variant="primary" onPress={onGoMy} />
       </View>
     </ScrollView>
   );

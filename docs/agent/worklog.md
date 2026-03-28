@@ -505,3 +505,58 @@ Verification:
 
 Notes:
 - This is a visual/data-structure upgrade for My view; full self-profile preference persistence remains a separate follow-up task.
+
+### Task 2026-03-29-04 - Global i18n Scaffold + My Language Switching
+Status: Completed
+
+Changes:
+- Added a lightweight app-wide i18n layer:
+  - `src/features/i18n/context.tsx`
+  - `src/features/i18n/messages.ts`
+  - `src/features/i18n/types.ts`
+- Wired i18n into the app shell so these now translate immediately:
+  - header title
+  - header status text
+  - bottom tab labels
+- Reworked `MyView` to become the current language-switch entry point:
+  - added `Language Settings` section
+  - added `English / 한국어` immediate toggle
+  - localized My screen copy through translation keys
+- Added app-level i18n interaction coverage:
+  - `src/features/app/__tests__/i18nFlow.test.tsx`
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test` passed.
+
+Notes:
+- Current localized surface is focused on `My`, `Home`, `Auth`, header, and tab shell.
+- `Network` and `Matching` static copy remain queued for follow-up expansion.
+
+### Task 2026-03-29-05 - Safe-Area Modernization + Home/Auth Rebuild
+Status: Completed
+
+Changes:
+- Added `react-native-safe-area-context` and migrated the app root shell:
+  - `App.tsx`
+  - `package.json`
+  - `package-lock.json`
+- Added Jest safe-area mocks in `jest.setup.ts` to keep test rendering stable.
+- Rebuilt `HomeView` against the current docs rather than the earlier hero-strip layout:
+  - `Alarm Feed`
+  - `Today's Rec's`
+  - `Recent Summary`
+  - `Quick Actions`
+- Reworked Home data display to use localized notification objects and recommendation cards.
+- Rebuilt `AuthRequiredView` into prototype-aligned card groups:
+  - intro card
+  - sign-in form card
+  - session status card
+- Updated existing tests and added Korean-render coverage for Auth.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test` passed (13 suites / 32 tests).
+
+Notes:
+- This closes the SafeArea deprecation cleanup from the previous round and moves the rebuilt surface to Home/My/Auth + shell.

@@ -1,44 +1,41 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
-import { SafeAreaView, View } from "react-native";
+import { useMemo, useState } from "react";
+import { View } from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 import { PixelBox } from "./src/features/app/components/PixelBox";
 import { PixelTabBar } from "./src/features/app/components/PixelTabBar";
 import { PixelText } from "./src/features/app/components/PixelText";
 import { useCupidateAppState } from "./src/features/app/model/useCupidateAppState";
 import { styles } from "./src/features/app/styles";
+import { designTokens } from "./src/features/app/theme/tokens";
 import { AuthRequiredView } from "./src/features/app/views/AuthRequiredView";
 import { HomeView } from "./src/features/app/views/HomeView";
 import { MatchingView } from "./src/features/app/views/MatchingView";
 import { MyView } from "./src/features/app/views/MyView";
 import { NetworkView } from "./src/features/app/views/NetworkView";
 import { useAuthSessionGate } from "./src/features/auth/hooks/useAuthSessionGate";
-import { designTokens } from "./src/features/app/theme/tokens";
+import { I18nProvider, useI18n } from "./src/features/i18n/context";
 import type { AppView } from "./src/features/app/model/types";
 
-const tabItems: Array<{ key: AppView; label: string; iconLabel: string; accentColor: string }> = [
-  { key: "home", label: "HOME", iconLabel: "HM", accentColor: designTokens.color.gold },
-  { key: "matching", label: "MATCHING", iconLabel: "MT", accentColor: designTokens.color.pink },
-  { key: "network", label: "NETWORK", iconLabel: "NW", accentColor: designTokens.color.blue },
-  { key: "my", label: "MY", iconLabel: "MY", accentColor: designTokens.color.gold }
-];
-
-function titleForView(activeView: AppView) {
+function titleKeyForView(activeView: AppView) {
   switch (activeView) {
     case "network":
-      return "Network";
+      return "app.views.network";
     case "matching":
-      return "Matching";
+      return "app.views.matching";
     case "my":
-      return "My Info";
+      return "app.views.my";
     case "home":
     default:
-      return "Home";
+      return "app.views.home";
   }
 }
 
 function CupidateHeader({ activeView, locked }: { activeView: AppView; locked?: boolean }) {
+  const { t } = useI18n();
+
   return (
     <PixelBox
       style={styles.headerFrame}
@@ -48,15 +45,15 @@ function CupidateHeader({ activeView, locked }: { activeView: AppView; locked?: 
       <View style={styles.headerRow}>
         <View style={{ flex: 1 }}>
           <PixelText variant="screenTitle" style={styles.title} color={designTokens.color.inkInverse}>
-            {`Cupidate: ${titleForView(activeView)}`}
+            {`Cupidate: ${t(titleKeyForView(activeView))}`}
           </PixelText>
           <PixelText variant="caption" style={styles.subtitle}>
-            PIXEL MATCH NETWORK
+            {t("app.header.subtitle")}
           </PixelText>
         </View>
         <View style={styles.statusBadge}>
           <PixelText variant="caption" style={styles.statusText}>
-            {locked ? "LOCKED" : "ONLINE"}
+            {locked ? t("app.status.locked") : t("app.status.online")}
           </PixelText>
         </View>
       </View>
@@ -69,10 +66,21 @@ function CupidateAppShell() {
   const state = useCupidateAppState({
     isDataAccessEnabled: authGate.canAccessProtectedData
   });
+  const { t } = useI18n();
+
+  const tabItems = useMemo<Array<{ key: AppView; label: string; iconLabel: string; accentColor: string }>>(
+    () => [
+      { key: "home", label: t("app.tabs.home"), iconLabel: "HM", accentColor: designTokens.color.gold },
+      { key: "matching", label: t("app.tabs.matching"), iconLabel: "MT", accentColor: designTokens.color.pink },
+      { key: "network", label: t("app.tabs.network"), iconLabel: "NW", accentColor: designTokens.color.blue },
+      { key: "my", label: t("app.tabs.my"), iconLabel: "MY", accentColor: designTokens.color.gold }
+    ],
+    [t]
+  );
 
   if (authGate.mode === "supabase" && !authGate.canAccessProtectedData) {
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={styles.safeArea} edges={["top", "left", "right", "bottom"]}>
         <StatusBar style="light" />
         <View style={styles.container}>
           <CupidateHeader activeView="home" locked />
@@ -91,7 +99,7 @@ function CupidateAppShell() {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right", "bottom"]}>
       <StatusBar style="light" />
       <View style={styles.container}>
         <CupidateHeader activeView={state.activeView} />
@@ -101,7 +109,10 @@ function CupidateAppShell() {
             <HomeView
               homeSummary={state.homeSummary}
               notifications={state.notifications}
+              recommendations={state.recommendations}
+              cupidates={state.cupidates}
               onGoNetwork={() => state.setActiveView("network")}
+              onGoMy={() => state.setActiveView("my")}
               onGoMatching={() => state.setActiveView("matching")}
               isHomeLoading={state.isHomeLoading}
               homeError={state.homeError}
@@ -237,8 +248,12 @@ export default function App() {
   );
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <CupidateAppShell />
-    </QueryClientProvider>
+    <SafeAreaProvider>
+      <I18nProvider initialLocale="en">
+        <QueryClientProvider client={queryClient}>
+          <CupidateAppShell />
+        </QueryClientProvider>
+      </I18nProvider>
+    </SafeAreaProvider>
   );
 }

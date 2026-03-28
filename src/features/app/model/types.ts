@@ -28,6 +28,13 @@ export type MatchRequest = {
   createdAt: string;
 };
 
+export type HomeNotification = {
+  id: string;
+  sourceLabel: string;
+  targetLabel: string;
+  status: MatchRequestStatus;
+};
+
 export type ValidationErrors = {
   displayName?: string;
   birthYear?: string;

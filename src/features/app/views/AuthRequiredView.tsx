@@ -6,6 +6,7 @@ import { PixelButton } from "../components/PixelButton";
 import { PixelText } from "../components/PixelText";
 import { styles } from "../styles";
 import { designTokens } from "../theme/tokens";
+import { useI18n } from "../../i18n/context";
 
 type AuthRequiredViewProps = {
   isLoading: boolean;
@@ -18,6 +19,18 @@ type AuthRequiredViewProps = {
 const emailPattern = /^\S+@\S+\.\S+$/;
 const placeholderTextColor = designTokens.color.inkMuted;
 
+function normalizeSuccessMessage(action: "signin" | "signup", rawMessage: string, t: (key: string) => string) {
+  if (action === "signin") {
+    return t("auth.success.signIn");
+  }
+
+  if (rawMessage.toLowerCase().includes("verify email")) {
+    return t("auth.success.signUpVerify");
+  }
+
+  return t("auth.success.signUp");
+}
+
 export function AuthRequiredView({
   isLoading,
   error,
@@ -25,6 +38,7 @@ export function AuthRequiredView({
   onSignInWithPassword,
   onSignUpWithPassword
 }: AuthRequiredViewProps) {
+  const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,12 +56,12 @@ export function AuthRequiredView({
     setActionError(null);
 
     if (!emailPattern.test(nextEmail)) {
-      setActionError("Enter a valid email address.");
+      setActionError(t("auth.validation.email"));
       return;
     }
 
     if (password.length < 6) {
-      setActionError("Password must be at least 6 characters.");
+      setActionError(t("auth.validation.password"));
       return;
     }
 
@@ -59,9 +73,9 @@ export function AuthRequiredView({
           ? await onSignInWithPassword(nextEmail, password)
           : await onSignUpWithPassword(nextEmail, password);
 
-      setActionMessage(message);
+      setActionMessage(normalizeSuccessMessage(action, message, t));
     } catch (requestError) {
-      const message = requestError instanceof Error ? requestError.message : "Authentication request failed.";
+      const message = requestError instanceof Error ? requestError.message : t("auth.error.requestFailed");
       setActionError(message);
     } finally {
       setIsSubmitting(false);
@@ -70,84 +84,111 @@ export function AuthRequiredView({
 
   return (
     <View style={styles.centerPanel}>
-      <PixelBox style={styles.gateCard} contentStyle={styles.gateCardContent}>
-        <PixelText variant="screenTitle" style={styles.gateTitle}>
-          AUTH REQUIRED
-        </PixelText>
-        <PixelText variant="body" style={styles.gateText}>
-          This app is connected to Supabase. Sign in here to unlock Network and Matching data.
-        </PixelText>
+      <View style={styles.authStack}>
+        <PixelBox style={styles.authHeroCard} contentStyle={styles.authHeroContent}>
+          <PixelText variant="screenTitle" style={styles.gateTitle}>
+            {t("auth.title")}
+          </PixelText>
+          <PixelText variant="body" style={styles.gateText}>
+            {t("auth.subtitle")}
+          </PixelText>
+        </PixelBox>
 
-        <View style={styles.gateForm}>
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Email
+        <PixelBox style={styles.authPanelCard} contentStyle={styles.authPanelContent}>
+          <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+            {t("auth.section.form")}
           </PixelText>
-          <TextInput
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="email-address"
-            placeholder="you@example.com"
-            placeholderTextColor={placeholderTextColor}
-            style={styles.input}
-            editable={!isSubmitting}
-          />
 
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Password
-          </PixelText>
-          <TextInput
-            value={password}
-            onChangeText={setPassword}
-            autoCapitalize="none"
-            autoCorrect={false}
-            secureTextEntry
-            placeholder="at least 6 chars"
-            placeholderTextColor={placeholderTextColor}
-            style={styles.input}
-            editable={!isSubmitting}
-          />
-        </View>
+          <View style={styles.gateForm}>
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("auth.fields.email")}
+            </PixelText>
+            <TextInput
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="email-address"
+              placeholder={t("auth.placeholders.email")}
+              placeholderTextColor={placeholderTextColor}
+              style={styles.input}
+              editable={!isSubmitting}
+            />
 
-        <View style={styles.buttonRow}>
-          <PixelButton
-            label={isSubmitting ? "Signing..." : "Sign In"}
-            variant="primary"
-            onPress={() => void runAuthAction("signin")}
-          />
-          <PixelButton
-            label={isSubmitting ? "Working..." : "Create Account"}
-            variant="success"
-            onPress={() => void runAuthAction("signup")}
-          />
-        </View>
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("auth.fields.password")}
+            </PixelText>
+            <TextInput
+              value={password}
+              onChangeText={setPassword}
+              autoCapitalize="none"
+              autoCorrect={false}
+              secureTextEntry
+              placeholder={t("auth.placeholders.password")}
+              placeholderTextColor={placeholderTextColor}
+              style={styles.input}
+              editable={!isSubmitting}
+            />
+          </View>
 
-        <View style={styles.buttonRow}>
-          <PixelButton label="Refresh Session" variant="secondary" onPress={() => void onRefresh()} />
-        </View>
+          <View style={styles.buttonRow}>
+            <PixelButton
+              label={isSubmitting ? t("auth.buttons.signingIn") : t("auth.buttons.signIn")}
+              variant="primary"
+              testID="auth-signin"
+              onPress={() => void runAuthAction("signin")}
+            />
+            <PixelButton
+              label={isSubmitting ? t("auth.buttons.working") : t("auth.buttons.signUp")}
+              variant="success"
+              testID="auth-signup"
+              onPress={() => void runAuthAction("signup")}
+            />
+          </View>
+        </PixelBox>
 
-        {isLoading ? (
-          <PixelText variant="body" style={styles.listMeta}>
-            Checking session...
+        <PixelBox style={styles.authPanelCard} contentStyle={styles.authPanelContent}>
+          <View style={styles.authStatusRow}>
+            <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+              {t("auth.section.status")}
+            </PixelText>
+            <View style={styles.authStatusChip}>
+              <PixelText variant="caption" style={styles.authStatusChipText}>
+                {isLoading ? t("auth.status.syncChip") : t("auth.status.readyChip")}
+              </PixelText>
+            </View>
+          </View>
+
+          <PixelText variant="body" style={styles.authCaption}>
+            {isLoading ? t("auth.status.checking") : t("auth.status.ready")}
           </PixelText>
-        ) : null}
-        {actionMessage ? (
-          <PixelText variant="body" style={styles.gateHint}>
-            {actionMessage}
-          </PixelText>
-        ) : null}
-        {error ? (
-          <PixelText variant="body" style={styles.errorText}>
-            {`Error: ${error}`}
-          </PixelText>
-        ) : null}
-        {actionError ? (
-          <PixelText variant="body" style={styles.errorText}>
-            {`Auth: ${actionError}`}
-          </PixelText>
-        ) : null}
-      </PixelBox>
+
+          <View style={styles.buttonRow}>
+            <PixelButton
+              label={t("auth.buttons.refresh")}
+              variant="secondary"
+              testID="auth-refresh"
+              onPress={() => void onRefresh()}
+            />
+          </View>
+
+          {actionMessage ? (
+            <PixelText variant="body" style={styles.gateHint}>
+              {actionMessage}
+            </PixelText>
+          ) : null}
+          {error ? (
+            <PixelText variant="body" style={styles.errorText}>
+              {t("auth.error.prefix", { message: error })}
+            </PixelText>
+          ) : null}
+          {actionError ? (
+            <PixelText variant="body" style={styles.errorText}>
+              {t("auth.error.authPrefix", { message: actionError })}
+            </PixelText>
+          ) : null}
+        </PixelBox>
+      </View>
     </View>
   );
 }

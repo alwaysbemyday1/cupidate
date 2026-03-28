@@ -2,7 +2,7 @@
 Last Updated: 2026-03-29
 
 Current Track: Service Build (Post-POC)
-Current Phase: S3 Pixel UI Rebuild (D3 Sequential Screen Rebuild)
+Current Phase: S3 Pixel UI Rebuild (D4 Network / Matching Rebuild Prep)
 Overall Status: in_progress
 
 Architecture Decision
@@ -45,11 +45,13 @@ Completed Work
 - [x] Codexrules document routing guide (Task 2026-03-29-01E)
 - [x] Pixel primitives refactor + app shell rebuild (Task 2026-03-29-02)
 - [x] My View vertical slice rebuild + auth/session metadata wiring (Task 2026-03-29-03)
+- [x] Global i18n scaffold + My language switching (Task 2026-03-29-04)
+- [x] Safe-area modernization + Home/Auth rebuild (Task 2026-03-29-05)
 
 Next Tasks (Rebuild Track)
- - Task 2026-03-29-04: Home/Network/Matching sequential rebuild with shared component reuse
- - Task 2026-03-29-05: Safe-area modernization (`react-native-safe-area-context`) and warning cleanup
- - Task 2026-03-29-06: My preference persistence expansion beyond nickname/toggles
+ - Task 2026-03-29-06: Network view prototype rebuild + i18n expansion
+ - Task 2026-03-29-07: Matching view prototype rebuild + score insight redesign
+ - Task 2026-03-29-08: Locale persistence + My preference persistence expansion
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:

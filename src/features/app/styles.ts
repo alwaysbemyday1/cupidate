@@ -140,6 +140,116 @@ export const styles = StyleSheet.create({
     opacity: 1,
     transform: [{ translateY: -1 }]
   },
+  sectionCard: {},
+  sectionCardContent: {
+    backgroundColor: c.surface,
+    padding: s.md,
+    gap: s.sm
+  },
+  feedRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: s.sm
+  },
+  feedBadge: {
+    minWidth: 52,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.pink,
+    paddingHorizontal: s.xs,
+    paddingVertical: 6
+  },
+  feedBadgeAccepted: {
+    backgroundColor: c.success
+  },
+  feedBadgeRejected: {
+    backgroundColor: c.danger
+  },
+  feedBadgeCompleted: {
+    backgroundColor: c.gold
+  },
+  feedBadgeText: {
+    color: c.inkInverse
+  },
+  feedBody: {
+    flex: 1,
+    gap: s.xxs
+  },
+  feedDescription: {
+    color: c.inkMuted
+  },
+  recommendationRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: s.xs
+  },
+  recommendationPressable: {
+    width: "48%"
+  },
+  recommendationCard: {},
+  recommendationCardContent: {
+    minHeight: 128,
+    backgroundColor: c.surface,
+    padding: s.sm,
+    justifyContent: "space-between",
+    gap: s.sm
+  },
+  recommendationHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: s.xs
+  },
+  recommendationMiniCard: {
+    flex: 1,
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surfaceAlt,
+    paddingHorizontal: s.xs,
+    paddingVertical: s.xs,
+    gap: 2
+  },
+  recommendationMiniName: {
+    color: c.ink
+  },
+  recommendationMiniMeta: {
+    color: c.inkMuted
+  },
+  recommendationHeart: {
+    color: c.pink
+  },
+  recommendationRateChip: {
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.blueDark,
+    paddingHorizontal: s.xs,
+    paddingVertical: 6,
+    alignSelf: "flex-start"
+  },
+  recommendationRateText: {
+    color: c.inkInverse
+  },
+  metricRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: s.xs
+  },
+  metricPill: {
+    width: "48%",
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surfaceAlt,
+    padding: s.sm,
+    gap: 2
+  },
+  metricValue: {
+    color: c.ink
+  },
+  metricLabel: {
+    color: c.inkMuted
+  },
 
   summaryGrid: {
     flexDirection: "row",
@@ -277,6 +387,11 @@ export const styles = StyleSheet.create({
   profileMetaText: {
     color: c.inkMuted
   },
+  languageButtonRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: s.xs
+  },
 
   settingRow: {
     flexDirection: "row",
@@ -287,6 +402,44 @@ export const styles = StyleSheet.create({
     backgroundColor: c.surfaceAlt,
     paddingHorizontal: s.sm,
     paddingVertical: s.xs
+  },
+  authStack: {
+    gap: s.md
+  },
+  authHeroCard: {
+    marginHorizontal: s.xs
+  },
+  authHeroContent: {
+    backgroundColor: c.surface,
+    padding: s.md,
+    gap: s.sm
+  },
+  authPanelCard: {
+    marginHorizontal: s.xs
+  },
+  authPanelContent: {
+    backgroundColor: c.surface,
+    padding: s.md,
+    gap: s.sm
+  },
+  authStatusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: s.sm
+  },
+  authStatusChip: {
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.blueDark,
+    paddingHorizontal: s.sm,
+    paddingVertical: s.xs
+  },
+  authStatusChipText: {
+    color: c.inkInverse
+  },
+  authCaption: {
+    color: c.inkMuted
   },
 
   textBody: {

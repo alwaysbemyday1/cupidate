@@ -29,7 +29,7 @@ describe("App", () => {
   it("shows validation message when required fields are missing", async () => {
     render(<App />);
 
-    fireEvent.press(screen.getByText("NETWORK"));
+    fireEvent.press(screen.getByTestId("tab-network"));
     fireEvent.press(screen.getByText("Save Cupidate"));
 
     await waitFor(() => {

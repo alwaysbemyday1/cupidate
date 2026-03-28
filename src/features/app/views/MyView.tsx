@@ -7,6 +7,7 @@ import { StateCard } from "../components/StateCard";
 import { SummaryCard } from "../components/SummaryCard";
 import { styles } from "../styles";
 import { designTokens } from "../theme/tokens";
+import { useI18n } from "../../i18n/context";
 
 type MyViewProps = {
   myNickname: string;
@@ -31,23 +32,23 @@ type MyViewProps = {
 };
 
 function buildAvatarSeed(nickname: string) {
-  const compact = nickname.replace(/[^a-zA-Z0-9가-힣]/g, "").trim();
+  const trimmed = nickname.trim();
 
-  if (!compact) {
+  if (!trimmed) {
     return "CU";
   }
 
-  return compact.slice(0, 2).toUpperCase();
+  return Array.from(trimmed.replace(/\s+/g, "")).slice(0, 2).join("").toUpperCase();
 }
 
-function formatJoinedAt(joinedAt?: string | null) {
+function formatJoinedAt(joinedAt: string | null | undefined, fallback: string, unknown: string) {
   if (!joinedAt) {
-    return "Local Build";
+    return fallback;
   }
 
   const date = new Date(joinedAt);
   if (Number.isNaN(date.getTime())) {
-    return "Unknown";
+    return unknown;
   }
 
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(
@@ -76,27 +77,32 @@ export function MyView({
   myError,
   onRetryMyError
 }: MyViewProps) {
+  const { locale, setLocale, t } = useI18n();
   const avatarSeed = buildAvatarSeed(myNickname);
-  const profileStatus = accountMode === "supabase" ? "Supabase Connected" : "Local Sandbox";
+  const profileStatus = accountMode === "supabase" ? t("my.status.supabase") : t("my.status.local");
+  const joinedLabel = formatJoinedAt(joinedAt, t("my.fallback.localBuild"), t("my.fallback.unknown"));
+  const accountStatus = notificationEnabled ? t("my.status.alertsOn") : t("my.status.alertsOff");
+  const visibilityLabel = privacyNetworkOnly ? t("my.visibility.network") : t("my.visibility.private");
+  const notificationLabel = notificationEnabled ? t("my.notification.on") : t("my.notification.off");
 
   return (
     <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
       {isMyLoading ? (
-        <StateCard tone="loading" title="SYNCING PROFILE TERMINAL" description="Loading my account and settings snapshot." />
+        <StateCard tone="loading" title={t("my.loading.title")} description={t("my.loading.description")} />
       ) : null}
       {myError ? (
         <StateCard
           tone="error"
-          title="PROFILE SYNC ERROR"
+          title={t("my.error.title")}
           description={myError}
-          actionLabel="Retry Profile Sync"
+          actionLabel={t("my.error.retry")}
           actionVariant="warning"
           onAction={onRetryMyError}
         />
       ) : null}
 
       <PixelText variant="sectionTitle" style={styles.sectionTitle}>
-        Profile Overview
+        {t("my.sections.profileOverview")}
       </PixelText>
       <PixelBox style={styles.listCard} contentStyle={styles.listCardContent}>
         <View style={styles.profileRow}>
@@ -107,11 +113,11 @@ export function MyView({
           </View>
           <View style={styles.profileInfo}>
             <PixelText variant="label" style={styles.fieldLabel}>
-              Nickname
+              {t("my.fields.nickname")}
             </PixelText>
             <TextInput value={myNickname} onChangeText={onChangeMyNickname} style={styles.input} />
             <PixelText variant="body" style={styles.textBody}>
-              {`Cupid ID: ${currentCupidId}`}
+              {t("my.fields.cupidId", { id: currentCupidId })}
             </PixelText>
             <PixelText variant="caption" style={styles.profileMetaText}>
               {profileStatus}
@@ -121,12 +127,12 @@ export function MyView({
 
         <View style={styles.buttonRow}>
           <PixelButton
-            label={isSavingNickname ? "Saving..." : "Save Nickname"}
+            label={isSavingNickname ? t("my.buttons.saving") : t("my.buttons.saveNickname")}
             variant="primary"
             onPress={onSaveMyNickname}
           />
           <PixelButton
-            label="Refresh Session"
+            label={t("my.buttons.refreshSession")}
             variant="secondary"
             onPress={() => {
               void onRefreshAccount?.();
@@ -137,29 +143,57 @@ export function MyView({
       </PixelBox>
 
       <PixelText variant="sectionTitle" style={styles.sectionTitle}>
-        Account Details
+        {t("my.sections.accountDetails")}
       </PixelText>
       <PixelBox style={styles.listCard} contentStyle={styles.listCardContent}>
         <PixelText variant="body" style={styles.textBody}>
-          {`Email: ${accountEmail ?? "Local mode account"}`}
+          {t("my.fields.email", { value: accountEmail ?? t("my.fallback.localAccount") })}
         </PixelText>
         <View style={styles.profileDivider} />
         <PixelText variant="body" style={styles.textBody}>
-          {`Join Date: ${formatJoinedAt(joinedAt)}`}
+          {t("my.fields.joinDate", { value: joinedLabel })}
         </PixelText>
         <View style={styles.profileDivider} />
         <PixelText variant="body" style={styles.textBody}>
-          {`Status: ${notificationEnabled ? "Alerts Active" : "Alerts Paused"}`}
+          {t("my.fields.status", { value: accountStatus })}
         </PixelText>
       </PixelBox>
 
       <PixelText variant="sectionTitle" style={styles.sectionTitle}>
-        Matching Preferences
+        {t("my.sections.language")}
+      </PixelText>
+      <PixelBox style={styles.listCard} contentStyle={styles.listCardContent}>
+        <PixelText variant="body" style={styles.textBody}>
+          {t("my.locale.current", { language: locale === "ko" ? t("my.locale.ko") : t("my.locale.en") })}
+        </PixelText>
+        <PixelText variant="caption" style={styles.profileMetaText}>
+          {t("my.fields.languageHint")}
+        </PixelText>
+        <View style={styles.languageButtonRow}>
+          <PixelButton
+            label={t("my.buttons.english")}
+            variant="secondary"
+            active={locale === "en"}
+            testID="locale-en"
+            onPress={() => setLocale("en")}
+          />
+          <PixelButton
+            label={t("my.buttons.korean")}
+            variant="primary"
+            active={locale === "ko"}
+            testID="locale-ko"
+            onPress={() => setLocale("ko")}
+          />
+        </View>
+      </PixelBox>
+
+      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+        {t("my.sections.preferences")}
       </PixelText>
       <PixelBox style={styles.listCard} contentStyle={styles.listCardContent}>
         <View style={styles.settingRow}>
           <PixelText variant="label" style={styles.fieldLabel}>
-            Network-only profile visibility
+            {t("my.preference.visibility")}
           </PixelText>
           <Switch
             value={privacyNetworkOnly}
@@ -168,12 +202,12 @@ export function MyView({
           />
         </View>
         <PixelText variant="body" style={styles.listMeta}>
-          {`Visibility: ${privacyNetworkOnly ? "Network only" : "Private"}`}
+          {t("my.fields.visibility", { value: visibilityLabel })}
         </PixelText>
 
         <View style={styles.settingRow}>
           <PixelText variant="label" style={styles.fieldLabel}>
-            Notifications
+            {t("my.preference.notifications")}
           </PixelText>
           <Switch
             value={notificationEnabled}
@@ -182,25 +216,24 @@ export function MyView({
           />
         </View>
         <PixelText variant="body" style={styles.listMeta}>
-          {`Notification status: ${notificationEnabled ? "ON" : "OFF"}`}
+          {t("my.fields.notifications", { value: notificationLabel })}
         </PixelText>
       </PixelBox>
 
       <PixelText variant="sectionTitle" style={styles.sectionTitle}>
-        Account Summary
+        {t("my.sections.summary")}
       </PixelText>
       {connectionCount === 0 && cupidateCount === 0 && requestCount === 0 ? (
-        <StateCard
-          tone="empty"
-          title="NO ACTIVITY YET"
-          description="Start by registering cupidates and sending your first match request."
-        />
+        <StateCard tone="empty" title={t("my.empty.title")} description={t("my.empty.description")} />
       ) : (
         <View style={styles.summaryGrid}>
-          <SummaryCard label="Connections" value={connectionCount} />
-          <SummaryCard label="Cupidates" value={cupidateCount} />
-          <SummaryCard label="Requests" value={requestCount} />
-          <SummaryCard label="Visibility" value={privacyNetworkOnly ? "NET" : "PRIVATE"} />
+          <SummaryCard label={t("my.summary.connections")} value={connectionCount} />
+          <SummaryCard label={t("my.summary.cupidates")} value={cupidateCount} />
+          <SummaryCard label={t("my.summary.requests")} value={requestCount} />
+          <SummaryCard
+            label={t("my.summary.visibility")}
+            value={privacyNetworkOnly ? t("my.summary.visibilityNetwork") : t("my.summary.visibilityPrivate")}
+          />
         </View>
       )}
     </ScrollView>

@@ -34,7 +34,12 @@ Last Updated: 2026-03-29
 - 성격 타입 드롭다운
 - 하단 CTA: `선호도 저장`
 
-5) 하단 탭바
+5) Language Settings 섹션 (`PixelBox`)
+- 앱 언어 전환
+- `English / 한국어` 즉시 반영형 토글
+- 변경 즉시 헤더/탭/Home/Auth/My 카피 갱신
+
+6) 하단 탭바
 - My Info 활성 상태
 
 ## 3. 기술 제약 반영
@@ -44,7 +49,12 @@ Last Updated: 2026-03-29
 - 모든 카드/섹션은 `PixelBox`로 하드 픽셀 섀도우 처리
 - 하단 탭바는 `position: absolute` 고정
 
-## 4. 데이터 계약
+## 4. i18n 규칙
+- 지원 언어: `en`, `ko`
+- My 화면은 전역 언어 설정의 진입점
+- 하드코딩된 카피 대신 번역 키 사용
+
+## 5. 데이터 계약
 Queries:
 - `my_profile`
 - `my_preferences`
@@ -56,12 +66,13 @@ Mutations:
 - `change_password`
 - `deactivate_account`
 
-## 5. 상태 정의
+## 6. 상태 정의
 - Loading: 섹션별 placeholder
 - Empty: 프로필 미완성 안내 + 작성 CTA
 - Error: 저장 실패/조회 실패 분리 표기 + 재시도
 
-## 6. 완료 기준
+## 7. 완료 기준
 - 프로필/선호도 조회값이 폼과 양방향 동기화
 - 저장 성공 시 홈/매칭 점수에 반영
+- 영/한 언어 전환이 즉시 반영
 - 모바일 스크롤과 하단 탭바 충돌 없음

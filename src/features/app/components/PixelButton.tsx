@@ -9,6 +9,7 @@ type PixelButtonProps = {
   active?: boolean;
   disabled?: boolean;
   variant?: ButtonVariant;
+  testID?: string;
   onPress: () => void;
 };
 
@@ -65,12 +66,19 @@ export function PixelButton({
   active,
   disabled,
   variant = "neutral",
+  testID,
   onPress
 }: PixelButtonProps) {
   const palette = variantPalette(variant);
 
   return (
-    <Pressable accessibilityRole="button" disabled={disabled} onPress={onPress} style={localStyles.pressable}>
+    <Pressable
+      accessibilityRole="button"
+      disabled={disabled}
+      onPress={onPress}
+      style={localStyles.pressable}
+      testID={testID}
+    >
       {({ pressed }) => (
         <View
           style={[

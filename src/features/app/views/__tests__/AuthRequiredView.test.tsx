@@ -1,6 +1,8 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 
 import { AuthRequiredView } from "../AuthRequiredView";
+import { I18nProvider } from "../../../i18n/context";
+import { messages } from "../../../i18n/messages";
 
 type SetupOptions = {
   isLoading?: boolean;
@@ -40,7 +42,7 @@ describe("AuthRequiredView", () => {
 
     fireEvent.changeText(emailInput, "invalid-email");
     fireEvent.changeText(passwordInput, "123456");
-    fireEvent.press(screen.getByText("Sign In"));
+    fireEvent.press(screen.getByTestId("auth-signin"));
 
     await waitFor(() => {
       expect(screen.getByText("Auth: Enter a valid email address.")).toBeTruthy();
@@ -54,7 +56,7 @@ describe("AuthRequiredView", () => {
 
     fireEvent.changeText(emailInput, "user@example.com");
     fireEvent.changeText(passwordInput, "123");
-    fireEvent.press(screen.getByText("Sign In"));
+    fireEvent.press(screen.getByTestId("auth-signin"));
 
     await waitFor(() => {
       expect(screen.getByText("Auth: Password must be at least 6 characters.")).toBeTruthy();
@@ -69,7 +71,7 @@ describe("AuthRequiredView", () => {
 
     fireEvent.changeText(emailInput, "  USER@Example.com ");
     fireEvent.changeText(passwordInput, "123456");
-    fireEvent.press(screen.getByText("Sign In"));
+    fireEvent.press(screen.getByTestId("auth-signin"));
 
     await waitFor(() => {
       expect(onSignInWithPassword).toHaveBeenCalledWith("user@example.com", "123456");
@@ -85,7 +87,7 @@ describe("AuthRequiredView", () => {
 
     fireEvent.changeText(emailInput, "user@example.com");
     fireEvent.changeText(passwordInput, "123456");
-    fireEvent.press(screen.getByText("Create Account"));
+    fireEvent.press(screen.getByTestId("auth-signup"));
 
     await waitFor(() => {
       expect(screen.getByText("Auth: Invalid login credentials")).toBeTruthy();
@@ -101,9 +103,29 @@ describe("AuthRequiredView", () => {
 
     fireEvent.changeText(emailInput, "user@example.com");
     fireEvent.changeText(passwordInput, "123456");
-    fireEvent.press(screen.getByText("Sign In"));
+    fireEvent.press(screen.getByTestId("auth-signin"));
 
     expect(screen.getByText("Checking session...")).toBeTruthy();
     expect(onSignInWithPassword).not.toHaveBeenCalled();
+  });
+
+  it("renders Korean copy when wrapped with Korean locale", async () => {
+    render(
+      <I18nProvider initialLocale="ko">
+        <AuthRequiredView
+          isLoading={false}
+          error={null}
+          onRefresh={jest.fn()}
+          onSignInWithPassword={jest.fn(async () => "Signed in successfully.")}
+          onSignUpWithPassword={jest.fn(async () => "Account created.")}
+        />
+      </I18nProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(messages.ko["auth.title"])).toBeTruthy();
+      expect(screen.getByTestId("auth-signin")).toBeTruthy();
+      expect(screen.getByText(messages.ko["auth.section.status"])).toBeTruthy();
+    });
   });
 });

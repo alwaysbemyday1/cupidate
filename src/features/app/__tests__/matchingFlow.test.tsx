@@ -81,7 +81,7 @@ describe("Matching flow", () => {
   it("processes request -> accept -> contact shared lifecycle", async () => {
     render(<App />);
 
-    fireEvent.press(screen.getByText("MATCHING"));
+    fireEvent.press(screen.getByTestId("tab-matching"));
 
     await waitFor(() => {
       expect(screen.getByText("Mina x Joon")).toBeTruthy();

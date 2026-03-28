@@ -20,6 +20,7 @@ import {
   type AppView,
   type CupidConnection,
   type CupidateRecord,
+  type HomeNotification,
   type HomeSummary,
   type MatchRequest,
   type MatchRequestStatus,
@@ -322,17 +323,24 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     return map;
   }, [requests]);
 
-  const notifications = useMemo(
+  const cupidateNameById = useMemo(
+    () => new Map(cupidates.map((item) => [item.cupidateId, item.displayName])),
+    [cupidates]
+  );
+
+  const notifications = useMemo<HomeNotification[]>(
     () =>
       requests
         .slice()
         .reverse()
         .slice(0, 5)
-        .map(
-          (request) =>
-            `Request ${request.sourceCupidateId} -> ${request.targetCupidateId}: ${request.status.toUpperCase()}`
-        ),
-    [requests]
+        .map((request) => ({
+          id: request.id,
+          sourceLabel: cupidateNameById.get(request.sourceCupidateId) ?? request.sourceCupidateId,
+          targetLabel: cupidateNameById.get(request.targetCupidateId) ?? request.targetCupidateId,
+          status: request.status
+        })),
+    [cupidateNameById, requests]
   );
 
   const homeSummary = useMemo<HomeSummary>(

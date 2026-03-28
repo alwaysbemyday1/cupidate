@@ -40,7 +40,7 @@ describe("Network discovery flow", () => {
   });
 
   async function openConnectedCupidsSegment() {
-    fireEvent.press(screen.getByText("NETWORK"));
+    fireEvent.press(screen.getByTestId("tab-network"));
     fireEvent.press(screen.getByText("Connected Cupids (0)"));
 
     await waitFor(() => {
