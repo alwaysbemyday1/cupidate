@@ -31,6 +31,7 @@ Completed Work
 - [x] Network discovery interaction test coverage (Task 2026-03-28-13)
 - [x] View-level empty/loading/error state cards (Task 2026-03-28-14)
 - [x] Home hero sprite loop animation (Task 2026-03-28-15)
+- [x] Auth gate interaction test coverage (Task 2026-03-28-16)
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:
@@ -43,9 +44,9 @@ Task 2026-03-28-01 (Completed)
 - Verified with tests and TypeScript check.
 
 Next Tasks
- - Task 2026-03-28-16: add Auth gate UI interaction tests (validation/sign-in error/success messaging)
  - Task 2026-03-28-17: add per-view retry actions for recoverable sync errors
  - Task 2026-03-28-18: wire retry handlers from app-state into state cards for network/matching/my
+ - Task 2026-03-28-19: add retry interaction tests for network/matching/my error states
 
 Task 2026-03-28-02 (Completed)
 - Added `src/features/network/repository` data layer:
@@ -190,3 +191,16 @@ Task 2026-03-28-15 (Completed)
 - Home view now cycles active frame every 180ms and highlights the current sprite frame.
 - Added frame meta label (`FRAME x/6`) and active frame visual treatment.
 - Added test-safe guard to disable animation interval while running Jest.
+
+Task 2026-03-28-16 (Completed)
+- Added dedicated Auth gate UI interaction tests.
+- New test file:
+  - `src/features/app/views/__tests__/AuthRequiredView.test.tsx`
+- Covered scenarios:
+  - invalid email validation message
+  - short password validation message
+  - successful sign-in with normalized email input
+  - signup failure error rendering
+  - loading-state action blocking
+- Stabilized Network discovery test timeout under full suite run:
+  - `src/features/app/__tests__/networkDiscoveryFlow.test.tsx` set to `15_000ms`

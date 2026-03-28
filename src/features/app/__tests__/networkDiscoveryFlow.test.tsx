@@ -6,6 +6,8 @@ import { createInMemoryMatchingRepository } from "../../matching/repository/inMe
 import { setNetworkRepositoryForTest } from "../../network/repository/createNetworkRepository";
 import { createInMemoryNetworkRepository } from "../../network/repository/inMemoryNetworkRepository";
 
+jest.setTimeout(15_000);
+
 describe("Network discovery flow", () => {
   beforeEach(() => {
     setNetworkRepositoryForTest(

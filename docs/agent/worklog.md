@@ -263,3 +263,26 @@ Verification:
 
 Notes:
 - This gives the home command center a living sprite identity while keeping implementation lightweight.
+
+### Task 2026-03-28-16 - Auth Gate Interaction Tests
+Status: Completed
+
+Changes:
+- Added dedicated Auth gate UI tests:
+  - `src/features/app/views/__tests__/AuthRequiredView.test.tsx`
+- Added coverage for:
+  - invalid email validation
+  - short password validation
+  - successful sign-in input normalization
+  - signup failure message handling
+  - loading-state submit blocking
+- Stabilized existing Network discovery suite by setting explicit timeout:
+  - `src/features/app/__tests__/networkDiscoveryFlow.test.tsx`
+
+Verification:
+- `npm.cmd test -- AuthRequiredView.test.tsx` passed.
+- `npm.cmd test` passed.
+- `npx.cmd tsc --noEmit` passed.
+
+Notes:
+- Auth lock-screen flow now has direct behavior coverage before adding retry actions.
