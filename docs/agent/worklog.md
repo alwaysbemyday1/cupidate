@@ -815,3 +815,46 @@ Verification:
 
 Notes:
 - The current POC now matches the product rule that every user can be a cupid, but only activated cupidates participate in matching visibility and scoring.
+
+### Task 2026-03-30-01 - Core View Copy Cleanup
+Status: Completed
+
+Changes:
+- Removed clunky or inconsistent surface copy from the rebuilt views:
+  - `Today's Rec's` -> `Today's Matches`
+  - `MY INFO` -> `MY`
+  - `Cupidate Hub` / `Cupid Hub` -> `My Cupidates` / `My Cupids`
+  - matching status copy now uses user-facing phrases instead of raw state names
+- Added missing Home quick action for direct Matching entry.
+- Normalized unsafe separator glyphs to ASCII-safe `/` in Network and Matching meta rows.
+- Replaced brittle center markers with safe pixel-style ASCII `<3` markers.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand` passed.
+
+Notes:
+- This pass focused on what the user sees first: labels, headings, and state wording.
+
+### Task 2026-03-30-02 - Cupidate Readiness Surfacing
+Status: Completed
+
+Changes:
+- Added explicit readiness guidance to Home:
+  - no cupidate
+  - no active cupidate
+  - no connected cupid
+- Added `Cupidate Readiness` section to My:
+  - active/inactive counts
+  - Network jump CTA when action is needed
+- Fixed My summary to count only my cupidates, not every cupidate in the loaded graph.
+- Added explicit `Active` / `Inactive` badges to Network cupidate roster rows.
+- Reworked Matching suggestion rows so both cupidate mini profiles are visible and directly pressable.
+- Updated tests to cover the new readiness flow and new duplicate profile-entry surfaces.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand` passed.
+
+Notes:
+- This pass was aimed at POC validation clarity: users should understand why matching is empty without needing explanation from outside the app.

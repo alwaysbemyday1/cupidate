@@ -1,6 +1,6 @@
 ﻿# Network View Spec (Prototype Rebuild)
 
-Last Updated: 2026-03-29
+Last Updated: 2026-03-30
 
 ## 1. Screen Purpose
 - Manage the relationship graph between my cupidates and connected cupids.
@@ -20,7 +20,7 @@ Last Updated: 2026-03-29
 2. primary segment row
 - `Board`
 - `My Cupidates`
-- `Connected Cupids`
+- `My Cupids`
 
 3. segment content
 - `Board` segment:
@@ -53,6 +53,7 @@ Last Updated: 2026-03-29
   - display name
   - age/gender/region summary
   - job title or fallback meta
+  - activation badge (`Active` / `Inactive`)
   - current match status badge
 - row press opens `Cupidate Profile View`
 - if the owner opens the profile, they can:
@@ -114,6 +115,9 @@ Last Updated: 2026-03-29
 - Do not show cupid connection search inside the cupid list view.
 - Avoid duplicate titles where the selected sub-tab already defines the mode.
 - Keep one clear purpose per subview.
+- Roster rows should explain both:
+  - activation state
+  - request/match state
 
 ## 7. Design Rules
 - Use the current `design_system.md` palette and dock navigation rules.

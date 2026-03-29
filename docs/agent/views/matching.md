@@ -1,6 +1,6 @@
 ﻿# Matching View Spec (Prototype Rebuild)
 
-Last Updated: 2026-03-29
+Last Updated: 2026-03-30
 
 ## 1. 화면 목적
 - 매칭 요청의 승인/거절/연락처 공유와 매칭률 근거 확인을 한 곳에서 처리하는 의사결정 화면.
@@ -35,12 +35,14 @@ Last Updated: 2026-03-29
 4) User Suggested Matches 섹션
 - 아직 요청으로 전환되지 않은 추천 후보 카드 리스트
 - 카드 정보:
+  - 양측 미니 프로필(press 가능)
   - 제안 제목 (`A suggested for B`)
   - 매칭률
   - 기본 상태 (`New Suggestion`)
 - 액션:
   - `매칭 요청`
 - 추천 대상은 `active cupidate`만 포함한다.
+- 사용자는 suggestion row 안에서도 곧바로 profile overlay를 열 수 있어야 한다.
 
 5) Matching Insights 섹션
 - 점수 분해 차트(카테고리별)
