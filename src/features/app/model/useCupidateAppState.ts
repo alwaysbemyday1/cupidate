@@ -19,7 +19,9 @@ import {
 import {
   type AppView,
   type CupidConnection,
+  type CupidProfileSummary,
   type CupidateRecord,
+  type CupidateProfileSummary,
   type HomeNotification,
   type HomeSummary,
   type MatchRequest,
@@ -27,6 +29,8 @@ import {
   MY_CUPID_ID,
   type NetworkSegment,
   type RecommendationItem,
+  type SelectedProfileSummary,
+  type SelectedProfileTarget,
   type ValidationErrors
 } from "./types";
 
@@ -163,6 +167,26 @@ function mapMatchRequestStatus(status: string, reason: Record<string, unknown>):
   return "requested";
 }
 
+function mapRelationship(status: CupidConnection["status"] | "self" | undefined): CupidProfileSummary["relationship"] {
+  if (status === "self") {
+    return "self";
+  }
+
+  if (status === "connected") {
+    return "connected";
+  }
+
+  if (status === "blocked") {
+    return "blocked";
+  }
+
+  if (status === "pending") {
+    return "pending";
+  }
+
+  return "discoverable";
+}
+
 export function pairKey(sourceCupidateId: string, targetCupidateId: string) {
   return `${sourceCupidateId}:${targetCupidateId}`;
 }
@@ -174,6 +198,7 @@ type UseCupidateAppStateOptions = {
 export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
   const isDataAccessEnabled = options?.isDataAccessEnabled ?? true;
   const [activeView, setActiveView] = useState<AppView>("home");
+  const [selectedProfileTarget, setSelectedProfileTarget] = useState<SelectedProfileTarget | null>(null);
   const [networkSegment, setNetworkSegment] = useState<NetworkSegment>("board");
   const [displayName, setDisplayName] = useState("");
   const [birthYearInput, setBirthYearInput] = useState("");
@@ -240,6 +265,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
         displayName: item.displayName,
         gender: item.gender ?? "unknown",
         bio: item.bio ?? "",
+        isActive: item.isActive,
         preferences: item.preferences
       })),
     [cupidatesQuery.data]
@@ -324,6 +350,116 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     () => new Map(cupidates.map((item) => [item.cupidateId, item.displayName])),
     [cupidates]
   );
+
+  const cupidById = useMemo(() => {
+    const map = new Map<
+      string,
+      {
+        nickname: string;
+        status: CupidConnection["status"] | "self" | undefined;
+      }
+    >();
+
+    map.set(myCupidId, {
+      nickname: currentCupidQuery.data?.nickname ?? myNickname,
+      status: "self"
+    });
+
+    connections.forEach((connection) => {
+      map.set(connection.cupidId, {
+        nickname: connection.name,
+        status: connection.status
+      });
+    });
+
+    connectionSearchResults.forEach((result) => {
+      if (!map.has(result.cupidId)) {
+        map.set(result.cupidId, {
+          nickname: result.nickname,
+          status: undefined
+        });
+      }
+    });
+
+    return map;
+  }, [connectionSearchResults, connections, currentCupidQuery.data?.nickname, myCupidId, myNickname]);
+
+  const requestsByCupidateId = useMemo(() => {
+    const map = new Map<string, MatchRequest[]>();
+
+    requests.forEach((request) => {
+      const sourceList = map.get(request.sourceCupidateId) ?? [];
+      sourceList.push(request);
+      map.set(request.sourceCupidateId, sourceList);
+
+      const targetList = map.get(request.targetCupidateId) ?? [];
+      targetList.push(request);
+      map.set(request.targetCupidateId, targetList);
+    });
+
+    return map;
+  }, [requests]);
+
+  const selectedProfile = useMemo<SelectedProfileSummary>(() => {
+    if (!selectedProfileTarget) {
+      return null;
+    }
+
+    if (selectedProfileTarget.kind === "cupid") {
+      const cupidId = selectedProfileTarget.cupidId;
+      const cupid = cupidById.get(cupidId);
+      const ownedCupidates = cupidates.filter((item) => item.ownerCupidId === cupidId);
+      const ownedCupidateIds = new Set(ownedCupidates.map((item) => item.cupidateId));
+      const relatedRequests = requests.filter(
+        (request) => ownedCupidateIds.has(request.sourceCupidateId) || ownedCupidateIds.has(request.targetCupidateId)
+      );
+
+      return {
+        kind: "cupid",
+        cupidId,
+        nickname: cupid?.nickname ?? cupidId,
+        relationship: mapRelationship(cupid?.status),
+        stats: {
+          cupidateCount: ownedCupidates.length,
+          activeCupidateCount: ownedCupidates.filter((item) => item.isActive).length,
+          introductions: relatedRequests.length,
+          ongoingMatches: relatedRequests.filter(
+            (request) => request.status === "requested" || request.status === "accepted"
+          ).length,
+          completedMatches: relatedRequests.filter((request) => request.status === "completed").length
+        }
+      };
+    }
+
+    const cupidate = cupidates.find((item) => item.cupidateId === selectedProfileTarget.cupidateId);
+    if (!cupidate) {
+      return null;
+    }
+
+    const relatedRequests = requestsByCupidateId.get(cupidate.cupidateId) ?? [];
+    const owner = cupidById.get(cupidate.ownerCupidId);
+
+    return {
+      kind: "cupidate",
+      cupidateId: cupidate.cupidateId,
+      ownerCupidId: cupidate.ownerCupidId,
+      ownerNickname: owner?.nickname ?? cupidate.ownerCupidId,
+      displayName: cupidate.displayName,
+      birthYear: cupidate.birthYear,
+      gender: cupidate.gender,
+      bio: cupidate.bio,
+      isActive: cupidate.isActive,
+      preferences: cupidate.preferences,
+      canEdit: cupidate.ownerCupidId === myCupidId,
+      stats: {
+        totalRequests: relatedRequests.length,
+        ongoingMatches: relatedRequests.filter(
+          (request) => request.status === "requested" || request.status === "accepted"
+        ).length,
+        completedMatches: relatedRequests.filter((request) => request.status === "completed").length
+      }
+    };
+  }, [cupidById, cupidates, myCupidId, requests, requestsByCupidateId, selectedProfileTarget]);
 
   const notifications = useMemo<HomeNotification[]>(
     () =>
@@ -563,6 +699,24 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     }
   };
 
+  const onOpenCupidProfile = (cupidId: string) => {
+    setSelectedProfileTarget({
+      kind: "cupid",
+      cupidId
+    });
+  };
+
+  const onOpenCupidateProfile = (cupidateId: string) => {
+    setSelectedProfileTarget({
+      kind: "cupidate",
+      cupidateId
+    });
+  };
+
+  const onCloseProfile = () => {
+    setSelectedProfileTarget(null);
+  };
+
   const onRetryHome = async () => {
     if (!isDataAccessEnabled) {
       return;
@@ -627,6 +781,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
   return {
     activeView,
     setActiveView,
+    selectedProfile,
     networkSegment,
     setNetworkSegment,
     displayName,
@@ -708,6 +863,9 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     onSaveNickname,
     onSendRequest,
     onUpdateRequestStatus,
+    onOpenCupidProfile,
+    onOpenCupidateProfile,
+    onCloseProfile,
     onRetryHome,
     onRetryNetwork,
     onRetryMatching,

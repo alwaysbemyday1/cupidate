@@ -20,6 +20,7 @@ type CupidateRow = {
   birth_year: number | null;
   gender: string | null;
   bio: string | null;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -74,6 +75,7 @@ function mapCupidateRow(row: CupidateRow, preferences: NetworkCupidate["preferen
     birthYear: row.birth_year,
     gender: row.gender,
     bio: row.bio,
+    isActive: row.is_active,
     preferences,
     createdAt: row.created_at,
     updatedAt: row.updated_at
@@ -220,7 +222,8 @@ export class SupabaseNetworkRepository implements NetworkRepository {
         display_name: input.displayName.trim(),
         birth_year: input.birthYear ?? null,
         gender: input.gender ?? null,
-        bio: input.bio ?? ""
+        bio: input.bio ?? "",
+        is_active: input.isActive ?? true
       })
       .select("*")
       .single<CupidateRow>();

@@ -1,4 +1,4 @@
-﻿import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 
 import App from "../../../../App";
 import { setMatchingRepositoryForTest } from "../../matching/repository/createMatchingRepository";
@@ -6,7 +6,7 @@ import { createInMemoryMatchingRepository } from "../../matching/repository/inMe
 import { setNetworkRepositoryForTest } from "../../network/repository/createNetworkRepository";
 import { createInMemoryNetworkRepository } from "../../network/repository/inMemoryNetworkRepository";
 
-describe("Matching flow", () => {
+describe("Profile overlay flow", () => {
   beforeEach(() => {
     setNetworkRepositoryForTest(
       createInMemoryNetworkRepository({
@@ -32,9 +32,7 @@ describe("Matching flow", () => {
             preferences: {
               ageRange: [25, 34],
               hobbies: ["coffee", "books"],
-              location: "seoul",
-              smoking: "any",
-              drinking: "any"
+              location: "seoul"
             },
             createdAt: "2026-03-28T00:00:00.000Z",
             updatedAt: "2026-03-28T00:00:00.000Z"
@@ -50,9 +48,7 @@ describe("Matching flow", () => {
             preferences: {
               ageRange: [24, 35],
               hobbies: ["coffee", "music"],
-              location: "seoul",
-              smoking: "any",
-              drinking: "any"
+              location: "seoul"
             },
             createdAt: "2026-03-28T00:00:00.000Z",
             updatedAt: "2026-03-28T00:00:00.000Z"
@@ -80,33 +76,39 @@ describe("Matching flow", () => {
     setMatchingRepositoryForTest(null);
   });
 
-  it("processes request -> accept -> contact shared lifecycle", async () => {
+  it("opens cupidate profile from network", async () => {
+    render(<App />);
+
+    fireEvent.press(screen.getByTestId("tab-network"));
+    fireEvent.press(screen.getByTestId("network-segment-cupidates"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("profile-open-cupidate-mine-1")).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByTestId("profile-open-cupidate-mine-1"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("profile-sheet-title")).toHaveTextContent("Cupidate Profile");
+      expect(screen.getByTestId("profile-sheet")).toBeTruthy();
+      expect(screen.getByText("ACTIVE CUPIDATE")).toBeTruthy();
+    });
+  });
+
+  it("opens cupidate profile from matching", async () => {
     render(<App />);
 
     fireEvent.press(screen.getByTestId("tab-matching"));
 
     await waitFor(() => {
-      expect(screen.getByText("Mina suggested for Joon")).toBeTruthy();
-      expect(screen.getAllByText("Status: none").length).toBeGreaterThan(0);
+      expect(screen.getByTestId("profile-open-cupidate-mine-1")).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText("Request Match"));
+    fireEvent.press(screen.getByTestId("profile-open-cupidate-mine-1"));
 
     await waitFor(() => {
-      expect(screen.getByText("Mina & Joon Request")).toBeTruthy();
-      expect(screen.getAllByText("Status: requested").length).toBeGreaterThan(0);
-    });
-
-    fireEvent.press(screen.getByText("Approve"));
-
-    await waitFor(() => {
-      expect(screen.getAllByText("Status: accepted").length).toBeGreaterThan(0);
-    });
-
-    fireEvent.press(screen.getByText("Mark Contact Shared"));
-
-    await waitFor(() => {
-      expect(screen.getAllByText("Status: completed").length).toBeGreaterThan(0);
+      expect(screen.getByTestId("profile-sheet-title")).toHaveTextContent("Cupidate Profile");
+      expect(screen.getByTestId("profile-sheet")).toBeTruthy();
     });
   });
 });

@@ -101,6 +101,7 @@ export class InMemoryNetworkRepository implements NetworkRepository {
       birthYear: input.birthYear ?? null,
       gender: input.gender ?? null,
       bio: input.bio ?? "",
+      isActive: input.isActive ?? true,
       preferences: input.preferences ?? {},
       createdAt: now,
       updatedAt: now

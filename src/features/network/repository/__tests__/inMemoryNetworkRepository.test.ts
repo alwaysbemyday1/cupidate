@@ -20,6 +20,7 @@ describe("InMemoryNetworkRepository", () => {
 
     expect(cupidates).toHaveLength(1);
     expect(cupidates[0].displayName).toBe("Mina");
+    expect(cupidates[0].isActive).toBe(true);
     expect(cupidates[0].preferences.hobbies).toEqual(["coffee", "travel"]);
   });
 

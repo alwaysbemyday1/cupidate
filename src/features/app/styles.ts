@@ -947,6 +947,92 @@ export const styles = StyleSheet.create({
   authCaption: {
     color: c.inkMuted
   },
+  networkProfilePressable: {
+    width: "100%"
+  },
+  profileSheetOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "flex-end"
+  },
+  profileSheetScrim: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(12, 17, 28, 0.7)"
+  },
+  profileSheetWrapper: {
+    paddingHorizontal: s.md,
+    paddingBottom: z.tabBarHeight + z.tabBarInset + s.sm,
+    paddingTop: s.xl
+  },
+  profileSheetFrame: {
+    maxHeight: "88%"
+  },
+  profileSheetFrameContent: {
+    backgroundColor: c.surfaceRaised,
+    padding: s.md,
+    gap: s.sm
+  },
+  profileSheetTopBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: s.sm
+  },
+  profileSheetScrollContent: {
+    gap: s.sm,
+    paddingBottom: s.md
+  },
+  profileSheetCard: {},
+  profileSheetCardContent: {
+    backgroundColor: c.surface,
+    padding: s.md,
+    gap: s.sm
+  },
+  profileSheetHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: s.sm
+  },
+  profileSheetAvatar: {
+    width: 72,
+    height: 72,
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.blue,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  profileSheetHeaderInfo: {
+    flex: 1,
+    gap: s.xxs
+  },
+  profileSheetStatusChip: {
+    alignSelf: "flex-start",
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.gold,
+    paddingHorizontal: s.xs,
+    paddingVertical: 4
+  },
+  profileSheetMetaList: {
+    gap: s.xs
+  },
+  profileSheetMetaRow: {
+    gap: 2
+  },
+  profileSheetMetaLabel: {
+    color: c.inkMuted
+  },
+  profileSheetMetaValue: {
+    color: c.ink
+  },
+  profileSheetStatPill: {
+    width: "48%",
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surfaceAlt,
+    padding: s.sm,
+    gap: 2
+  },
 
   textBody: {
     color: c.ink

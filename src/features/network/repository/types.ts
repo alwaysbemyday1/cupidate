@@ -19,6 +19,7 @@ export type NetworkCupidate = {
   birthYear: number | null;
   gender: string | null;
   bio: string | null;
+  isActive: boolean;
   preferences: PreferenceData;
   createdAt: string;
   updatedAt: string;
@@ -42,6 +43,7 @@ export type CreateCupidateInput = {
   birthYear?: number | null;
   gender?: string | null;
   bio?: string | null;
+  isActive?: boolean;
   preferences?: PreferenceData;
 };
 

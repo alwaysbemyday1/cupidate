@@ -11,6 +11,7 @@ export type CupidateRecord = CupidateProfile & {
   displayName: string;
   gender: string;
   bio: string;
+  isActive: boolean;
 };
 
 export type CupidConnection = {
@@ -52,3 +53,48 @@ export type HomeSummary = {
 };
 
 export type RecommendationItem = MatchCandidate;
+
+export type SelectedProfileTarget =
+  | {
+      kind: "cupid";
+      cupidId: string;
+    }
+  | {
+      kind: "cupidate";
+      cupidateId: string;
+    };
+
+export type CupidProfileSummary = {
+  kind: "cupid";
+  cupidId: string;
+  nickname: string;
+  relationship: "self" | "connected" | "pending" | "blocked" | "discoverable";
+  stats: {
+    cupidateCount: number;
+    activeCupidateCount: number;
+    introductions: number;
+    ongoingMatches: number;
+    completedMatches: number;
+  };
+};
+
+export type CupidateProfileSummary = {
+  kind: "cupidate";
+  cupidateId: string;
+  ownerCupidId: string;
+  ownerNickname: string;
+  displayName: string;
+  birthYear: number | null;
+  gender: string;
+  bio: string;
+  isActive: boolean;
+  preferences: CupidateRecord["preferences"];
+  canEdit: boolean;
+  stats: {
+    totalRequests: number;
+    ongoingMatches: number;
+    completedMatches: number;
+  };
+};
+
+export type SelectedProfileSummary = CupidProfileSummary | CupidateProfileSummary | null;

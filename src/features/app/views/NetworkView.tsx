@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ScrollView, TextInput, View, useWindowDimensions } from "react-native";
+import { Pressable, ScrollView, TextInput, View, useWindowDimensions } from "react-native";
 
 import { useI18n } from "../../i18n/context";
 import { PixelBox } from "../components/PixelBox";
@@ -77,6 +77,8 @@ type NetworkViewProps = {
   selectedConnectionCupidId: string | null;
   onSelectConnectionCupid: (cupidId: string) => void;
   onAddConnection: () => void | Promise<void>;
+  onOpenCupidProfile: (cupidId: string) => void;
+  onOpenCupidateProfile: (cupidateId: string) => void;
   isNetworkLoading?: boolean;
   isSearchingCupids?: boolean;
   isMutatingNetwork?: boolean;
@@ -247,6 +249,8 @@ export function NetworkView({
   selectedConnectionCupidId,
   onSelectConnectionCupid,
   onAddConnection,
+  onOpenCupidProfile,
+  onOpenCupidateProfile,
   isNetworkLoading,
   isSearchingCupids,
   isMutatingNetwork,
@@ -357,36 +361,46 @@ export function NetworkView({
   }
 
   function renderBoardNode(node: BoardNode, compact = false) {
+    const onPress = () => {
+      if (node.role === "cupid") {
+        onOpenCupidProfile(node.id);
+        return;
+      }
+
+      onOpenCupidateProfile(node.id);
+    };
+
     return (
-      <PixelBox
-        key={node.id}
-        style={compact ? styles.networkMiniNode : styles.networkFeaturedNode}
-        contentStyle={compact ? styles.networkMiniNodeContent : styles.networkNodeContent}
-        backgroundColor={compact ? designTokens.color.surfaceAlt : designTokens.color.surface}
-      >
-        <View style={styles.networkNodeHeader}>
-          <View style={[compact ? styles.networkMiniAvatar : styles.networkNodeAvatar, avatarToneStyle(node.role)]}>
-            <PixelText variant={compact ? "label" : "body"} style={styles.networkAvatarText}>
-              {buildAvatarSeed(node.name)}
-            </PixelText>
-          </View>
-          {node.tone !== "neutral" ? (
-            <View style={[styles.networkNodeBadge, boardBadgeStyle(node.tone)]}>
-              <PixelText variant="caption" style={styles.networkNodeBadgeText}>
-                {t(boardBadgeKey(node.tone))}
+      <Pressable key={node.id} onPress={onPress} testID={`profile-open-${node.role}-${node.id}`}>
+        <PixelBox
+          style={compact ? styles.networkMiniNode : styles.networkFeaturedNode}
+          contentStyle={compact ? styles.networkMiniNodeContent : styles.networkNodeContent}
+          backgroundColor={compact ? designTokens.color.surfaceAlt : designTokens.color.surface}
+        >
+          <View style={styles.networkNodeHeader}>
+            <View style={[compact ? styles.networkMiniAvatar : styles.networkNodeAvatar, avatarToneStyle(node.role)]}>
+              <PixelText variant={compact ? "label" : "body"} style={styles.networkAvatarText}>
+                {buildAvatarSeed(node.name)}
               </PixelText>
             </View>
-          ) : null}
-        </View>
-        <PixelText variant={compact ? "caption" : "body"} style={styles.networkNodeName} numberOfLines={1}>
-          {node.name}
-        </PixelText>
-        {!compact ? (
-          <PixelText variant="caption" style={styles.networkNodeMeta} numberOfLines={1}>
-            {node.subtitle}
+            {node.tone !== "neutral" ? (
+              <View style={[styles.networkNodeBadge, boardBadgeStyle(node.tone)]}>
+                <PixelText variant="caption" style={styles.networkNodeBadgeText}>
+                  {t(boardBadgeKey(node.tone))}
+                </PixelText>
+              </View>
+            ) : null}
+          </View>
+          <PixelText variant={compact ? "caption" : "body"} style={styles.networkNodeName} numberOfLines={1}>
+            {node.name}
           </PixelText>
-        ) : null}
-      </PixelBox>
+          {!compact ? (
+            <PixelText variant="caption" style={styles.networkNodeMeta} numberOfLines={1}>
+              {node.subtitle}
+            </PixelText>
+          ) : null}
+        </PixelBox>
+      </Pressable>
     );
   }
 
@@ -574,7 +588,13 @@ export function NetworkView({
                 const tone = resolveCupidateTone(item.cupidateId, requests);
 
                 return (
-                  <View key={item.cupidateId} style={styles.networkRosterItem}>
+                  <Pressable
+                    key={item.cupidateId}
+                    onPress={() => onOpenCupidateProfile(item.cupidateId)}
+                    testID={`profile-open-cupidate-${item.cupidateId}`}
+                    style={styles.networkProfilePressable}
+                  >
+                  <View style={styles.networkRosterItem}>
                     <View style={styles.networkRosterItemHeader}>
                       <View style={styles.networkRosterMain}>
                         <PixelText variant="body" style={styles.listName}>
@@ -596,6 +616,7 @@ export function NetworkView({
                       </View>
                     </View>
                   </View>
+                  </Pressable>
                 );
               })}
             </PixelBox>
@@ -984,7 +1005,13 @@ export function NetworkView({
           ) : (
             <PixelBox style={styles.networkRosterCard} contentStyle={styles.networkRosterContent}>
               {connections.map((item) => (
-                <View key={item.cupidId} style={styles.networkRosterItem}>
+                <Pressable
+                  key={item.cupidId}
+                  onPress={() => onOpenCupidProfile(item.cupidId)}
+                  testID={`profile-open-cupid-${item.cupidId}`}
+                  style={styles.networkProfilePressable}
+                >
+                <View style={styles.networkRosterItem}>
                   <View style={styles.networkRosterItemHeader}>
                     <View style={styles.networkRosterMain}>
                       <PixelText variant="body" style={styles.listName}>
@@ -1004,6 +1031,7 @@ export function NetworkView({
                     </View>
                   </View>
                 </View>
+                </Pressable>
               ))}
             </PixelBox>
           )}
@@ -1056,27 +1084,30 @@ export function NetworkView({
                   const isSelected = selectedConnectionCupidId === item.cupidId;
 
                   return (
-                    <PixelBox
+                    <Pressable
                       key={item.cupidId}
-                      style={styles.networkRosterCard}
-                      contentStyle={styles.networkRosterContent}
+                      onPress={() => onOpenCupidProfile(item.cupidId)}
+                      testID={`profile-open-cupid-${item.cupidId}`}
+                      style={styles.networkProfilePressable}
                     >
-                      <View style={styles.networkRosterItemHeader}>
-                        <View style={styles.networkRosterMain}>
-                          <PixelText variant="body" style={styles.listName}>
-                            {item.nickname}
-                          </PixelText>
-                          <PixelText variant="caption" style={styles.networkRosterMeta}>
-                            {t("network.connection.id", { id: item.cupidId })}
-                          </PixelText>
+                      <PixelBox style={styles.networkRosterCard} contentStyle={styles.networkRosterContent}>
+                        <View style={styles.networkRosterItemHeader}>
+                          <View style={styles.networkRosterMain}>
+                            <PixelText variant="body" style={styles.listName}>
+                              {item.nickname}
+                            </PixelText>
+                            <PixelText variant="caption" style={styles.networkRosterMeta}>
+                              {t("network.connection.id", { id: item.cupidId })}
+                            </PixelText>
+                          </View>
+                          <PixelButton
+                            label={isSelected ? t("network.actions.selected") : t("network.actions.select")}
+                            variant={isSelected ? "success" : "secondary"}
+                            onPress={() => onSelectConnectionCupid(item.cupidId)}
+                          />
                         </View>
-                        <PixelButton
-                          label={isSelected ? t("network.actions.selected") : t("network.actions.select")}
-                          variant={isSelected ? "success" : "secondary"}
-                          onPress={() => onSelectConnectionCupid(item.cupidId)}
-                        />
-                      </View>
-                    </PixelBox>
+                      </PixelBox>
+                    </Pressable>
                   );
                 })}
               </View>

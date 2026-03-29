@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { ScrollView, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 
 import { useI18n } from "../../i18n/context";
 import type { ScoreBreakdown } from "../../../domain/matching/types";
@@ -23,6 +23,7 @@ type MatchingViewProps = {
     targetCupidateId: string,
     status: MatchRequestStatus
   ) => void | Promise<void>;
+  onOpenCupidateProfile: (cupidateId: string) => void;
   isMatchingLoading?: boolean;
   isMutatingMatching?: boolean;
   matchingError?: string | null;
@@ -124,6 +125,7 @@ export function MatchingView({
   requests,
   onSendRequest,
   onUpdateRequestStatus,
+  onOpenCupidateProfile,
   isMatchingLoading,
   isMutatingMatching,
   matchingError,
@@ -261,25 +263,27 @@ export function MatchingView({
     return styles.matchingStatusNeutral;
   }
 
-  function renderMiniProfile(name: string, subtitle?: string) {
+  function renderMiniProfile(cupidateId: string, name: string, subtitle?: string) {
     return (
-      <View style={styles.matchingMiniProfile}>
-        <View style={styles.matchingMiniAvatar}>
-          <PixelText variant="body" style={styles.networkAvatarText}>
-            {buildAvatarSeed(name)}
-          </PixelText>
-        </View>
-        <View style={styles.matchingMiniInfo}>
-          <PixelText variant="body" style={styles.matchingMiniName} numberOfLines={1}>
-            {name}
-          </PixelText>
-          {subtitle ? (
-            <PixelText variant="caption" style={styles.matchingMiniMeta} numberOfLines={1}>
-              {subtitle}
+      <Pressable onPress={() => onOpenCupidateProfile(cupidateId)} testID={`profile-open-cupidate-${cupidateId}`}>
+        <View style={styles.matchingMiniProfile}>
+          <View style={styles.matchingMiniAvatar}>
+            <PixelText variant="body" style={styles.networkAvatarText}>
+              {buildAvatarSeed(name)}
             </PixelText>
-          ) : null}
+          </View>
+          <View style={styles.matchingMiniInfo}>
+            <PixelText variant="body" style={styles.matchingMiniName} numberOfLines={1}>
+              {name}
+            </PixelText>
+            {subtitle ? (
+              <PixelText variant="caption" style={styles.matchingMiniMeta} numberOfLines={1}>
+                {subtitle}
+              </PixelText>
+            ) : null}
+          </View>
         </View>
-      </View>
+      </Pressable>
     );
   }
 
@@ -322,11 +326,11 @@ export function MatchingView({
               backgroundColor={designTokens.color.surface}
             >
               <View style={styles.matchingCardTopRow}>
-                {renderMiniProfile(item.sourceName)}
+                {renderMiniProfile(item.sourceCupidateId, item.sourceName)}
                 <PixelText variant="screenTitle" style={styles.recommendationHeart}>
                   ♥
                 </PixelText>
-                {renderMiniProfile(item.targetName)}
+                {renderMiniProfile(item.targetCupidateId, item.targetName)}
               </View>
 
               <View style={styles.matchingCardMetaBlock}>
@@ -448,6 +452,10 @@ export function MatchingView({
           </PixelText>
 
           <View style={styles.matchingInsightHeader}>
+            <Pressable
+              onPress={() => onOpenCupidateProfile(focusCard.sourceCupidateId)}
+              testID={`profile-open-cupidate-${focusCard.sourceCupidateId}`}
+            >
             <View style={styles.matchingInsightProfileCard}>
               <View style={styles.matchingInsightAvatar}>
                 <PixelText variant="body" style={styles.networkAvatarText}>
@@ -458,6 +466,7 @@ export function MatchingView({
                 {focusCard.sourceName}
               </PixelText>
             </View>
+            </Pressable>
 
             <View style={styles.matchingBreakdownChart}>
               {focusBreakdown.map((item) => {
@@ -479,6 +488,10 @@ export function MatchingView({
               })}
             </View>
 
+            <Pressable
+              onPress={() => onOpenCupidateProfile(focusCard.targetCupidateId)}
+              testID={`profile-open-cupidate-${focusCard.targetCupidateId}`}
+            >
             <View style={styles.matchingInsightProfileCard}>
               <View style={styles.matchingInsightAvatar}>
                 <PixelText variant="body" style={styles.networkAvatarText}>
@@ -489,6 +502,7 @@ export function MatchingView({
                 {focusCard.targetName}
               </PixelText>
             </View>
+            </Pressable>
           </View>
 
           <View style={styles.matchingInsightScoreRow}>

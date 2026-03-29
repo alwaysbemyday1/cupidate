@@ -15,6 +15,7 @@ import { HomeView } from "./src/features/app/views/HomeView";
 import { MatchingView } from "./src/features/app/views/MatchingView";
 import { MyView } from "./src/features/app/views/MyView";
 import { NetworkView } from "./src/features/app/views/NetworkView";
+import { ProfileView } from "./src/features/app/views/ProfileView";
 import { useAuthSessionGate } from "./src/features/auth/hooks/useAuthSessionGate";
 import { I18nProvider, useI18n } from "./src/features/i18n/context";
 import type { AppView } from "./src/features/app/model/types";
@@ -186,6 +187,8 @@ function CupidateAppShell() {
                 selectedConnectionCupidId={state.selectedConnectionCupidId}
                 onSelectConnectionCupid={state.setSelectedConnectionCupidId}
                 onAddConnection={state.onAddConnection}
+                onOpenCupidProfile={state.onOpenCupidProfile}
+                onOpenCupidateProfile={state.onOpenCupidateProfile}
                 isNetworkLoading={state.isNetworkLoading}
                 isSearchingCupids={state.isSearchingCupids}
                 isMutatingNetwork={state.isMutatingNetwork}
@@ -202,6 +205,7 @@ function CupidateAppShell() {
                 requests={state.requests}
                 onSendRequest={state.onSendRequest}
                 onUpdateRequestStatus={state.onUpdateRequestStatus}
+                onOpenCupidateProfile={state.onOpenCupidateProfile}
                 isMatchingLoading={state.isMatchingLoading}
                 isMutatingMatching={state.isMutatingMatching}
                 matchingError={state.matchingError}
@@ -236,6 +240,7 @@ function CupidateAppShell() {
         </View>
 
         <PixelTabBar activeKey={state.activeView} items={tabItems} onSelect={state.setActiveView} />
+        <ProfileView profile={state.selectedProfile} onClose={state.onCloseProfile} />
       </View>
     </SafeAreaView>
   );
