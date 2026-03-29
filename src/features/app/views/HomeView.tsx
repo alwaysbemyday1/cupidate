@@ -81,7 +81,7 @@ export function HomeView({
         />
       ) : null}
 
-      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+      <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
         {t("home.sections.alarmFeed")}
       </PixelText>
       <PixelBox style={styles.sectionCard} contentStyle={styles.sectionCardContent}>
@@ -115,7 +115,7 @@ export function HomeView({
         )}
       </PixelBox>
 
-      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+      <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
         {t("home.sections.todaysRecs")}
       </PixelText>
       {topRecommendations.length === 0 ? (
@@ -173,7 +173,7 @@ export function HomeView({
         </View>
       )}
 
-      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+      <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
         {t("home.sections.recentSummary")}
       </PixelText>
       <PixelBox style={styles.sectionCard} contentStyle={styles.sectionCardContent}>
@@ -213,7 +213,7 @@ export function HomeView({
         </View>
       </PixelBox>
 
-      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+      <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
         {t("home.sections.quickActions")}
       </PixelText>
       <View style={styles.buttonRow}>

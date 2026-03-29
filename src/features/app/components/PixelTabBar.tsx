@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PixelText } from "./PixelText";
 import { designTokens } from "../theme/tokens";
@@ -17,11 +18,13 @@ type PixelTabBarProps<T extends string> = {
 };
 
 export function PixelTabBar<T extends string>({ activeKey, items, onSelect }: PixelTabBarProps<T>) {
+  const insets = useSafeAreaInsets();
+
   return (
     <View pointerEvents="box-none" style={localStyles.mount}>
-      <View style={localStyles.frame}>
+      <View style={[localStyles.frame, { paddingBottom: Math.max(insets.bottom, designTokens.spacing.xs) }]}>
         <View style={localStyles.row}>
-          {items.map((item) => {
+          {items.map((item, index) => {
             const active = item.key === activeKey;
 
             return (
@@ -32,36 +35,39 @@ export function PixelTabBar<T extends string>({ activeKey, items, onSelect }: Pi
                 accessibilityState={{ selected: active }}
                 onPress={() => onSelect(item.key)}
                 testID={`tab-${item.key}`}
-                style={localStyles.cellPressable}
+                style={[localStyles.cellPressable, index > 0 ? localStyles.cellPressableBorder : null]}
               >
                 {({ pressed }) => (
                   <View
                     style={[
-                      localStyles.cellShadow,
-                      pressed ? localStyles.cellShadowPressed : null,
-                      active ? { backgroundColor: item.accentColor } : null
+                      localStyles.cellFace,
+                      active ? localStyles.cellFaceActive : localStyles.cellFaceInactive,
+                      pressed ? localStyles.cellFacePressed : null
                     ]}
                   >
                     <View
                       style={[
-                        localStyles.cellFace,
-                        active ? { backgroundColor: item.accentColor } : localStyles.cellFaceInactive,
-                        pressed ? localStyles.cellFacePressed : null
+                        localStyles.activeStrip,
+                        active ? { backgroundColor: item.accentColor, opacity: 1 } : null
+                      ]}
+                    />
+                    <View
+                      style={[
+                        localStyles.iconChip,
+                        active ? { backgroundColor: item.accentColor } : localStyles.iconChipInactive
                       ]}
                     >
-                      <View style={localStyles.iconChip}>
-                        <PixelText variant="caption" color={designTokens.color.inkInverse}>
-                          {item.iconLabel}
-                        </PixelText>
-                      </View>
-                      <PixelText
-                        variant="caption"
-                        style={localStyles.cellLabel}
-                        color={active ? designTokens.color.inkInverse : designTokens.color.ink}
-                      >
-                        {item.label}
+                      <PixelText variant="caption" color={designTokens.color.inkInverse}>
+                        {item.iconLabel}
                       </PixelText>
                     </View>
+                    <PixelText
+                      variant="caption"
+                      style={localStyles.cellLabel}
+                      color={active ? designTokens.color.ink : designTokens.color.inkMuted}
+                    >
+                      {item.label}
+                    </PixelText>
                   </View>
                 )}
               </Pressable>
@@ -78,61 +84,64 @@ const localStyles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
-    bottom: 0,
-    paddingHorizontal: designTokens.spacing.md,
-    paddingBottom: designTokens.size.tabBarInset
+    bottom: 0
   },
   frame: {
-    backgroundColor: designTokens.color.surfaceAlt,
-    borderTopWidth: designTokens.border.normal,
-    borderLeftWidth: designTokens.border.normal,
-    borderRightWidth: designTokens.border.normal,
-    borderBottomWidth: designTokens.border.normal,
+    backgroundColor: designTokens.color.surfaceRaised,
+    borderTopWidth: designTokens.border.heavy,
     borderColor: designTokens.color.border,
-    paddingHorizontal: designTokens.spacing.xs,
-    paddingVertical: designTokens.spacing.xs
+    paddingTop: designTokens.spacing.xs,
+    paddingHorizontal: designTokens.spacing.xs
   },
   row: {
-    flexDirection: "row",
-    gap: designTokens.spacing.xs
+    flexDirection: "row"
   },
   cellPressable: {
-    flex: 1
+    flex: 1,
+    minHeight: designTokens.size.tabBarHeight - 12
   },
-  cellShadow: {
-    backgroundColor: designTokens.color.shadow,
-    paddingRight: 3,
-    paddingBottom: 3
-  },
-  cellShadowPressed: {
-    paddingRight: 1,
-    paddingBottom: 1
+  cellPressableBorder: {
+    borderLeftWidth: designTokens.border.thin,
+    borderLeftColor: designTokens.color.inputBorder
   },
   cellFace: {
-    minHeight: designTokens.size.buttonHeight,
-    borderWidth: designTokens.border.normal,
-    borderColor: designTokens.color.border,
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: 4,
+    gap: 6,
     paddingHorizontal: 4,
-    paddingVertical: 6
+    paddingTop: 8,
+    paddingBottom: 6
   },
-  cellFaceInactive: {
+  cellFaceActive: {
     backgroundColor: designTokens.color.surface
   },
   cellFacePressed: {
     transform: [{ translateY: 1 }]
   },
+  cellFaceInactive: {
+    backgroundColor: designTokens.color.surfaceRaised
+  },
+  activeStrip: {
+    position: "absolute",
+    top: 0,
+    left: 10,
+    right: 10,
+    height: 4,
+    opacity: 0
+  },
   iconChip: {
-    minWidth: 18,
-    paddingHorizontal: 3,
-    paddingVertical: 1,
+    minWidth: 28,
+    minHeight: 24,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: designTokens.color.navyDark,
-    borderWidth: designTokens.border.thin,
+    borderWidth: designTokens.border.normal,
     borderColor: designTokens.color.border
+  },
+  iconChipInactive: {
+    backgroundColor: designTokens.color.navyDark
   },
   cellLabel: {
     textAlign: "center"

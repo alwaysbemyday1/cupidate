@@ -95,7 +95,7 @@ export function AuthRequiredView({
         </PixelBox>
 
         <PixelBox style={styles.authPanelCard} contentStyle={styles.authPanelContent}>
-          <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+          <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
             {t("auth.section.form")}
           </PixelText>
 
@@ -149,7 +149,7 @@ export function AuthRequiredView({
 
         <PixelBox style={styles.authPanelCard} contentStyle={styles.authPanelContent}>
           <View style={styles.authStatusRow}>
-            <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+            <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
               {t("auth.section.status")}
             </PixelText>
             <View style={styles.authStatusChip}>

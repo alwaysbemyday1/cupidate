@@ -303,11 +303,11 @@ export function MatchingView({
         />
       ) : null}
 
-      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+      <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
         {t("matching.sections.manager")}
       </PixelText>
 
-      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+      <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
         {t("matching.sections.pending")}
       </PixelText>
       {activeRequestCards.length === 0 ? (
@@ -396,7 +396,7 @@ export function MatchingView({
         </PixelBox>
       )}
 
-      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+      <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
         {t("matching.sections.suggestions")}
       </PixelText>
       {suggestionCards.length === 0 ? (
@@ -436,7 +436,7 @@ export function MatchingView({
         </PixelBox>
       )}
 
-      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+      <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
         {t("matching.sections.insights")}
       </PixelText>
       {!focusCard ? (
@@ -447,7 +447,7 @@ export function MatchingView({
         />
       ) : (
         <PixelBox style={styles.matchingInsightCard} contentStyle={styles.matchingInsightContent}>
-          <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+          <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
             {t("matching.sections.breakdown")}
           </PixelText>
 
@@ -511,7 +511,7 @@ export function MatchingView({
 
           <View style={styles.profileDivider} />
 
-          <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+          <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
             {t("matching.sections.timeline")}
           </PixelText>
           <View style={styles.matchingTimelineRow}>
@@ -560,7 +560,7 @@ export function MatchingView({
 
           <View style={styles.profileDivider} />
 
-          <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+          <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
             {t("matching.sections.feedback")}
           </PixelText>
           <View style={styles.matchingFeedbackList}>

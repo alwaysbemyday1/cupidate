@@ -42,6 +42,7 @@ describe("Network discovery flow", () => {
   async function openConnectedCupidsSegment() {
     fireEvent.press(screen.getByTestId("tab-network"));
     fireEvent.press(screen.getByTestId("network-segment-cupids"));
+    fireEvent.press(screen.getByTestId("network-subsegment-cupids-register"));
 
     await waitFor(() => {
       expect(screen.getByText("Search Cupid by Nickname")).toBeTruthy();
@@ -83,6 +84,11 @@ describe("Network discovery flow", () => {
     await waitFor(() => {
       expect(screen.queryByDisplayValue("buddy")).toBeNull();
       expect(screen.getByText("Connected Cupids (1)")).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByTestId("network-subsegment-cupids-list"));
+
+    await waitFor(() => {
       expect(screen.getByText("pending")).toBeTruthy();
     });
   });

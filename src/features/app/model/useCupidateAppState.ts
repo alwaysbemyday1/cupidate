@@ -174,7 +174,7 @@ type UseCupidateAppStateOptions = {
 export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
   const isDataAccessEnabled = options?.isDataAccessEnabled ?? true;
   const [activeView, setActiveView] = useState<AppView>("home");
-  const [networkSegment, setNetworkSegment] = useState<NetworkSegment>("cupidates");
+  const [networkSegment, setNetworkSegment] = useState<NetworkSegment>("board");
   const [displayName, setDisplayName] = useState("");
   const [birthYearInput, setBirthYearInput] = useState("");
   const [gender, setGender] = useState("");
@@ -193,7 +193,6 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
   const [preferredGender, setPreferredGender] = useState<"any" | "male" | "female" | "other">("any");
   const [preferredHeightMinInput, setPreferredHeightMinInput] = useState("");
   const [preferredHeightMaxInput, setPreferredHeightMaxInput] = useState("");
-  const [ownerType, setOwnerType] = useState<"mine" | "connected">("mine");
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [connectionSearchQuery, setConnectionSearchQuery] = useState("");
   const [selectedConnectionCupidId, setSelectedConnectionCupidId] = useState<string | null>(null);
@@ -229,8 +228,6 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       setNicknameHydrated(true);
     }
   }, [currentCupidQuery.data?.nickname, currentCupidQuery.isSuccess, nicknameHydrated]);
-
-  const canSubmit = useMemo(() => displayName.trim().length > 0 && !!gender, [displayName, gender]);
 
   const myCupidId = currentCupidQuery.data?.id ?? MY_CUPID_ID;
 
@@ -668,8 +665,6 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       setPreferredHeightMinInput,
       preferredHeightMaxInput,
       setPreferredHeightMaxInput,
-      ownerType,
-      setOwnerType,
     errors,
     cupidates,
     connections,
@@ -685,7 +680,6 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     setPrivacyNetworkOnly,
     notificationEnabled,
     setNotificationEnabled,
-    canSubmit,
     myCupidId,
     recommendations,
     requestByPair,

@@ -2,50 +2,114 @@
 
 Last Updated: 2026-03-29
 
-## 1. 화면 목적
-- 내 지인(Cupidate)과 연결된 Cupid 네트워크를 구조적으로 관리하는 화면.
+## 1. Screen Purpose
+- Manage the relationship graph between my cupidates and connected cupids.
+- Keep the overview board separate from registration/detail management.
+- Make it clear where the user should go for:
+  - board overview
+  - cupidate list
+  - cupidate registration
+  - connected cupid list
+  - connected cupid registration/search
 
-## 2. 핵심 구성
-1) 상단 헤더
-- 타이틀: `Cupidate: Network`
+## 2. High-Level Layout
+1. app header
+- title: `Cupidate: Network`
 
-2) Network Board
-- 루트: `MASTER CUPID`
-- 하위 노드: Cupidate/Cupid 프로필 썸네일
-- 노드 연결선(수평/수직)로 관계 시각화
-- 상태 아이콘:
-  - 매칭됨(체크)
-  - 대기(모래시계)
-  - 거절(X)
+2. primary segment row
+- `Board`
+- `My Cupidates`
+- `Connected Cupids`
 
-3) Side Stat Panel / Legend
-- 매칭 제안 수
-- 연결된 큐피드 수
-- 성공한 주선 수
-- 진행 매칭 수
-- LEGEND 표기
+3. segment content
+- `Board` segment:
+  - `MASTER CUPID`
+  - relationship board
+  - match proposal stats
+  - legend
+- `My Cupidates` segment:
+  - sub-toggle: `Cupidate List` / `Register Cupidate`
+- `Connected Cupids` segment:
+  - sub-toggle: `Cupid List` / `Register Cupid`
 
-4) 하단 관리 영역
-- 세그먼트 탭: `My Cupidates` / `Connected Cupids`
-- `My Cupidates`:
-  - 현재 등록된 큐피데이트 목록
-  - 새 큐피데이트 등록 폼
-  - 프로필/선호도 핵심 데이터 입력
-- `Connected Cupids`:
-  - 현재 연결된 큐피드 상태 목록
-  - 닉네임 검색 기반 `Connection Radar`
-  - 연결 요청 액션
+4. bottom dock tab bar
+- Network tab active
 
-5) 하단 탭바
-- Network 활성 상태
+## 3. Board Segment Rules
+- This is the summary/overview mode.
+- It should answer, at a glance:
+  - how many proposals exist
+  - how many cupids are connected
+  - how many introductions succeeded
+  - how many matches are active
+- The board is the only place that should show the large relationship graph.
+- Do not repeat the same stats again inside the list/register segments.
 
-## 3. 디자인 규칙
-- 그래프 노드도 `PixelBox`/검은 외곽선 스타일 유지
-- 상태는 색상+아이콘 병행
-- 작은 썸네일에서도 식별되도록 1px 이상 외곽선 유지
-- 상단 보드가 첫 인상을 결정하고, 상세 입력 폼은 스크롤 아래에서 이어진다
+## 4. My Cupidates Segment
+### 4.1 Cupidate List Subview
+- shows registered cupidates owned by the current cupid
+- each row should include:
+  - display name
+  - age/gender/region summary
+  - job title or fallback meta
+  - current match status badge
 
-## 4. 데이터 계약
+### 4.2 Register Cupidate Subview
+- dedicated registration view for cupidate creation
+- must collect the profile fields needed for the current POC:
+  - name
+  - birth year
+  - height
+  - gender
+  - region
+  - job title
+  - hobbies
+  - bio / matching notes
+  - smoking habit
+  - drinking habit
+- must collect the preference fields needed for scoring:
+  - preferred age min/max
+  - preferred regions
+  - preferred gender
+  - preferred height min/max
+  - preferred smoking
+  - preferred drinking
+- save CTA must still allow submission-driven validation feedback
+- save CTA should be disabled only while the mutation is actively running
+
+## 5. Connected Cupids Segment
+### 5.1 Cupid List Subview
+- shows currently connected or pending cupids
+- each row should include:
+  - nickname
+  - cupid id
+  - region or fallback meta
+  - connection status badge
+
+### 5.2 Register Cupid Subview
+- dedicated registration/search view for finding another cupid by nickname
+- should contain:
+  - search input
+  - search result list
+  - select action
+  - send connection request action
+- empty/loading/error states must stay inside this subview only
+
+## 6. Redundancy Cleanup Rules
+- Remove dead controls that do not change real behavior.
+- Do not show cupidate registration form inside the board view.
+- Do not show cupid connection search inside the cupid list view.
+- Avoid duplicate titles where the selected sub-tab already defines the mode.
+- Keep one clear purpose per subview.
+
+## 7. Design Rules
+- Use the current `design_system.md` palette and dock navigation rules.
+- Board nodes, roster rows, and forms must all use `PixelBox` language.
+- Text on dark shell background uses light text.
+- Text on beige surfaces uses dark text.
+- Status should be readable by color + label together.
+
+## 8. Data Contract
 Queries:
 - `network_my_cupidates`
 - `network_connected_cupids`
@@ -56,21 +120,30 @@ Mutations:
 - `request_cupid_connection`
 - `update_connection_status`
 
-## 5. 상태 정의
-- Loading: 네트워크 노드 자리 유지 스켈레톤
-- Empty: "등록된 지인이 없습니다" + 등록 CTA
-- Error: 재시도 + 실패한 작업 안내
+## 9. States
+- Loading:
+  - board sync card
+  - search loading card
+- Empty:
+  - no board nodes
+  - no cupidates
+  - no connected cupids
+  - no search results
+- Error:
+  - retry CTA inside Network only
 
-## 6. i18n
-- 영문/한글 전환 시 아래가 즉시 함께 바뀌어야 한다
-  - 보드 타이틀/캡션
-  - 매칭 제안/범례 라벨
-  - 세그먼트 탭
-  - 큐피데이트 등록 필드/검증 메시지
-  - 연결 검색/선택/요청 카피
+## 10. i18n
+When locale changes, these must switch together:
+- segment labels
+- subview labels
+- board labels and legend
+- form fields and validation messages
+- search and action labels
+- empty/loading/error copy
 
-## 7. 완료 기준
-- 관계망 상태를 1스크린에서 파악 가능
-- 노드 상태와 서버 상태가 일치
-- 관리 액션 이후 네트워크 보드 즉시 갱신
-- 영어/한글 전환 시 Network 정적 카피와 검증 메시지가 함께 전환
+## 11. Definition of Done
+- The board feels like an overview screen, not a data-entry page.
+- Cupidate registration is a clearly dedicated subview.
+- Cupid registration/search is a clearly dedicated subview.
+- Redundant blocks are removed.
+- English and Korean both remain readable in the same layout.

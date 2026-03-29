@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ScrollView, TextInput, View, useWindowDimensions } from "react-native";
 
 import { useI18n } from "../../i18n/context";
@@ -21,6 +21,8 @@ type ConnectionSearchResult = {
   nickname: string;
 };
 
+type DetailSubview = "list" | "register";
+
 type NetworkViewProps = {
   networkSegment: NetworkSegment;
   onChangeNetworkSegment: (segment: NetworkSegment) => void;
@@ -29,8 +31,6 @@ type NetworkViewProps = {
   requests: MatchRequest[];
   recommendationCount: number;
   masterCupidName: string;
-  ownerType: "mine" | "connected";
-  onChangeOwnerType: (ownerType: "mine" | "connected") => void;
   displayName: string;
   onChangeDisplayName: (value: string) => void;
   birthYearInput: string;
@@ -68,7 +68,6 @@ type NetworkViewProps = {
   bio: string;
   onChangeBio: (value: string) => void;
   errors: ValidationErrors;
-  canSubmit: boolean;
   onSaveCupidate: () => void | Promise<void>;
   currentCupidId: string;
   connectionSearchQuery: string;
@@ -190,6 +189,10 @@ function ageLabel(birthYear: number | null | undefined) {
   return String(new Date().getFullYear() - birthYear);
 }
 
+function joinMeta(parts: Array<string | undefined | null>) {
+  return parts.filter(Boolean).join(" · ");
+}
+
 export function NetworkView({
   networkSegment,
   onChangeNetworkSegment,
@@ -198,8 +201,6 @@ export function NetworkView({
   requests,
   recommendationCount,
   masterCupidName,
-  ownerType,
-  onChangeOwnerType,
   displayName,
   onChangeDisplayName,
   birthYearInput,
@@ -237,7 +238,6 @@ export function NetworkView({
   bio,
   onChangeBio,
   errors,
-  canSubmit,
   onSaveCupidate,
   currentCupidId,
   connectionSearchQuery,
@@ -254,6 +254,8 @@ export function NetworkView({
 }: NetworkViewProps) {
   const { t } = useI18n();
   const { width } = useWindowDimensions();
+  const [cupidateSubview, setCupidateSubview] = useState<DetailSubview>("list");
+  const [cupidSubview, setCupidSubview] = useState<DetailSubview>("register");
   const isWideHero = width >= 410;
   const boardColumns = width < 360 ? 3 : 4;
 
@@ -303,6 +305,7 @@ export function NetworkView({
   const activeCount = requests.filter((item) => item.status === "requested" || item.status === "accepted").length;
   const showSearchEmptyState =
     networkSegment === "cupids" &&
+    cupidSubview === "register" &&
     connectionSearchQuery.trim().length > 0 &&
     !isSearchingCupids &&
     connectionSearchResults.length === 0;
@@ -397,128 +400,14 @@ export function NetworkView({
         />
       ) : null}
 
-      <View style={[styles.networkHeroRow, isWideHero ? styles.networkHeroRowWide : null]}>
-        <PixelBox style={styles.networkBoardCard} contentStyle={styles.networkBoardContent}>
-          <View style={styles.networkBoardHeader}>
-            <PixelText variant="sectionTitle" style={styles.sectionTitle}>
-              {t("network.sections.board")}
-            </PixelText>
-            <PixelText variant="caption" style={styles.networkBoardCaption}>
-              {t("network.board.caption")}
-            </PixelText>
-          </View>
-
-          <View style={styles.networkBoardCanvas}>
-            <View style={styles.networkMasterBlock}>
-              <PixelText variant="label" style={styles.networkMasterLabel}>
-                {t("network.master.title")}
-              </PixelText>
-              <PixelBox
-                style={styles.networkMasterCard}
-                contentStyle={styles.networkMasterCardContent}
-                backgroundColor={designTokens.color.surfaceRaised}
-              >
-                <View style={[styles.networkNodeAvatar, styles.networkAvatarMaster]}>
-                  <PixelText variant="body" style={styles.networkAvatarText}>
-                    {buildAvatarSeed(masterCupidName || currentCupidId)}
-                  </PixelText>
-                </View>
-                <View style={styles.networkMasterInfo}>
-                  <PixelText variant="body" style={styles.networkMasterName}>
-                    {(masterCupidName || currentCupidId).toUpperCase()}
-                  </PixelText>
-                  <PixelText variant="caption" style={styles.networkNodeMeta}>
-                    {t("network.master.subtitle")}
-                  </PixelText>
-                </View>
-              </PixelBox>
-            </View>
-
-            {featuredNodes.length === 0 && remainingNodes.length === 0 ? (
-              <StateCard
-                tone="empty"
-                title={t("network.empty.boardTitle")}
-                description={t("network.empty.boardDescription")}
-              />
-            ) : (
-              <>
-                <View style={styles.networkConnectorVertical} />
-                <View style={styles.networkConnectorHorizontal} />
-                <View style={styles.networkFeaturedRow}>{featuredNodes.map((node) => renderBoardNode(node))}</View>
-
-                {remainingRows.length > 0 ? (
-                  <>
-                    <View style={styles.networkConnectorVertical} />
-                    <View style={styles.networkMiniGrid}>
-                      {remainingRows.map((row, rowIndex) => (
-                        <View key={`row-${rowIndex}`} style={styles.networkMiniRow}>
-                          {row.map((node) => renderBoardNode(node, true))}
-                        </View>
-                      ))}
-                    </View>
-                  </>
-                ) : null}
-              </>
-            )}
-          </View>
-        </PixelBox>
-
-        <View style={[styles.networkSideStack, isWideHero ? styles.networkSideStackWide : null]}>
-          <PixelBox style={styles.networkInfoCard} contentStyle={styles.networkInfoCardContent}>
-            <PixelText variant="sectionTitle" style={styles.sectionTitle}>
-              {t("network.sections.stats")}
-            </PixelText>
-            <View style={styles.networkStatItem}>
-              <PixelText variant="body" style={styles.metricValue}>
-                {recommendationCount}
-              </PixelText>
-              <PixelText variant="caption" style={styles.metricLabel}>
-                {t("network.metrics.proposals")}
-              </PixelText>
-            </View>
-            <View style={styles.networkStatItem}>
-              <PixelText variant="body" style={styles.metricValue}>
-                {connectedCount}
-              </PixelText>
-              <PixelText variant="caption" style={styles.metricLabel}>
-                {t("network.metrics.connected")}
-              </PixelText>
-            </View>
-            <View style={styles.networkStatItem}>
-              <PixelText variant="body" style={styles.metricValue}>
-                {successfulCount}
-              </PixelText>
-              <PixelText variant="caption" style={styles.metricLabel}>
-                {t("network.metrics.success")}
-              </PixelText>
-            </View>
-            <View style={styles.networkStatItem}>
-              <PixelText variant="body" style={styles.metricValue}>
-                {activeCount}
-              </PixelText>
-              <PixelText variant="caption" style={styles.metricLabel}>
-                {t("network.metrics.active")}
-              </PixelText>
-            </View>
-          </PixelBox>
-
-          <PixelBox style={styles.networkInfoCard} contentStyle={styles.networkInfoCardContent}>
-            <PixelText variant="sectionTitle" style={styles.sectionTitle}>
-              {t("network.sections.legend")}
-            </PixelText>
-            {(["matched", "wait", "reject"] as const).map((tone) => (
-              <View key={tone} style={styles.networkLegendItem}>
-                <View style={[styles.networkLegendSwatch, boardBadgeStyle(tone)]} />
-                <PixelText variant="body" style={styles.textBody}>
-                  {t(boardLegendKey(tone))}
-                </PixelText>
-              </View>
-            ))}
-          </PixelBox>
-        </View>
-      </View>
-
       <View style={styles.networkSegmentRow}>
+        <PixelButton
+          label={t("network.segment.board")}
+          variant="secondary"
+          active={networkSegment === "board"}
+          testID="network-segment-board"
+          onPress={() => onChangeNetworkSegment("board")}
+        />
         <PixelButton
           label={t("network.segment.cupidates", { count: myCupidates.length })}
           variant="primary"
@@ -535,18 +424,162 @@ export function NetworkView({
         />
       </View>
 
+      {networkSegment === "board" ? (
+        <View style={[styles.networkHeroRow, isWideHero ? styles.networkHeroRowWide : null]}>
+          <PixelBox style={styles.networkBoardCard} contentStyle={styles.networkBoardContent}>
+            <View style={styles.networkBoardHeader}>
+              <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+                {t("network.sections.board")}
+              </PixelText>
+              <PixelText variant="caption" style={styles.networkBoardCaption}>
+                {t("network.board.caption")}
+              </PixelText>
+            </View>
+
+            <View style={styles.networkBoardCanvas}>
+              <View style={styles.networkMasterBlock}>
+                <PixelText variant="label" style={styles.networkMasterLabel}>
+                  {t("network.master.title")}
+                </PixelText>
+                <PixelBox
+                  style={styles.networkMasterCard}
+                  contentStyle={styles.networkMasterCardContent}
+                  backgroundColor={designTokens.color.surfaceRaised}
+                >
+                  <View style={[styles.networkNodeAvatar, styles.networkAvatarMaster]}>
+                    <PixelText variant="body" style={styles.networkAvatarText}>
+                      {buildAvatarSeed(masterCupidName || currentCupidId)}
+                    </PixelText>
+                  </View>
+                  <View style={styles.networkMasterInfo}>
+                    <PixelText variant="body" style={styles.networkMasterName}>
+                      {(masterCupidName || currentCupidId).toUpperCase()}
+                    </PixelText>
+                    <PixelText variant="caption" style={styles.networkNodeMeta}>
+                      {t("network.master.subtitle")}
+                    </PixelText>
+                  </View>
+                </PixelBox>
+              </View>
+
+              {featuredNodes.length === 0 && remainingNodes.length === 0 ? (
+                <StateCard
+                  tone="empty"
+                  title={t("network.empty.boardTitle")}
+                  description={t("network.empty.boardDescription")}
+                />
+              ) : (
+                <>
+                  <View style={styles.networkConnectorVertical} />
+                  <View style={styles.networkConnectorHorizontal} />
+                  <View style={styles.networkFeaturedRow}>{featuredNodes.map((node) => renderBoardNode(node))}</View>
+
+                  {remainingRows.length > 0 ? (
+                    <>
+                      <View style={styles.networkConnectorVertical} />
+                      <View style={styles.networkMiniGrid}>
+                        {remainingRows.map((row, rowIndex) => (
+                          <View key={`row-${rowIndex}`} style={styles.networkMiniRow}>
+                            {row.map((node) => renderBoardNode(node, true))}
+                          </View>
+                        ))}
+                      </View>
+                    </>
+                  ) : null}
+                </>
+              )}
+            </View>
+          </PixelBox>
+
+          <View style={[styles.networkSideStack, isWideHero ? styles.networkSideStackWide : null]}>
+            <PixelBox style={styles.networkInfoCard} contentStyle={styles.networkInfoCardContent}>
+              <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+                {t("network.sections.stats")}
+              </PixelText>
+              <View style={styles.networkStatItem}>
+                <PixelText variant="body" style={styles.metricValue}>
+                  {recommendationCount}
+                </PixelText>
+                <PixelText variant="caption" style={styles.metricLabel}>
+                  {t("network.metrics.proposals")}
+                </PixelText>
+              </View>
+              <View style={styles.networkStatItem}>
+                <PixelText variant="body" style={styles.metricValue}>
+                  {connectedCount}
+                </PixelText>
+                <PixelText variant="caption" style={styles.metricLabel}>
+                  {t("network.metrics.connected")}
+                </PixelText>
+              </View>
+              <View style={styles.networkStatItem}>
+                <PixelText variant="body" style={styles.metricValue}>
+                  {successfulCount}
+                </PixelText>
+                <PixelText variant="caption" style={styles.metricLabel}>
+                  {t("network.metrics.success")}
+                </PixelText>
+              </View>
+              <View style={styles.networkStatItem}>
+                <PixelText variant="body" style={styles.metricValue}>
+                  {activeCount}
+                </PixelText>
+                <PixelText variant="caption" style={styles.metricLabel}>
+                  {t("network.metrics.active")}
+                </PixelText>
+              </View>
+            </PixelBox>
+
+            <PixelBox style={styles.networkInfoCard} contentStyle={styles.networkInfoCardContent}>
+              <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+                {t("network.sections.legend")}
+              </PixelText>
+              {(["matched", "wait", "reject"] as const).map((tone) => (
+                <View key={tone} style={styles.networkLegendItem}>
+                  <View style={[styles.networkLegendSwatch, boardBadgeStyle(tone)]} />
+                  <PixelText variant="body" style={styles.textBody}>
+                    {t(boardLegendKey(tone))}
+                  </PixelText>
+                </View>
+              ))}
+            </PixelBox>
+          </View>
+        </View>
+      ) : null}
+
       {networkSegment === "cupidates" ? (
         <>
-          <PixelText variant="sectionTitle" style={styles.sectionTitle}>
-            {t("network.sections.roster")}
+          <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
+            {t("network.sections.cupidatesHub")}
           </PixelText>
-          {myCupidates.length === 0 ? (
+          <View style={styles.buttonRow}>
+            <PixelButton
+              label={t("network.subsegment.cupidateList")}
+              variant="secondary"
+              active={cupidateSubview === "list"}
+              testID="network-subsegment-cupidates-list"
+              onPress={() => setCupidateSubview("list")}
+            />
+            <PixelButton
+              label={t("network.subsegment.cupidateRegister")}
+              variant="primary"
+              active={cupidateSubview === "register"}
+              testID="network-subsegment-cupidates-register"
+              onPress={() => setCupidateSubview("register")}
+            />
+          </View>
+          {cupidateSubview === "list" ? (
+            <>
+              <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
+                {t("network.sections.roster")}
+              </PixelText>
+              {myCupidates.length === 0 ? (
             <StateCard
               tone="empty"
               title={t("network.empty.cupidatesTitle")}
               description={t("network.empty.cupidatesDescription")}
             />
-          ) : (
+              ) : (
             <PixelBox style={styles.networkRosterCard} contentStyle={styles.networkRosterContent}>
               {myCupidates.map((item) => {
                 const tone = resolveCupidateTone(item.cupidateId, requests);
@@ -577,32 +610,22 @@ export function NetworkView({
                 );
               })}
             </PixelBox>
-          )}
+              )}
+            </>
+          ) : null}
 
-          <PixelText variant="sectionTitle" style={styles.sectionTitle}>
-            {t("network.sections.register")}
-          </PixelText>
+          {cupidateSubview === "register" ? (
+            <>
           <PixelBox style={styles.networkFormCard} contentStyle={styles.networkFormContent}>
+            <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+              {t("network.form.profileTitle")}
+            </PixelText>
             <PixelText variant="caption" style={styles.fieldHint}>
               {t("network.form.caption")}
             </PixelText>
-
-            <PixelText variant="label" style={styles.fieldLabel}>
-              {t("network.fields.ownerType")}
+            <PixelText variant="caption" style={styles.fieldHint}>
+              {t("network.form.registerHint")}
             </PixelText>
-            <View style={styles.buttonRow}>
-              <PixelButton
-                label={t("network.owner.mine")}
-                active={ownerType === "mine"}
-                onPress={() => onChangeOwnerType("mine")}
-              />
-              <PixelButton
-                label={t("network.owner.connected")}
-                variant="secondary"
-                active={ownerType === "connected"}
-                onPress={() => onChangeOwnerType("connected")}
-              />
-            </View>
 
             <PixelText variant="label" style={styles.fieldLabel}>
               {t("network.fields.name")}
@@ -771,8 +794,8 @@ export function NetworkView({
               />
             </View>
 
-            <PixelText variant="sectionTitle" style={styles.sectionTitle}>
-              {t("network.sections.preferences")}
+            <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+              {t("network.form.preferenceTitle")}
             </PixelText>
 
             <View style={styles.buttonRow}>
@@ -938,10 +961,36 @@ export function NetworkView({
               />
             </View>
           </PixelBox>
+            </>
+          ) : null}
         </>
-      ) : (
+      ) : null}
+
+      {networkSegment === "cupids" ? (
         <>
-          <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+          <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
+            {t("network.sections.cupidsHub")}
+          </PixelText>
+          <View style={styles.buttonRow}>
+            <PixelButton
+              label={t("network.subsegment.cupidList")}
+              variant="secondary"
+              active={cupidSubview === "list"}
+              testID="network-subsegment-cupids-list"
+              onPress={() => setCupidSubview("list")}
+            />
+            <PixelButton
+              label={t("network.subsegment.cupidRegister")}
+              variant="primary"
+              active={cupidSubview === "register"}
+              testID="network-subsegment-cupids-register"
+              onPress={() => setCupidSubview("register")}
+            />
+          </View>
+
+          {cupidSubview === "list" ? (
+            <>
+          <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
             {t("network.sections.connectedRoster")}
           </PixelText>
           {connections.length === 0 ? (
@@ -976,12 +1025,20 @@ export function NetworkView({
               ))}
             </PixelBox>
           )}
-          <PixelText variant="sectionTitle" style={styles.sectionTitle}>
-            {t("network.sections.discovery")}
-          </PixelText>
+            </>
+          ) : null}
+
+          {cupidSubview === "register" ? (
+            <>
           <PixelBox style={styles.networkFormCard} contentStyle={styles.networkFormContent}>
+            <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+              {t("network.sections.discovery")}
+            </PixelText>
             <PixelText variant="caption" style={styles.fieldHint}>
               {t("network.discovery.caption")}
+            </PixelText>
+            <PixelText variant="caption" style={styles.fieldHint}>
+              {t("network.form.cupidHint")}
             </PixelText>
 
             <PixelText variant="label" style={styles.fieldLabel}>
@@ -1054,8 +1111,10 @@ export function NetworkView({
               />
             </View>
           </PixelBox>
+            </>
+          ) : null}
         </>
-      )}
+      ) : null}
     </ScrollView>
   );
 }

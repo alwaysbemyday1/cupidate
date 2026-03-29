@@ -30,6 +30,8 @@ describe("App", () => {
     render(<App />);
 
     fireEvent.press(screen.getByTestId("tab-network"));
+    fireEvent.press(screen.getByTestId("network-segment-cupidates"));
+    fireEvent.press(screen.getByTestId("network-subsegment-cupidates-register"));
     fireEvent.press(screen.getByText("Save Cupidate"));
 
     await waitFor(() => {

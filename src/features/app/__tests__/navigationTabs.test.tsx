@@ -27,8 +27,8 @@ describe("App navigation tabs", () => {
     fireEvent.press(screen.getByTestId("tab-network"));
 
     await waitFor(() => {
+      expect(screen.getByText("Network Board")).toBeTruthy();
       expect(screen.getByText(/My Cupidates \(/)).toBeTruthy();
-      expect(screen.getByText("Save Cupidate")).toBeTruthy();
     });
 
     fireEvent.press(screen.getByTestId("tab-matching"));

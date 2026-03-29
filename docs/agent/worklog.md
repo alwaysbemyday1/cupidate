@@ -651,3 +651,34 @@ Verification:
 Notes:
 - Persistence is currently device-local.
 - A later step can sync the locale into account-level preferences if we want cross-device continuity.
+
+### Task 2026-03-29-11 - Dock Tab Bar + Network Register Split + Contrast Cleanup
+Status: Completed
+
+Changes:
+- Refined `PixelTabBar` from a row of button-like tabs into a single dock-style bottom navigation bar:
+  - full-width mount
+  - shared light surface
+  - strong top border
+  - active top strip + icon chip treatment
+- Updated core palette tokens to improve readability on dark shells:
+  - darker navy shell kept for framing
+  - lighter beige surfaces for readable content
+  - improved light/dark text mapping for contrast
+- Reworked app shell layout so the dock is visually attached to the bottom of the screen.
+- Split Network into clearer dedicated flows:
+  - top-level segments: `Board`, `My Cupidates`, `Connected Cupids`
+  - cupidate subviews: `Cupidate List`, `Register Cupidate`
+  - cupid subviews: `Cupid List`, `Register Cupid`
+- Removed dead owner-type UI and trimmed redundant headings in registration modes.
+- Synced docs with the new structure and cleaned `design_system.md` into a readable UTF-8 source of truth.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand` passed.
+
+Notes:
+- The Network screen now behaves more like a small in-app workspace:
+  - board for overview
+  - list for review
+  - dedicated register/search subviews for data entry

@@ -4,7 +4,7 @@ export const MY_CUPID_ID = "cupid-me";
 export const CONNECTED_CUPID_ID = "cupid-connected-1";
 
 export type AppView = "home" | "network" | "matching" | "my";
-export type NetworkSegment = "cupidates" | "cupids";
+export type NetworkSegment = "board" | "cupidates" | "cupids";
 export type MatchRequestStatus = "requested" | "accepted" | "rejected" | "completed";
 
 export type CupidateRecord = CupidateProfile & {

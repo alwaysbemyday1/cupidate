@@ -13,6 +13,10 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: c.background
   },
+  appShell: {
+    flex: 1,
+    backgroundColor: c.background
+  },
   container: {
     flex: 1,
     backgroundColor: c.background,
@@ -21,7 +25,7 @@ export const styles = StyleSheet.create({
   },
   screenBody: {
     flex: 1,
-    paddingBottom: z.tabBarHeight + z.tabBarInset + s.sm
+    paddingBottom: z.tabBarHeight + s.xl
   },
   panel: {
     flex: 1
@@ -307,7 +311,11 @@ export const styles = StyleSheet.create({
     marginTop: s.xxs
   },
 
-  sectionTitle: {
+  pageSectionTitle: {
+    marginTop: s.xxs,
+    color: c.inkInverse
+  },
+  surfaceSectionTitle: {
     marginTop: s.xxs,
     color: c.ink
   },

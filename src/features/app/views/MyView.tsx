@@ -101,7 +101,7 @@ export function MyView({
         />
       ) : null}
 
-      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+      <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
         {t("my.sections.profileOverview")}
       </PixelText>
       <PixelBox style={styles.listCard} contentStyle={styles.listCardContent}>
@@ -142,7 +142,7 @@ export function MyView({
         </View>
       </PixelBox>
 
-      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+      <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
         {t("my.sections.accountDetails")}
       </PixelText>
       <PixelBox style={styles.listCard} contentStyle={styles.listCardContent}>
@@ -159,7 +159,7 @@ export function MyView({
         </PixelText>
       </PixelBox>
 
-      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+      <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
         {t("my.sections.language")}
       </PixelText>
       <PixelBox style={styles.listCard} contentStyle={styles.listCardContent}>
@@ -190,7 +190,7 @@ export function MyView({
         </View>
       </PixelBox>
 
-      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+      <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
         {t("my.sections.preferences")}
       </PixelText>
       <PixelBox style={styles.listCard} contentStyle={styles.listCardContent}>
@@ -223,7 +223,7 @@ export function MyView({
         </PixelText>
       </PixelBox>
 
-      <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+      <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
         {t("my.sections.summary")}
       </PixelText>
       {connectionCount === 0 && cupidateCount === 0 && requestCount === 0 ? (

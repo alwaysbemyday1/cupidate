@@ -50,11 +50,13 @@ Completed Work
 - [x] Network view prototype rebuild + i18n expansion (Task 2026-03-29-06)
 - [x] Matching view prototype rebuild + score insight redesign (Task 2026-03-29-07)
 - [x] Locale persistence with device storage (Task 2026-03-29-08A)
+- [x] Dock tab-bar refinement + network subview split + contrast cleanup (Task 2026-03-29-11)
 
 Next Tasks (Rebuild Track)
  - Task 2026-03-29-08B: My preference persistence expansion
  - Task 2026-03-29-09: Network action hardening (edit/block/unblock flows)
  - Task 2026-03-29-10: Matching action hardening + completed-state persistence QA
+ - Task 2026-03-29-12: Device QA pass on the dock/tab contrast and network registration subviews
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:
@@ -338,3 +340,18 @@ Task 2026-03-29-01E (Completed)
   - domain data / preference / scoring rules
   - view-specific PRD
   - recent implementation history
+
+Task 2026-03-29-11 (Completed)
+- Refined the bottom navigation into a dock-style fixed bar instead of a loose row of button-like tabs.
+- Updated the live color palette to improve contrast on dark navy surfaces:
+  - brighter beige dock/card surfaces
+  - lighter blue utility fills
+  - stronger white-on-dark text usage
+- Split Network management into clearer dedicated subviews:
+  - `Board`
+  - `My Cupidates` -> `Cupidate List` / `Register Cupidate`
+  - `Connected Cupids` -> `Cupid List` / `Register Cupid`
+- Removed dead/duplicate owner-type UI and reduced repeated section headings in registration flows.
+- Synced the updated structure back into:
+  - `docs/agent/design_system.md`
+  - `docs/agent/views/network.md`
