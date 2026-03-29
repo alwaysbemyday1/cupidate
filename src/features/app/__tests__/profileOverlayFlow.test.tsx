@@ -92,6 +92,7 @@ describe("Profile overlay flow", () => {
       expect(screen.getByTestId("profile-sheet-title")).toHaveTextContent("Cupidate Profile");
       expect(screen.getByTestId("profile-sheet")).toBeTruthy();
       expect(screen.getByText("ACTIVE CUPIDATE")).toBeTruthy();
+      expect(screen.getByText("This is the simple public dating profile visible to matching participants.")).toBeTruthy();
     });
   });
 
@@ -109,6 +110,27 @@ describe("Profile overlay flow", () => {
     await waitFor(() => {
       expect(screen.getByTestId("profile-sheet-title")).toHaveTextContent("Cupidate Profile");
       expect(screen.getByTestId("profile-sheet")).toBeTruthy();
+      expect(screen.getByText("Dating Preferences")).toBeTruthy();
+    });
+  });
+
+  it("opens cupid profile from network and shows matchmaking stats", async () => {
+    render(<App />);
+
+    fireEvent.press(screen.getByTestId("tab-network"));
+    fireEvent.press(screen.getByTestId("network-segment-cupids"));
+    fireEvent.press(screen.getByTestId("network-subsegment-cupids-list"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("profile-open-cupid-local-cupid-a")).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByTestId("profile-open-cupid-local-cupid-a"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("profile-sheet-title")).toHaveTextContent("Cupid Profile");
+      expect(screen.getByText("Shows how this cupid has guided matches and relationship handoffs across the network.")).toBeTruthy();
+      expect(screen.getByText("Romance Conversions")).toBeTruthy();
     });
   });
 });

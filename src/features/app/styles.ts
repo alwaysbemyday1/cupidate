@@ -959,14 +959,19 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(12, 17, 28, 0.7)"
   },
   profileSheetWrapper: {
+    flex: 1,
+    justifyContent: "flex-end",
     paddingHorizontal: s.md,
     paddingBottom: z.tabBarHeight + z.tabBarInset + s.sm,
     paddingTop: s.xl
   },
   profileSheetFrame: {
-    maxHeight: "88%"
+    width: "100%",
+    height: "84%",
+    minHeight: 420
   },
   profileSheetFrameContent: {
+    flex: 1,
     backgroundColor: c.surfaceRaised,
     padding: s.md,
     gap: s.sm
@@ -977,7 +982,14 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: s.sm
   },
+  profileSheetTitle: {
+    color: c.ink
+  },
+  profileSheetScroll: {
+    flex: 1
+  },
   profileSheetScrollContent: {
+    flexGrow: 1,
     gap: s.sm,
     paddingBottom: s.md
   },

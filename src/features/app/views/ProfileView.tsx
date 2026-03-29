@@ -196,12 +196,15 @@ function CupidProfilePanel({
         <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
           {t("profile.sections.matchmaking")}
         </PixelText>
+        <PixelText variant="body" style={styles.textBody}>
+          {t("profile.cupid.summary")}
+        </PixelText>
         <View style={styles.summaryGrid}>
-          {renderStatPill(t("profile.stats.cupidates"), profile.stats.cupidateCount)}
+          {renderStatPill(t("profile.stats.managedCupidates"), profile.stats.cupidateCount)}
           {renderStatPill(t("profile.stats.activeCupidates"), profile.stats.activeCupidateCount)}
-          {renderStatPill(t("profile.stats.introductions"), profile.stats.introductions)}
+          {renderStatPill(t("profile.stats.matchmakingRequests"), profile.stats.introductions)}
           {renderStatPill(t("profile.stats.ongoing"), profile.stats.ongoingMatches)}
-          {renderStatPill(t("profile.stats.completed"), profile.stats.completedMatches)}
+          {renderStatPill(t("profile.stats.romanceConversions"), profile.stats.completedMatches)}
         </View>
       </PixelBox>
     </>
@@ -235,6 +238,11 @@ function CupidateProfilePanel({
     editState.preferredGender === "any"
       ? t("network.option.preferredGender.any")
       : genderText(editState.preferredGender, t);
+  const preferredAgeRange = parseRange(editState.preferredAgeMinInput, editState.preferredAgeMaxInput);
+  const preferredHeightRange = parseRange(
+    editState.preferredHeightMinInput,
+    editState.preferredHeightMaxInput
+  );
 
   async function handleSave() {
     if (!onSave) {
@@ -243,11 +251,6 @@ function CupidateProfilePanel({
 
     const birthYear = parseOptionalNumber(editState.birthYearInput) ?? null;
     const heightCm = parseOptionalNumber(editState.heightInput);
-    const preferredAgeRange = parseRange(editState.preferredAgeMinInput, editState.preferredAgeMaxInput);
-    const preferredHeightRange = parseRange(
-      editState.preferredHeightMinInput,
-      editState.preferredHeightMaxInput
-    );
     const location = editState.locationInput.trim().toLowerCase();
 
     await onSave({
@@ -312,6 +315,9 @@ function CupidateProfilePanel({
         <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
           {t("profile.sections.publicProfile")}
         </PixelText>
+        <PixelText variant="caption" style={styles.profileMetaText}>
+          {t("profile.cupidate.snapshotHint")}
+        </PixelText>
         <PixelText variant="body" style={styles.textBody}>
           {editState.bio || t("profile.cupidate.noBio")}
         </PixelText>
@@ -329,21 +335,13 @@ function CupidateProfilePanel({
         </PixelText>
         {renderMetaLine(
           t("profile.meta.preferredAge"),
-          parseRange(editState.preferredAgeMinInput, editState.preferredAgeMaxInput)
-            ? `${parseRange(editState.preferredAgeMinInput, editState.preferredAgeMaxInput)?.[0]} - ${
-                parseRange(editState.preferredAgeMinInput, editState.preferredAgeMaxInput)?.[1]
-              }`
-            : "-"
+          preferredAgeRange ? `${preferredAgeRange[0]} - ${preferredAgeRange[1]}` : "-"
         )}
         {renderMetaLine(t("profile.meta.preferredGender"), preferredGenderLabel)}
         {renderMetaLine(t("profile.meta.preferredRegions"), regions)}
         {renderMetaLine(
           t("profile.meta.preferredHeight"),
-          parseRange(editState.preferredHeightMinInput, editState.preferredHeightMaxInput)
-            ? `${parseRange(editState.preferredHeightMinInput, editState.preferredHeightMaxInput)?.[0]} - ${
-                parseRange(editState.preferredHeightMinInput, editState.preferredHeightMaxInput)?.[1]
-              } cm`
-            : "-"
+          preferredHeightRange ? `${preferredHeightRange[0]} - ${preferredHeightRange[1]} cm` : "-"
         )}
       </PixelBox>
 
@@ -646,13 +644,13 @@ export function ProfileView({
       <View style={styles.profileSheetWrapper}>
         <PixelBox style={styles.profileSheetFrame} contentStyle={styles.profileSheetFrameContent}>
           <View style={styles.profileSheetTopBar}>
-            <PixelText testID="profile-sheet-title" variant="screenTitle" style={styles.title}>
+            <PixelText testID="profile-sheet-title" variant="screenTitle" style={styles.profileSheetTitle}>
               {profile.kind === "cupid" ? t("profile.title.cupid") : t("profile.title.cupidate")}
             </PixelText>
             <PixelButton label={t("profile.actions.close")} variant="secondary" onPress={onClose} />
           </View>
 
-          <ScrollView style={styles.panel} contentContainerStyle={styles.profileSheetScrollContent}>
+          <ScrollView style={styles.profileSheetScroll} contentContainerStyle={styles.profileSheetScrollContent}>
             {profile.kind === "cupid" ? (
               <CupidProfilePanel profile={profile} t={t} />
             ) : (
