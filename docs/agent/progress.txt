@@ -57,6 +57,9 @@ Completed Work
 - [x] Hybrid cupidate schema rollout (structured columns + flexible json hydration) (Task 2026-03-29-16)
 - [x] Core view copy cleanup + matching state wording polish (Task 2026-03-30-01)
 - [x] Cupidate readiness surfacing across Home/Network/Matching/My (Task 2026-03-30-02)
+- [x] Must-have preference weighting and cap-of-five flow (Task 2026-03-30-04)
+- [x] Cupidate profile visibility gating (`private/basic/public`) (Task 2026-03-30-05)
+- [x] Visibility surface clarification across Network/My/Profile (Task 2026-03-30-06)
 
 Next Tasks (Rebuild Track)
  - Task 2026-03-30-03: Device QA pass on Home readiness -> Network -> activation -> Matching flow

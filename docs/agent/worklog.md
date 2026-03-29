@@ -858,3 +858,62 @@ Verification:
 
 Notes:
 - This pass was aimed at POC validation clarity: users should understand why matching is empty without needing explanation from outside the app.
+
+### Task 2026-03-30-04 - Must-Have Preference Weighting
+Status: Completed
+
+Changes:
+- Added `mustHaveConditionKeys` across the matching domain, repository contracts, app-state drafts, profile overlay, and Network registration flow.
+- Added cap-of-five selection behavior:
+  - users can mark up to 5 non-negotiable conditions
+  - additional options become non-selectable once 5 are already chosen
+- Extended structured persistence with `cupidate_preferences.must_have_condition_keys`.
+- Updated score calculation so matched non-negotiables amplify the relevant scoring axis.
+- Added explainability support:
+  - `priorityMatches[]`
+  - matching feedback now calls out aligned non-negotiables
+- Applied the schema migration and refreshed the live dev seed.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand` passed (`15` suites / `43` tests).
+
+Notes:
+- This keeps the POC close to the product promise that some preferences matter more than others, while still staying explainable.
+
+### Task 2026-03-30-05 - Cupidate Profile Visibility Gating
+Status: Completed
+
+Changes:
+- Added `profileVisibility` to cupidate storage and hydration:
+  - `private`
+  - `basic`
+  - `public`
+- Added a Supabase migration for `cupidates.profile_visibility` and refreshed the seed data.
+- Updated Network registration and owner profile editing so each cupidate can set its own visibility scope.
+- Reworked the profile overlay:
+  - owner sees full management controls
+  - non-owner sees only what the chosen visibility scope permits
+- Tightened Matching card/profile surfaces so remote detail exposure respects visibility scope.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand` passed.
+
+Notes:
+- Account-level cupid discovery and per-cupidate profile visibility are now separate concepts in both data and UI.
+
+### Task 2026-03-30-06 - Visibility Surface Clarification
+Status: Completed
+
+Changes:
+- Clarified wording in My so the app-level toggle is presented as cupid account discovery, not cupidate profile visibility.
+- Added visibility and must-have summaries directly to Network cupidate roster rows.
+- Updated translation keys in English/Korean so the two privacy layers are explained consistently.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand` passed.
+
+Notes:
+- This pass focused on reducing user confusion before device QA.

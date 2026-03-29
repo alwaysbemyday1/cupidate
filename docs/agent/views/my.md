@@ -30,8 +30,10 @@ Last Updated: 2026-03-30
 - 변경 즉시 헤더/탭/Home/Auth/My 카피 갱신
 
 5) App Settings 섹션 (`PixelBox`)
-- 공개 범위 토글
+- 큐피드 계정 노출 토글
 - 알림 토글
+- 이 섹션의 공개 설정은 `cupid account discovery` 용도다
+- 각 cupidate의 소개팅 프로필 공개범위(`private/basic/public`)는 각 프로필 overlay에서 별도 관리한다
 
 6) Cupidate Readiness 섹션 (`PixelBox` 또는 StateCard`)
 - 내가 소유한 cupidate 기준으로만 집계
@@ -82,3 +84,4 @@ Mutations:
 - 영/한 언어 전환이 즉시 반영
 - 모바일 스크롤과 하단 탭바 충돌 없음
 - 내 cupidate 활성화 여부를 혼동하지 않게 표현
+- 계정 노출 설정과 cupidate 프로필 공개범위를 혼동하지 않게 표현

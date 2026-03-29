@@ -1,6 +1,6 @@
 ﻿# Cupidate Domain & Data Contract
 
-Last Updated: 2026-03-29
+Last Updated: 2026-03-30
 
 ## 1) Domain Overview
 Roles:
@@ -20,6 +20,10 @@ Core constraints:
 Profile ownership:
 - `cupid`는 여러 cupidate 프로필을 관리할 수 있다.
 - 각 cupidate는 `isActive` 상태를 가진다.
+- 각 cupidate는 소개팅 프로필 공개범위 `profileVisibility` 를 가진다:
+  - `private`: 본인(owner)만 상세 열람 가능
+  - `basic`: 비소유자는 기본 메타만 열람 가능
+  - `public`: 비소유자도 공개 소개팅 프로필/선호 요약 열람 가능
 - `isActive = true` 인 경우에만:
   - Matching 추천 대상에 포함
   - 검색 가능한 dating profile로 취급
@@ -50,6 +54,19 @@ Profile ownership:
 - relation intent: `marriageIntent`, `childrenIntent`, `datingPurpose`
 - distance: `maxDistanceKm`
 - custom conditions: `customConditions[]`
+- non-negotiables: `mustHaveConditionKeys[]`
+  - 최대 5개까지 선택 가능
+  - 선호도 입력 중 체크하면 해당 조건이 `true` 성격의 우선조건으로 승격된다
+  - 이미 5개가 선택된 상태에서는 추가 체크 불가
+  - 현재 POC 지원 키:
+    - `age_range`
+    - `preferred_gender`
+    - `preferred_regions`
+    - `preferred_job_groups`
+    - `preferred_height_range`
+    - `preferred_smoking`
+    - `preferred_drinking`
+    - `shared_hobbies`
 
 ## 3.1) Hybrid Storage Policy
 Goal:
@@ -63,6 +80,7 @@ Structured columns:
   - `height_cm`
   - `smoking_habit`
   - `drinking_habit`
+  - `profile_visibility`
 - `public.cupidate_preferences`
   - `preferred_age_min`
   - `preferred_age_max`
@@ -73,6 +91,7 @@ Structured columns:
   - `preferred_smoking`
   - `preferred_drinking`
   - `preferred_genders`
+  - `must_have_condition_keys`
 
 Flexible json payload:
 - `preferences.hobbies`
@@ -110,6 +129,12 @@ Current POC profile-preference fit inputs:
 - preferred height range
 - preferred job groups
 
+### Priority weighting
+- `mustHaveConditionKeys`는 일반 선호도보다 높은 우선순위를 가진다.
+- 선택된 우선조건이 실제 후보와 맞을 경우 해당 축의 점수에 추가 가중치를 준다.
+- 우선조건이 explainability payload에 그대로 남아야 한다.
+- 현재 UI/저장소는 `priorityMatches[]` 로 실제 매칭된 우선조건 키를 전달한다.
+
 ### Bonuses
 - verification completeness: up to +5
 - profile completeness: up to +5
@@ -119,6 +144,7 @@ Current POC profile-preference fit inputs:
 - `matchScore`
 - `breakdown` (`age`, `hobbies`, `lifestyle`, `location`, `profile`)
 - `reasonTags[]`
+- `priorityMatches[]`
 - `scoringVersion`
 - `scoredAt`
 
@@ -150,6 +176,11 @@ Location:
   - public snapshot: age / gender / region / job / height / hobbies / lifestyle
   - preference snapshot: preferred age / gender / regions / job groups / lifestyle / height
 - owner가 보는 cupidate profile에서는 활성화 토글과 핵심 프로필/선호도 수정 가능
+- visibility gating:
+  - `private`: 비소유자는 비공개 안내만 본다
+  - `basic`: 비소유자는 이름/상태/기본 메타까지만 본다
+  - `public`: 비소유자는 공개 소개팅 프로필 요약 + 공개 선호도 요약을 본다
+- Matching/Network에서 remote profile을 열었을 때 상세 사유나 취미, 선호 요약은 visibility rule을 통과한 범위 안에서만 노출한다
 
 ### Matching entity
 - `MatchingCandidate`
@@ -191,11 +222,16 @@ Matching:
 
 ## 11) Current App Surface Mapping
 - Network register view:
-  - structured profile input: region / job title / height / smoking / drinking
-  - structured preference input: age range / preferred regions / preferred job groups / preferred smoking / preferred drinking / preferred genders / preferred height
+  - structured profile input: region / job title / height / smoking / drinking / profile visibility
+  - structured preference input: age range / preferred regions / preferred job groups / preferred smoking / preferred drinking / preferred genders / preferred height / must-have conditions
+  - roster rows surface: activation state / visibility / must-have count
 - Matching view:
   - recommendation subtitles use structured public profile info (`region`, `jobTitle`)
   - profile score includes job-group preference fit
+  - priority alignment is surfaced through `priorityMatches` feedback when visibility permits
 - Profile overlay:
   - cupid profile = matchmaking stats
-  - cupidate profile = public snapshot + preference snapshot + owner-only edit controls
+  - cupidate profile = visibility-gated public snapshot + preference snapshot + owner-only edit controls
+- My view:
+  - account-level visibility toggle controls cupid account discovery only
+  - per-cupidate profile visibility is managed inside each cupidate profile

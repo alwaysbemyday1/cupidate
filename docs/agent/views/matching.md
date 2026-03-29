@@ -26,6 +26,7 @@ Last Updated: 2026-03-30
   - 매칭률
   - 현재 상태 (`Awaiting Approval`, `Reviewing`, `Contacts Shared` 등)
   - 공유 취미 또는 핵심 근거
+  - 우선조건 일치 여부(`priorityMatches`)가 있으면 별도 근거로 노출
 - 양측 미니 프로필 press 시 `Cupidate Profile View` 오픈
 - 상태별 액션:
   - `requested` -> `승인`, `거절`
@@ -62,6 +63,7 @@ Last Updated: 2026-03-30
   - preferred gender
   - preferred height range
   - preferred job groups
+- 선택된 우선조건이 실제로 맞아떨어진 경우, 인사이트 피드백은 그 조건을 상단 근거로 우선 표시한다.
 - 인사이트 헤더에 보이는 양측 프로필도 press 대상이어야 한다.
 
 6) 하단 탭바
@@ -74,6 +76,7 @@ Last Updated: 2026-03-30
 - 매칭률은 텍스트 + 차트/상태로 이중 표기
 - 근거 시각화는 숫자만이 아니라 범례와 함께 표시
 - 미니 프로필은 네트워크 화면과 같은 픽셀 아바타 규칙을 따른다
+- 단, 원격 cupidate의 visibility가 `private/basic` 이면 공개 범위 밖의 근거(상세 취미/선호/생활정보)는 숨긴다
 
 ## 4. 데이터 계약
 Queries:
@@ -104,3 +107,4 @@ Mutations:
 - 진행 상태 타임라인이 실제 데이터와 일치
 - 영/한 전환 시 Matching 전체 정적 카피가 함께 전환
 - inactive cupidate는 추천/요청 생성 경로에 나타나지 않음
+- visibility rule을 위반하는 상세 정보는 Matching에서 노출되지 않음

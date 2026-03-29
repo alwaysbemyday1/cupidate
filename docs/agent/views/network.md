@@ -54,10 +54,13 @@ Last Updated: 2026-03-30
   - age/gender/region summary
   - job title or fallback meta
   - activation badge (`Active` / `Inactive`)
+  - profile visibility label (`Private` / `Basic` / `Public`)
+  - must-have condition count
   - current match status badge
 - row press opens `Cupidate Profile View`
 - if the owner opens the profile, they can:
   - activate/deactivate the cupidate
+  - change cupidate profile visibility
   - edit core public profile fields
   - edit core matching preference fields
 
@@ -82,6 +85,9 @@ Last Updated: 2026-03-30
   - preferred height min/max
   - preferred smoking
   - preferred drinking
+  - must-have conditions (up to 5)
+- must collect cupidate profile access settings:
+  - profile visibility (`private` / `basic` / `public`)
 - structured fields should be saved into top-level columns first, not only nested json
 - flexible tags like hobbies remain json-backed
 - save CTA must still allow submission-driven validation feedback
@@ -140,9 +146,10 @@ Mutations:
 - `update_connection_status`
 
 Structured persistence contract:
-- `region`, `jobTitle`, `heightCm`, `smokingHabit`, `drinkingHabit`
+- `region`, `jobTitle`, `heightCm`, `smokingHabit`, `drinkingHabit`, `profileVisibility`
 - `preferredAgeRange`, `preferredRegions`, `preferredJobGroups`
 - `preferredSmoking`, `preferredDrinking`, `preferredGenders`, `preferredHeightRange`
+- `mustHaveConditionKeys`
 - repository hydrates those back into `preferences` for backward-safe reads
 
 ## 9. States
@@ -172,3 +179,4 @@ When locale changes, these must switch together:
 - Cupid registration/search is a clearly dedicated subview.
 - Redundant blocks are removed.
 - English and Korean both remain readable in the same layout.
+- Users can tell at a glance which cupidates are active, how visible they are, and how many non-negotiable conditions they currently use.

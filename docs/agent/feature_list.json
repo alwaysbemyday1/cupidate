@@ -54,7 +54,8 @@
         "Cupidate registration and list",
         "Connected cupid request/list/status",
         "Network scope management",
-        "Cupid/Cupidate profile detail entry"
+        "Cupid/Cupidate profile detail entry",
+        "Per-cupidate visibility and must-have preference setup"
       ],
       "spec_path": "docs/agent/views/network.md"
     },
@@ -67,7 +68,8 @@
         "Request/accept/reject flow",
         "Contact-shared completion",
         "Matching history",
-        "Active-cupidate-only candidate pool"
+        "Active-cupidate-only candidate pool",
+        "Priority-weighted explainability with visibility-safe details"
       ],
       "spec_path": "docs/agent/views/matching.md"
     },
@@ -77,7 +79,7 @@
       "description": "Profile/settings/account security controls",
       "core_features": [
         "Nickname/profile settings",
-        "Privacy and notification preferences",
+        "Cupid account discovery and notification preferences",
         "Account summary"
       ],
       "spec_path": "docs/agent/views/my.md"
@@ -123,7 +125,8 @@
         "Error/loading UX hardening",
         "Supabase auth-flow alignment",
         "Prototype-based pixel UI rebuilding",
-        "Profile overlay and cupidate activation flow"
+        "Profile overlay and cupidate activation flow",
+        "Per-cupidate visibility and priority preference flow"
       ]
     },
     {
