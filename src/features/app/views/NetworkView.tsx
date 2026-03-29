@@ -656,6 +656,16 @@ export function NetworkView({
                         <PixelText variant="caption" style={styles.networkRosterMeta}>
                           {item.jobTitle ?? item.preferences.jobTitle ?? t("network.meta.awaitingProfile")}
                         </PixelText>
+                        <PixelText variant="caption" style={styles.networkRosterMeta}>
+                          {t("network.cupidate.visibility", {
+                            value: t(`network.option.visibility.${item.profileVisibility}`)
+                          })}
+                        </PixelText>
+                        <PixelText variant="caption" style={styles.networkRosterMeta}>
+                          {t("network.cupidate.mustHaveCount", {
+                            count: item.mustHaveConditionKeys?.length ?? 0
+                          })}
+                        </PixelText>
                       </View>
                       <View style={styles.networkStatusColumn}>
                         <View

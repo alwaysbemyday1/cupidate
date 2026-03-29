@@ -210,6 +210,9 @@ export function MyView({
             trackColor={{ false: designTokens.color.switchTrack, true: designTokens.color.pink }}
           />
         </View>
+        <PixelText variant="caption" style={styles.profileMetaText}>
+          {t("my.preference.visibilityHint")}
+        </PixelText>
         <PixelText variant="body" style={styles.listMeta}>
           {t("my.fields.visibility", { value: visibilityLabel })}
         </PixelText>
