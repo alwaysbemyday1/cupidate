@@ -1,5 +1,46 @@
 # Agent Worklog
 
+## 2026-03-29
+
+### Task 2026-03-29-16 - Hybrid Cupidate Schema Rollout
+Status: Completed
+
+Changes:
+- Promoted high-signal cupidate profile/preference fields from flexible JSON into structured database columns:
+  - `cupidates.region`
+  - `cupidates.job_title`
+  - `cupidates.height_cm`
+  - `cupidates.smoking_habit`
+  - `cupidates.drinking_habit`
+  - `cupidate_preferences.preferred_age_min/max`
+  - `cupidate_preferences.preferred_height_min_cm/max`
+  - `cupidate_preferences.preferred_regions`
+  - `cupidate_preferences.preferred_job_groups`
+  - `cupidate_preferences.preferred_smoking`
+  - `cupidate_preferences.preferred_drinking`
+  - `cupidate_preferences.preferred_genders`
+- Added migration:
+  - `supabase/migrations/20260329212000_cupidate_hybrid_profile_fields.sql`
+- Updated seed data to populate structured fields while leaving flexible tags in `preferences`.
+- Added repository hydration utilities so reads still expose a backward-safe merged `preferences` object.
+- Fixed partial-update behavior so legacy nested inputs such as `preferences.location` are promoted into structured columns during updates.
+- Updated app surfaces:
+  - Network register form now saves structured job/lifestyle/preference fields
+  - Profile overlay shows structured public snapshot and preference snapshot
+  - Matching mini profiles show structured `region/jobTitle`
+  - matching profile score now includes `preferredJobGroups`
+- Rebuilt Korean override coverage for current screen-level i18n labels.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand` passed (`14` suites / `37` tests).
+
+Notes:
+- Storage policy is now hybrid by default:
+  - columns for filtering/scoring/rendering
+  - json for flexible tags and optional extensions
+  - repository hydration keeps current UI logic from fragmenting.
+
 ## 2026-03-28
 
 ### Task 2026-03-28-01 - App Modularization

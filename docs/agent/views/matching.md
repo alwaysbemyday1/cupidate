@@ -56,6 +56,10 @@ Last Updated: 2026-03-29
   - `Lifestyle`
   - `Location`
 - `Profile`
+- `Profile` 축은 현재 POC 기준으로 다음 입력을 사용한다:
+  - preferred gender
+  - preferred height range
+  - preferred job groups
 - 인사이트 헤더에 보이는 양측 프로필도 press 대상이어야 한다.
 
 6) 하단 탭바

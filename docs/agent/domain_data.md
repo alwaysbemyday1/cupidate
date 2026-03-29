@@ -46,10 +46,43 @@ Profile ownership:
 - height range: `heightMinCm`, `heightMaxCm`
 - profile pref: `preferredGenders[]`, `preferredBodyTypes[]`, `preferredStyles[]`
 - lifestyle pref: `preferredSmoking`, `preferredDrinking`, `preferredReligion`
-- social pref: `preferredOccupationalGroups[]`, `preferredMbti[]`
+- social pref: `preferredJobGroups[]`, `preferredMbti[]`
 - relation intent: `marriageIntent`, `childrenIntent`, `datingPurpose`
 - distance: `maxDistanceKm`
 - custom conditions: `customConditions[]`
+
+## 3.1) Hybrid Storage Policy
+Goal:
+- 자주 필터링/정렬/점수 계산/카드 렌더링에 직접 쓰는 필드는 relational column으로 승격한다.
+- 형태가 자주 바뀌거나 선택적인 확장 정보는 `jsonb`에 남긴다.
+
+Structured columns:
+- `public.cupidates`
+  - `region`
+  - `job_title`
+  - `height_cm`
+  - `smoking_habit`
+  - `drinking_habit`
+- `public.cupidate_preferences`
+  - `preferred_age_min`
+  - `preferred_age_max`
+  - `preferred_height_min_cm`
+  - `preferred_height_max_cm`
+  - `preferred_regions`
+  - `preferred_job_groups`
+  - `preferred_smoking`
+  - `preferred_drinking`
+  - `preferred_genders`
+
+Flexible json payload:
+- `preferences.hobbies`
+- `preferences.mbti`
+- future optional profile tags / narrative fields
+
+Repository rule:
+- repository는 structured columns + flexible json을 읽어 하나의 hydrated `preferences` view로 합친다.
+- update 시에는 top-level structured input이 우선이고, 없으면 merged preferences payload에서 승격 가능한 값을 다시 추출한다.
+- legacy payload (`preferences.location`, `preferences.jobTitle` 등)를 보내더라도 구조화 컬럼으로 흡수해야 한다.
 
 ## 4) Normalization & Validation Rules
 - 텍스트 태그: trim + lowercase + dedupe
@@ -71,6 +104,11 @@ Profile ownership:
 - hobby overlap: 15
 - social condition fit: 10
 - profile preference fit: 10
+
+Current POC profile-preference fit inputs:
+- preferred gender
+- preferred height range
+- preferred job groups
 
 ### Bonuses
 - verification completeness: up to +5
@@ -109,6 +147,8 @@ Location:
 ### Profile access rule
 - `Cupid profile`: 해당 cupid가 관리 중인 cupidate 수, active cupidate 수, 주선 수, 진행/완료 통계 노출
 - `Cupidate profile`: 공개 가능한 소개팅 프로필 요약 + 선호도 요약 노출
+  - public snapshot: age / gender / region / job / height / hobbies / lifestyle
+  - preference snapshot: preferred age / gender / regions / job groups / lifestyle / height
 - owner가 보는 cupidate profile에서는 활성화 토글과 핵심 프로필/선호도 수정 가능
 
 ### Matching entity
@@ -148,3 +188,14 @@ Matching:
 - frontend default: registration creates an inactive cupidate first
 - activation happens from the cupidate profile management view
 - Supabase trigger must reject match candidate creation if either cupidate is inactive
+
+## 11) Current App Surface Mapping
+- Network register view:
+  - structured profile input: region / job title / height / smoking / drinking
+  - structured preference input: age range / preferred regions / preferred job groups / preferred smoking / preferred drinking / preferred genders / preferred height
+- Matching view:
+  - recommendation subtitles use structured public profile info (`region`, `jobTitle`)
+  - profile score includes job-group preference fit
+- Profile overlay:
+  - cupid profile = matchmaking stats
+  - cupidate profile = public snapshot + preference snapshot + owner-only edit controls

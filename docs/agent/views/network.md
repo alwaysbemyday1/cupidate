@@ -76,10 +76,13 @@ Last Updated: 2026-03-29
 - must collect the preference fields needed for scoring:
   - preferred age min/max
   - preferred regions
+  - preferred job groups
   - preferred gender
   - preferred height min/max
   - preferred smoking
   - preferred drinking
+- structured fields should be saved into top-level columns first, not only nested json
+- flexible tags like hobbies remain json-backed
 - save CTA must still allow submission-driven validation feedback
 - save CTA should be disabled only while the mutation is actively running
 - newly created cupidates should default to `inactive`
@@ -131,6 +134,12 @@ Mutations:
 - `update_cupidate`
 - `request_cupid_connection`
 - `update_connection_status`
+
+Structured persistence contract:
+- `region`, `jobTitle`, `heightCm`, `smokingHabit`, `drinkingHabit`
+- `preferredAgeRange`, `preferredRegions`, `preferredJobGroups`
+- `preferredSmoking`, `preferredDrinking`, `preferredGenders`, `preferredHeightRange`
+- repository hydrates those back into `preferences` for backward-safe reads
 
 ## 9. States
 - Loading:
