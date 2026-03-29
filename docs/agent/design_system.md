@@ -136,7 +136,8 @@ Last Updated: 2026-03-29
   - `My`
   - `Home`
   - `Auth`
-- `Network`, `Matching`의 정적 카피는 후속 리빌드 단계에서 같은 체계로 확장한다.
+- `Network`는 리빌드 완료 기준으로 같은 체계에 포함한다.
+- `Matching`의 정적 카피는 후속 리빌드 단계에서 같은 체계로 확장한다.
 
 ### 8.2 Implementation Policy
 - 번역은 key 기반으로 관리한다.
@@ -170,8 +171,10 @@ Last Updated: 2026-03-29
 - 요약은 숫자 인지가 빠르게 보여야 한다
 
 ### Network
-- 리스트보다 관계 구조와 상태 인지성이 우선
-- 상태는 색 + 텍스트 + 배지 조합
+- 상단은 `MASTER CUPID + Network Board + Match Proposal + Legend` 구조가 먼저 보인다
+- 하단은 `My Cupidates / Connected Cupids` 세그먼트 아래에서 관리 액션이 이어진다
+- 리스트보다 관계 구조와 상태 인지성이 우선이다
+- 상태는 색 + 텍스트 + 배지 조합으로 표현한다
 
 ### Matching
 - 승인/거절/진행 단계가 최상단에서 먼저 보이도록

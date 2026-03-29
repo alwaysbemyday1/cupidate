@@ -2,7 +2,7 @@
 Last Updated: 2026-03-29
 
 Current Track: Service Build (Post-POC)
-Current Phase: S3 Pixel UI Rebuild (D4 Network / Matching Rebuild Prep)
+Current Phase: S3 Pixel UI Rebuild (D5 Matching Rebuild Prep)
 Overall Status: in_progress
 
 Architecture Decision
@@ -47,11 +47,12 @@ Completed Work
 - [x] My View vertical slice rebuild + auth/session metadata wiring (Task 2026-03-29-03)
 - [x] Global i18n scaffold + My language switching (Task 2026-03-29-04)
 - [x] Safe-area modernization + Home/Auth rebuild (Task 2026-03-29-05)
+- [x] Network view prototype rebuild + i18n expansion (Task 2026-03-29-06)
 
 Next Tasks (Rebuild Track)
- - Task 2026-03-29-06: Network view prototype rebuild + i18n expansion
  - Task 2026-03-29-07: Matching view prototype rebuild + score insight redesign
  - Task 2026-03-29-08: Locale persistence + My preference persistence expansion
+ - Task 2026-03-29-09: Network action hardening (edit/block/unblock flows)
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:

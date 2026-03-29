@@ -392,6 +392,256 @@ export const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: s.xs
   },
+  networkHeroRow: {
+    gap: s.sm
+  },
+  networkHeroRowWide: {
+    flexDirection: "row",
+    alignItems: "flex-start"
+  },
+  networkBoardCard: {
+    flex: 1
+  },
+  networkBoardContent: {
+    backgroundColor: c.surface,
+    padding: s.sm,
+    gap: s.sm
+  },
+  networkBoardHeader: {
+    gap: s.xxs
+  },
+  networkBoardCaption: {
+    color: c.inkMuted
+  },
+  networkBoardCanvas: {
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surfaceRaised,
+    padding: s.sm,
+    gap: s.sm
+  },
+  networkMasterBlock: {
+    alignItems: "center",
+    gap: s.xs
+  },
+  networkMasterLabel: {
+    color: c.blueDark
+  },
+  networkMasterCard: {
+    width: "100%",
+    maxWidth: 220
+  },
+  networkMasterCardContent: {
+    backgroundColor: c.surfaceRaised,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: s.sm,
+    padding: s.sm
+  },
+  networkMasterInfo: {
+    flex: 1,
+    gap: 2
+  },
+  networkMasterName: {
+    color: c.ink
+  },
+  networkConnectorVertical: {
+    width: 2,
+    height: 14,
+    alignSelf: "center",
+    backgroundColor: c.inputBorder
+  },
+  networkConnectorHorizontal: {
+    height: 2,
+    backgroundColor: c.inputBorder,
+    marginHorizontal: s.lg
+  },
+  networkFeaturedRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: s.xs
+  },
+  networkFeaturedNode: {
+    width: "48%"
+  },
+  networkNodeContent: {
+    backgroundColor: c.surface,
+    minHeight: 116,
+    padding: s.xs,
+    gap: s.xs
+  },
+  networkNodeHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: s.xs
+  },
+  networkNodeAvatar: {
+    width: 42,
+    height: 42,
+    borderWidth: b.normal,
+    borderColor: c.border,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  networkMiniAvatar: {
+    width: 26,
+    height: 26,
+    borderWidth: b.normal,
+    borderColor: c.border,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  networkAvatarMaster: {
+    backgroundColor: c.gold
+  },
+  networkAvatarCupidate: {
+    backgroundColor: "#E7B7C6"
+  },
+  networkAvatarCupid: {
+    backgroundColor: "#A9C0DE"
+  },
+  networkAvatarText: {
+    color: c.ink
+  },
+  networkNodeName: {
+    color: c.ink
+  },
+  networkNodeMeta: {
+    color: c.inkMuted
+  },
+  networkNodeBadge: {
+    minWidth: 38,
+    borderWidth: b.normal,
+    borderColor: c.border,
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    alignItems: "center"
+  },
+  networkNodeBadgeMatched: {
+    backgroundColor: c.success
+  },
+  networkNodeBadgeWait: {
+    backgroundColor: c.warning
+  },
+  networkNodeBadgeReject: {
+    backgroundColor: c.danger
+  },
+  networkNodeBadgeText: {
+    color: c.inkInverse
+  },
+  networkMiniGrid: {
+    gap: s.xs
+  },
+  networkMiniRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: s.xs
+  },
+  networkMiniNode: {
+    flex: 1
+  },
+  networkMiniNodeContent: {
+    backgroundColor: c.surfaceAlt,
+    minHeight: 78,
+    padding: s.xs,
+    gap: s.xs,
+    alignItems: "center"
+  },
+  networkSideStack: {
+    gap: s.sm
+  },
+  networkSideStackWide: {
+    width: 144
+  },
+  networkInfoCard: {
+    flexGrow: 1
+  },
+  networkInfoCardContent: {
+    backgroundColor: c.surface,
+    padding: s.sm,
+    gap: s.xs
+  },
+  networkStatItem: {
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surfaceAlt,
+    paddingHorizontal: s.sm,
+    paddingVertical: s.xs,
+    gap: 2
+  },
+  networkLegendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: s.xs
+  },
+  networkLegendSwatch: {
+    width: 18,
+    height: 18,
+    borderWidth: b.normal,
+    borderColor: c.border
+  },
+  networkSegmentRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: s.xs
+  },
+  networkRosterCard: {},
+  networkRosterContent: {
+    backgroundColor: c.surface,
+    padding: s.sm,
+    gap: s.xs
+  },
+  networkRosterItem: {
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surfaceAlt,
+    padding: s.sm
+  },
+  networkRosterItemHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: s.sm
+  },
+  networkRosterMain: {
+    flex: 1,
+    gap: 2
+  },
+  networkRosterMeta: {
+    color: c.inkMuted
+  },
+  networkStatusChip: {
+    borderWidth: b.normal,
+    borderColor: c.border,
+    paddingHorizontal: s.xs,
+    paddingVertical: 6
+  },
+  networkStatusNeutral: {
+    backgroundColor: c.blueDark
+  },
+  networkStatusMatched: {
+    backgroundColor: c.success
+  },
+  networkStatusPending: {
+    backgroundColor: c.warning
+  },
+  networkStatusBlocked: {
+    backgroundColor: c.danger
+  },
+  networkStatusText: {
+    color: c.inkInverse
+  },
+  networkFormCard: {},
+  networkFormContent: {
+    backgroundColor: c.surface,
+    padding: s.md,
+    gap: s.sm
+  },
+  networkSearchResults: {
+    gap: s.xs
+  },
 
   settingRow: {
     flexDirection: "row",

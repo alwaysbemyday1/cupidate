@@ -126,6 +126,9 @@ function CupidateAppShell() {
               onChangeNetworkSegment={state.setNetworkSegment}
               cupidates={state.cupidates}
               connections={state.connections}
+              requests={state.requests}
+              recommendationCount={state.recommendations.length}
+              masterCupidName={state.myNickname}
               ownerType={state.ownerType}
               onChangeOwnerType={state.setOwnerType}
               displayName={state.displayName}

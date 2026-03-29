@@ -36,7 +36,7 @@ function validateForm(displayName: string, birthYearInput: string, gender: strin
   const parsedBirthYear = birthYearInput ? Number(birthYearInput) : null;
 
   if (!displayName.trim()) {
-    errors.displayName = "Name is required.";
+    errors.displayName = "network.validation.nameRequired";
   }
 
   if (
@@ -46,11 +46,11 @@ function validateForm(displayName: string, birthYearInput: string, gender: strin
       parsedBirthYear < 1900 ||
       parsedBirthYear > currentYear)
   ) {
-    errors.birthYear = `Birth year must be in range 1900-${currentYear}.`;
+    errors.birthYear = "network.validation.birthYear";
   }
 
   if (!gender) {
-    errors.gender = "Gender is required.";
+    errors.gender = "network.validation.genderRequired";
   }
 
   return errors;
@@ -403,17 +403,17 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
 
     const preferredAgeRange = parseClampedRange(preferredAgeMinInput, preferredAgeMaxInput, 19, 100);
     if (!preferredAgeRange) {
-      formErrors.preferredAgeRange = "Preferred age range must be within 19-100.";
+      formErrors.preferredAgeRange = "network.validation.preferredAgeRange";
     }
 
     const parsedHeight = parseOptionalNumber(heightInput);
     if (heightInput.trim() && (parsedHeight === undefined || parsedHeight < 120 || parsedHeight > 230)) {
-      formErrors.height = "Height must be within 120-230 cm.";
+      formErrors.height = "network.validation.heightRange";
     }
 
     const preferredHeightRange = parseClampedRange(preferredHeightMinInput, preferredHeightMaxInput, 120, 230);
     if ((preferredHeightMinInput.trim() || preferredHeightMaxInput.trim()) && !preferredHeightRange) {
-      formErrors.preferredHeightRange = "Preferred height range must be within 120-230 cm.";
+      formErrors.preferredHeightRange = "network.validation.preferredHeightRange";
     }
 
     setErrors(formErrors);

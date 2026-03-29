@@ -1,10 +1,18 @@
-import { ScrollView, TextInput, View } from "react-native";
+import { useMemo } from "react";
+import { ScrollView, TextInput, View, useWindowDimensions } from "react-native";
 
+import { useI18n } from "../../i18n/context";
 import { PixelBox } from "../components/PixelBox";
 import { PixelButton } from "../components/PixelButton";
 import { PixelText } from "../components/PixelText";
 import { StateCard } from "../components/StateCard";
-import type { CupidConnection, CupidateRecord, NetworkSegment, ValidationErrors } from "../model/types";
+import type {
+  CupidConnection,
+  CupidateRecord,
+  MatchRequest,
+  NetworkSegment,
+  ValidationErrors
+} from "../model/types";
 import { styles } from "../styles";
 import { designTokens } from "../theme/tokens";
 
@@ -18,6 +26,9 @@ type NetworkViewProps = {
   onChangeNetworkSegment: (segment: NetworkSegment) => void;
   cupidates: CupidateRecord[];
   connections: CupidConnection[];
+  requests: MatchRequest[];
+  recommendationCount: number;
+  masterCupidName: string;
   ownerType: "mine" | "connected";
   onChangeOwnerType: (ownerType: "mine" | "connected") => void;
   displayName: string;
@@ -73,13 +84,120 @@ type NetworkViewProps = {
   onRetryNetworkError?: () => void | Promise<void>;
 };
 
+type BoardTone = "matched" | "wait" | "reject" | "neutral";
+type BoardNodeRole = "master" | "cupidate" | "cupid";
+
+type BoardNode = {
+  id: string;
+  name: string;
+  subtitle: string;
+  tone: BoardTone;
+  role: BoardNodeRole;
+};
+
 const placeholderTextColor = designTokens.color.inkMuted;
+
+function buildAvatarSeed(label: string) {
+  const trimmed = label.trim();
+
+  if (!trimmed) {
+    return "CU";
+  }
+
+  return Array.from(trimmed.replace(/\s+/g, "")).slice(0, 2).join("").toUpperCase();
+}
+
+function chunkItems<T>(items: T[], size: number) {
+  const rows: T[][] = [];
+
+  for (let index = 0; index < items.length; index += size) {
+    rows.push(items.slice(index, index + size));
+  }
+
+  return rows;
+}
+
+function resolveCupidateTone(cupidateId: string, requests: MatchRequest[]): BoardTone {
+  const related = requests.filter(
+    (request) => request.sourceCupidateId === cupidateId || request.targetCupidateId === cupidateId
+  );
+
+  if (related.some((request) => request.status === "completed" || request.status === "accepted")) {
+    return "matched";
+  }
+
+  if (related.some((request) => request.status === "requested")) {
+    return "wait";
+  }
+
+  if (related.some((request) => request.status === "rejected")) {
+    return "reject";
+  }
+
+  return "neutral";
+}
+
+function resolveConnectionTone(status: CupidConnection["status"]): BoardTone {
+  if (status === "connected") {
+    return "matched";
+  }
+
+  if (status === "pending") {
+    return "wait";
+  }
+
+  if (status === "blocked") {
+    return "reject";
+  }
+
+  return "neutral";
+}
+
+function boardBadgeKey(tone: Exclude<BoardTone, "neutral">) {
+  return `network.badge.${tone}`;
+}
+
+function boardLegendKey(tone: Exclude<BoardTone, "neutral">) {
+  return `network.legend.${tone}`;
+}
+
+function connectionStatusKey(status: CupidConnection["status"]) {
+  return `network.connection.status.${status}`;
+}
+
+function cupidateStatusKey(tone: BoardTone) {
+  return `network.cupidate.status.${tone}`;
+}
+
+function genderKey(gender: string) {
+  switch (gender) {
+    case "male":
+      return "network.option.gender.male";
+    case "female":
+      return "network.option.gender.female";
+    case "other":
+      return "network.option.gender.other";
+    default:
+      return "network.option.unspecified";
+  }
+}
+
+function ageLabel(birthYear: number | null | undefined) {
+  if (!birthYear) {
+    return "--";
+  }
+
+  return String(new Date().getFullYear() - birthYear);
+}
 
 export function NetworkView({
   networkSegment,
   onChangeNetworkSegment,
   cupidates,
   connections,
+  requests,
+  recommendationCount,
+  masterCupidName,
   ownerType,
   onChangeOwnerType,
   displayName,
@@ -134,411 +252,808 @@ export function NetworkView({
   networkError,
   onRetryNetworkError
 }: NetworkViewProps) {
+  const { t } = useI18n();
+  const { width } = useWindowDimensions();
+  const isWideHero = width >= 410;
+  const boardColumns = width < 360 ? 3 : 4;
+
+  const myCupidates = useMemo(
+    () => cupidates.filter((item) => item.ownerCupidId === currentCupidId),
+    [cupidates, currentCupidId]
+  );
+
+  const cupidateNodes = useMemo<BoardNode[]>(
+    () =>
+      myCupidates.map((item) => ({
+        id: item.cupidateId,
+        name: item.displayName,
+        subtitle: `${ageLabel(item.birthYear)} · ${item.preferences.location ?? item.preferences.region ?? "--"}`,
+        tone: resolveCupidateTone(item.cupidateId, requests),
+        role: "cupidate"
+      })),
+    [myCupidates, requests]
+  );
+
+  const connectionNodes = useMemo<BoardNode[]>(
+    () =>
+      connections.map((item) => ({
+        id: item.cupidId,
+        name: item.name,
+        subtitle: item.region === "-" ? t("network.meta.cupid") : item.region,
+        tone: resolveConnectionTone(item.status),
+        role: "cupid"
+      })),
+    [connections, t]
+  );
+
+  const featuredNodes = useMemo(
+    () => [...cupidateNodes.slice(0, 2), ...connectionNodes.slice(0, 2)].slice(0, 4),
+    [connectionNodes, cupidateNodes]
+  );
+
+  const remainingNodes = useMemo(
+    () => [...cupidateNodes.slice(2), ...connectionNodes.slice(2)],
+    [connectionNodes, cupidateNodes]
+  );
+
+  const remainingRows = useMemo(() => chunkItems(remainingNodes, boardColumns), [boardColumns, remainingNodes]);
+
+  const connectedCount = connections.filter((item) => item.status === "connected").length;
+  const successfulCount = requests.filter((item) => item.status === "completed").length;
+  const activeCount = requests.filter((item) => item.status === "requested" || item.status === "accepted").length;
+  const showSearchEmptyState =
+    networkSegment === "cupids" &&
+    connectionSearchQuery.trim().length > 0 &&
+    !isSearchingCupids &&
+    connectionSearchResults.length === 0;
+
+  function boardBadgeStyle(tone: Exclude<BoardTone, "neutral">) {
+    if (tone === "matched") {
+      return styles.networkNodeBadgeMatched;
+    }
+
+    if (tone === "wait") {
+      return styles.networkNodeBadgeWait;
+    }
+
+    return styles.networkNodeBadgeReject;
+  }
+
+  function avatarToneStyle(role: BoardNodeRole) {
+    if (role === "master") {
+      return styles.networkAvatarMaster;
+    }
+
+    if (role === "cupid") {
+      return styles.networkAvatarCupid;
+    }
+
+    return styles.networkAvatarCupidate;
+  }
+
+  function rosterStatusStyle(tone: BoardTone) {
+    if (tone === "matched") {
+      return styles.networkStatusMatched;
+    }
+
+    if (tone === "wait") {
+      return styles.networkStatusPending;
+    }
+
+    if (tone === "reject") {
+      return styles.networkStatusBlocked;
+    }
+
+    return styles.networkStatusNeutral;
+  }
+
+  function renderBoardNode(node: BoardNode, compact = false) {
+    return (
+      <PixelBox
+        key={node.id}
+        style={compact ? styles.networkMiniNode : styles.networkFeaturedNode}
+        contentStyle={compact ? styles.networkMiniNodeContent : styles.networkNodeContent}
+        backgroundColor={compact ? designTokens.color.surfaceAlt : designTokens.color.surface}
+      >
+        <View style={styles.networkNodeHeader}>
+          <View style={[compact ? styles.networkMiniAvatar : styles.networkNodeAvatar, avatarToneStyle(node.role)]}>
+            <PixelText variant={compact ? "label" : "body"} style={styles.networkAvatarText}>
+              {buildAvatarSeed(node.name)}
+            </PixelText>
+          </View>
+          {node.tone !== "neutral" ? (
+            <View style={[styles.networkNodeBadge, boardBadgeStyle(node.tone)]}>
+              <PixelText variant="caption" style={styles.networkNodeBadgeText}>
+                {t(boardBadgeKey(node.tone))}
+              </PixelText>
+            </View>
+          ) : null}
+        </View>
+        <PixelText variant={compact ? "caption" : "body"} style={styles.networkNodeName} numberOfLines={1}>
+          {node.name}
+        </PixelText>
+        {!compact ? (
+          <PixelText variant="caption" style={styles.networkNodeMeta} numberOfLines={1}>
+            {node.subtitle}
+          </PixelText>
+        ) : null}
+      </PixelBox>
+    );
+  }
+
   return (
     <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
       {isNetworkLoading ? (
-        <StateCard tone="loading" title="SYNCING NETWORK ROSTER" description="Loading cupidates and connection map." />
+        <StateCard tone="loading" title={t("network.loading.title")} description={t("network.loading.description")} />
       ) : null}
       {networkError ? (
         <StateCard
           tone="error"
-          title="NETWORK SYNC ERROR"
+          title={t("network.error.title")}
           description={networkError}
-          actionLabel="Retry Network Sync"
+          actionLabel={t("network.error.retry")}
           actionVariant="warning"
           onAction={onRetryNetworkError}
         />
       ) : null}
 
-      <View style={styles.buttonRow}>
+      <View style={[styles.networkHeroRow, isWideHero ? styles.networkHeroRowWide : null]}>
+        <PixelBox style={styles.networkBoardCard} contentStyle={styles.networkBoardContent}>
+          <View style={styles.networkBoardHeader}>
+            <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+              {t("network.sections.board")}
+            </PixelText>
+            <PixelText variant="caption" style={styles.networkBoardCaption}>
+              {t("network.board.caption")}
+            </PixelText>
+          </View>
+
+          <View style={styles.networkBoardCanvas}>
+            <View style={styles.networkMasterBlock}>
+              <PixelText variant="label" style={styles.networkMasterLabel}>
+                {t("network.master.title")}
+              </PixelText>
+              <PixelBox
+                style={styles.networkMasterCard}
+                contentStyle={styles.networkMasterCardContent}
+                backgroundColor={designTokens.color.surfaceRaised}
+              >
+                <View style={[styles.networkNodeAvatar, styles.networkAvatarMaster]}>
+                  <PixelText variant="body" style={styles.networkAvatarText}>
+                    {buildAvatarSeed(masterCupidName || currentCupidId)}
+                  </PixelText>
+                </View>
+                <View style={styles.networkMasterInfo}>
+                  <PixelText variant="body" style={styles.networkMasterName}>
+                    {(masterCupidName || currentCupidId).toUpperCase()}
+                  </PixelText>
+                  <PixelText variant="caption" style={styles.networkNodeMeta}>
+                    {t("network.master.subtitle")}
+                  </PixelText>
+                </View>
+              </PixelBox>
+            </View>
+
+            {featuredNodes.length === 0 && remainingNodes.length === 0 ? (
+              <StateCard
+                tone="empty"
+                title={t("network.empty.boardTitle")}
+                description={t("network.empty.boardDescription")}
+              />
+            ) : (
+              <>
+                <View style={styles.networkConnectorVertical} />
+                <View style={styles.networkConnectorHorizontal} />
+                <View style={styles.networkFeaturedRow}>{featuredNodes.map((node) => renderBoardNode(node))}</View>
+
+                {remainingRows.length > 0 ? (
+                  <>
+                    <View style={styles.networkConnectorVertical} />
+                    <View style={styles.networkMiniGrid}>
+                      {remainingRows.map((row, rowIndex) => (
+                        <View key={`row-${rowIndex}`} style={styles.networkMiniRow}>
+                          {row.map((node) => renderBoardNode(node, true))}
+                        </View>
+                      ))}
+                    </View>
+                  </>
+                ) : null}
+              </>
+            )}
+          </View>
+        </PixelBox>
+
+        <View style={[styles.networkSideStack, isWideHero ? styles.networkSideStackWide : null]}>
+          <PixelBox style={styles.networkInfoCard} contentStyle={styles.networkInfoCardContent}>
+            <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+              {t("network.sections.stats")}
+            </PixelText>
+            <View style={styles.networkStatItem}>
+              <PixelText variant="body" style={styles.metricValue}>
+                {recommendationCount}
+              </PixelText>
+              <PixelText variant="caption" style={styles.metricLabel}>
+                {t("network.metrics.proposals")}
+              </PixelText>
+            </View>
+            <View style={styles.networkStatItem}>
+              <PixelText variant="body" style={styles.metricValue}>
+                {connectedCount}
+              </PixelText>
+              <PixelText variant="caption" style={styles.metricLabel}>
+                {t("network.metrics.connected")}
+              </PixelText>
+            </View>
+            <View style={styles.networkStatItem}>
+              <PixelText variant="body" style={styles.metricValue}>
+                {successfulCount}
+              </PixelText>
+              <PixelText variant="caption" style={styles.metricLabel}>
+                {t("network.metrics.success")}
+              </PixelText>
+            </View>
+            <View style={styles.networkStatItem}>
+              <PixelText variant="body" style={styles.metricValue}>
+                {activeCount}
+              </PixelText>
+              <PixelText variant="caption" style={styles.metricLabel}>
+                {t("network.metrics.active")}
+              </PixelText>
+            </View>
+          </PixelBox>
+
+          <PixelBox style={styles.networkInfoCard} contentStyle={styles.networkInfoCardContent}>
+            <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+              {t("network.sections.legend")}
+            </PixelText>
+            {(["matched", "wait", "reject"] as const).map((tone) => (
+              <View key={tone} style={styles.networkLegendItem}>
+                <View style={[styles.networkLegendSwatch, boardBadgeStyle(tone)]} />
+                <PixelText variant="body" style={styles.textBody}>
+                  {t(boardLegendKey(tone))}
+                </PixelText>
+              </View>
+            ))}
+          </PixelBox>
+        </View>
+      </View>
+
+      <View style={styles.networkSegmentRow}>
         <PixelButton
-          label={`My Cupidates (${cupidates.length})`}
+          label={t("network.segment.cupidates", { count: myCupidates.length })}
           variant="primary"
           active={networkSegment === "cupidates"}
+          testID="network-segment-cupidates"
           onPress={() => onChangeNetworkSegment("cupidates")}
         />
         <PixelButton
-          label={`Connected Cupids (${connections.length})`}
+          label={t("network.segment.cupids", { count: connections.length })}
           variant="secondary"
           active={networkSegment === "cupids"}
+          testID="network-segment-cupids"
           onPress={() => onChangeNetworkSegment("cupids")}
         />
       </View>
 
       {networkSegment === "cupidates" ? (
         <>
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Owner Type
+          <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+            {t("network.sections.roster")}
           </PixelText>
-          <View style={styles.buttonRow}>
-            <PixelButton label="My Cupidate" active={ownerType === "mine"} onPress={() => onChangeOwnerType("mine")} />
-            <PixelButton
-              label="Connected Cupidate"
-              variant="secondary"
-              active={ownerType === "connected"}
-              onPress={() => onChangeOwnerType("connected")}
+          {myCupidates.length === 0 ? (
+            <StateCard
+              tone="empty"
+              title={t("network.empty.cupidatesTitle")}
+              description={t("network.empty.cupidatesDescription")}
             />
-          </View>
+          ) : (
+            <PixelBox style={styles.networkRosterCard} contentStyle={styles.networkRosterContent}>
+              {myCupidates.map((item) => {
+                const tone = resolveCupidateTone(item.cupidateId, requests);
 
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Name
-          </PixelText>
-          <TextInput
-            value={displayName}
-            onChangeText={onChangeDisplayName}
-            placeholder="e.g. Mina"
-            placeholderTextColor={placeholderTextColor}
-            style={styles.input}
-          />
-          {!!errors.displayName && (
-            <PixelText variant="body" style={styles.errorText}>
-              {errors.displayName}
-            </PixelText>
+                return (
+                  <View key={item.cupidateId} style={styles.networkRosterItem}>
+                    <View style={styles.networkRosterItemHeader}>
+                      <View style={styles.networkRosterMain}>
+                        <PixelText variant="body" style={styles.listName}>
+                          {item.displayName}
+                        </PixelText>
+                        <PixelText variant="caption" style={styles.networkRosterMeta}>
+                          {`${t(genderKey(item.gender))} · ${ageLabel(item.birthYear)} · ${
+                            item.preferences.location ?? item.preferences.region ?? "--"
+                          }`}
+                        </PixelText>
+                        <PixelText variant="caption" style={styles.networkRosterMeta}>
+                          {item.preferences.jobTitle ?? t("network.meta.awaitingProfile")}
+                        </PixelText>
+                      </View>
+                      <View style={[styles.networkStatusChip, rosterStatusStyle(tone)]}>
+                        <PixelText variant="caption" style={styles.networkStatusText}>
+                          {t(cupidateStatusKey(tone))}
+                        </PixelText>
+                      </View>
+                    </View>
+                  </View>
+                );
+              })}
+            </PixelBox>
           )}
-
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Birth Year
-          </PixelText>
-          <TextInput
-            value={birthYearInput}
-            onChangeText={onChangeBirthYearInput}
-            keyboardType="numeric"
-            placeholder="e.g. 1998"
-            placeholderTextColor={placeholderTextColor}
-            style={styles.input}
-          />
-          {!!errors.birthYear && (
-            <PixelText variant="body" style={styles.errorText}>
-              {errors.birthYear}
-            </PixelText>
-          )}
-
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Gender
-          </PixelText>
-          <View style={styles.buttonRow}>
-            <PixelButton label="Male" active={gender === "male"} onPress={() => onChangeGender("male")} />
-            <PixelButton label="Female" active={gender === "female"} onPress={() => onChangeGender("female")} />
-            <PixelButton label="Other" active={gender === "other"} onPress={() => onChangeGender("other")} />
-          </View>
-          {!!errors.gender && (
-            <PixelText variant="body" style={styles.errorText}>
-              {errors.gender}
-            </PixelText>
-          )}
-
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Region
-          </PixelText>
-          <TextInput
-            value={locationInput}
-            onChangeText={onChangeLocationInput}
-            placeholder="e.g. seoul"
-            placeholderTextColor={placeholderTextColor}
-            style={styles.input}
-          />
-
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Job Title
-          </PixelText>
-          <TextInput
-            value={jobTitleInput}
-            onChangeText={onChangeJobTitleInput}
-            placeholder="e.g. Product Designer"
-            placeholderTextColor={placeholderTextColor}
-            style={styles.input}
-          />
-
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Height (cm)
-          </PixelText>
-          <TextInput
-            value={heightInput}
-            onChangeText={onChangeHeightInput}
-            keyboardType="numeric"
-            placeholder="e.g. 168"
-            placeholderTextColor={placeholderTextColor}
-            style={styles.input}
-          />
-          {!!errors.height && (
-            <PixelText variant="body" style={styles.errorText}>
-              {errors.height}
-            </PixelText>
-          )}
-
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Smoking Habit
-          </PixelText>
-          <View style={styles.buttonRow}>
-            <PixelButton label="None" active={smokingHabit === "none"} onPress={() => onChangeSmokingHabit("none")} />
-            <PixelButton
-              label="Sometimes"
-              active={smokingHabit === "sometimes"}
-              onPress={() => onChangeSmokingHabit("sometimes")}
-            />
-            <PixelButton label="Often" active={smokingHabit === "often"} onPress={() => onChangeSmokingHabit("often")} />
-          </View>
-
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Drinking Habit
-          </PixelText>
-          <View style={styles.buttonRow}>
-            <PixelButton label="Never" active={drinkingHabit === "never"} onPress={() => onChangeDrinkingHabit("never")} />
-            <PixelButton label="Social" active={drinkingHabit === "social"} onPress={() => onChangeDrinkingHabit("social")} />
-            <PixelButton label="Often" active={drinkingHabit === "often"} onPress={() => onChangeDrinkingHabit("often")} />
-          </View>
-
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Hobbies (comma separated)
-          </PixelText>
-          <TextInput
-            value={hobbiesInput}
-            onChangeText={onChangeHobbiesInput}
-            placeholder="hiking,music,coffee"
-            placeholderTextColor={placeholderTextColor}
-            style={styles.input}
-          />
-
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Preferred Age Range
-          </PixelText>
-          <View style={styles.buttonRow}>
-            <TextInput
-              value={preferredAgeMinInput}
-              onChangeText={onChangePreferredAgeMinInput}
-              keyboardType="numeric"
-              placeholder="min"
-              placeholderTextColor={placeholderTextColor}
-              style={[styles.input, styles.halfInput]}
-            />
-            <TextInput
-              value={preferredAgeMaxInput}
-              onChangeText={onChangePreferredAgeMaxInput}
-              keyboardType="numeric"
-              placeholder="max"
-              placeholderTextColor={placeholderTextColor}
-              style={[styles.input, styles.halfInput]}
-            />
-          </View>
-          {!!errors.preferredAgeRange && (
-            <PixelText variant="body" style={styles.errorText}>
-              {errors.preferredAgeRange}
-            </PixelText>
-          )}
-
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Preferred Regions (comma separated)
-          </PixelText>
-          <TextInput
-            value={preferredRegionsInput}
-            onChangeText={onChangePreferredRegionsInput}
-            placeholder="seoul,busan"
-            placeholderTextColor={placeholderTextColor}
-            style={styles.input}
-          />
-
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Preferred Smoking
-          </PixelText>
-          <View style={styles.buttonRow}>
-            <PixelButton
-              label="Non-smoker"
-              active={preferredSmoking === "none_only"}
-              onPress={() => onChangePreferredSmoking("none_only")}
-            />
-            <PixelButton label="OK" active={preferredSmoking === "ok"} onPress={() => onChangePreferredSmoking("ok")} />
-            <PixelButton label="Any" active={preferredSmoking === "any"} onPress={() => onChangePreferredSmoking("any")} />
-          </View>
-
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Preferred Drinking
-          </PixelText>
-          <View style={styles.buttonRow}>
-            <PixelButton
-              label="Never"
-              active={preferredDrinking === "never"}
-              onPress={() => onChangePreferredDrinking("never")}
-            />
-            <PixelButton
-              label="Social"
-              active={preferredDrinking === "social"}
-              onPress={() => onChangePreferredDrinking("social")}
-            />
-            <PixelButton
-              label="Often"
-              active={preferredDrinking === "often"}
-              onPress={() => onChangePreferredDrinking("often")}
-            />
-            <PixelButton label="Any" active={preferredDrinking === "any"} onPress={() => onChangePreferredDrinking("any")} />
-          </View>
-
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Preferred Gender
-          </PixelText>
-          <View style={styles.buttonRow}>
-            <PixelButton label="Any" active={preferredGender === "any"} onPress={() => onChangePreferredGender("any")} />
-            <PixelButton label="Male" active={preferredGender === "male"} onPress={() => onChangePreferredGender("male")} />
-            <PixelButton
-              label="Female"
-              active={preferredGender === "female"}
-              onPress={() => onChangePreferredGender("female")}
-            />
-            <PixelButton label="Other" active={preferredGender === "other"} onPress={() => onChangePreferredGender("other")} />
-          </View>
-
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Preferred Height Range (optional)
-          </PixelText>
-          <View style={styles.buttonRow}>
-            <TextInput
-              value={preferredHeightMinInput}
-              onChangeText={onChangePreferredHeightMinInput}
-              keyboardType="numeric"
-              placeholder="min cm"
-              placeholderTextColor={placeholderTextColor}
-              style={[styles.input, styles.halfInput]}
-            />
-            <TextInput
-              value={preferredHeightMaxInput}
-              onChangeText={onChangePreferredHeightMaxInput}
-              keyboardType="numeric"
-              placeholder="max cm"
-              placeholderTextColor={placeholderTextColor}
-              style={[styles.input, styles.halfInput]}
-            />
-          </View>
-          {!!errors.preferredHeightRange && (
-            <PixelText variant="body" style={styles.errorText}>
-              {errors.preferredHeightRange}
-            </PixelText>
-          )}
-
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Bio
-          </PixelText>
-          <TextInput
-            value={bio}
-            onChangeText={onChangeBio}
-            multiline
-            numberOfLines={3}
-            placeholder="A short profile summary"
-            placeholderTextColor={placeholderTextColor}
-            style={[styles.input, styles.multilineInput]}
-          />
-
-          <PixelButton
-            label={isMutatingNetwork ? "Saving..." : "Save Cupidate"}
-            variant={canSubmit ? "primary" : "warning"}
-            onPress={onSaveCupidate}
-            active={canSubmit}
-          />
 
           <PixelText variant="sectionTitle" style={styles.sectionTitle}>
-            Cupidate List
+            {t("network.sections.register")}
           </PixelText>
-          {cupidates.length === 0 ? (
-            <StateCard tone="empty" title="NO CUPIDATES YET" description="Register your first cupidate profile." />
-          ) : (
-            cupidates.map((item) => (
-              <PixelBox key={item.cupidateId} style={styles.listCard} contentStyle={styles.listCardContent}>
-                <PixelText variant="sectionTitle" style={styles.listName}>
-                  {`${item.displayName} (${item.gender})`}
+          <PixelBox style={styles.networkFormCard} contentStyle={styles.networkFormContent}>
+            <PixelText variant="caption" style={styles.fieldHint}>
+              {t("network.form.caption")}
+            </PixelText>
+
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.ownerType")}
+            </PixelText>
+            <View style={styles.buttonRow}>
+              <PixelButton
+                label={t("network.owner.mine")}
+                active={ownerType === "mine"}
+                onPress={() => onChangeOwnerType("mine")}
+              />
+              <PixelButton
+                label={t("network.owner.connected")}
+                variant="secondary"
+                active={ownerType === "connected"}
+                onPress={() => onChangeOwnerType("connected")}
+              />
+            </View>
+
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.name")}
+            </PixelText>
+            <TextInput
+              value={displayName}
+              onChangeText={onChangeDisplayName}
+              placeholder={t("network.placeholders.name")}
+              placeholderTextColor={placeholderTextColor}
+              style={styles.input}
+            />
+            {!!errors.displayName ? (
+              <PixelText variant="body" style={styles.errorText}>
+                {t(errors.displayName)}
+              </PixelText>
+            ) : null}
+
+            <View style={styles.buttonRow}>
+              <View style={styles.halfInput}>
+                <PixelText variant="label" style={styles.fieldLabel}>
+                  {t("network.fields.birthYear")}
                 </PixelText>
-                <PixelText variant="body" style={styles.listMeta}>
-                  {`Birth Year: ${item.birthYear ?? "-"}`}
+                <TextInput
+                  value={birthYearInput}
+                  onChangeText={onChangeBirthYearInput}
+                  keyboardType="numeric"
+                  placeholder={t("network.placeholders.birthYear")}
+                  placeholderTextColor={placeholderTextColor}
+                  style={styles.input}
+                />
+                {!!errors.birthYear ? (
+                  <PixelText variant="body" style={styles.errorText}>
+                    {t(errors.birthYear)}
+                  </PixelText>
+                ) : null}
+              </View>
+
+              <View style={styles.halfInput}>
+                <PixelText variant="label" style={styles.fieldLabel}>
+                  {t("network.fields.height")}
                 </PixelText>
-                <PixelText variant="body" style={styles.listMeta}>
-                  {`Owner: ${item.ownerCupidId === currentCupidId ? "My Cupidate" : "Connected Cupidate"}`}
+                <TextInput
+                  value={heightInput}
+                  onChangeText={onChangeHeightInput}
+                  keyboardType="numeric"
+                  placeholder={t("network.placeholders.height")}
+                  placeholderTextColor={placeholderTextColor}
+                  style={styles.input}
+                />
+                {!!errors.height ? (
+                  <PixelText variant="body" style={styles.errorText}>
+                    {t(errors.height)}
+                  </PixelText>
+                ) : null}
+              </View>
+            </View>
+
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.gender")}
+            </PixelText>
+            <View style={styles.buttonRow}>
+              <PixelButton label={t("network.option.gender.male")} active={gender === "male"} onPress={() => onChangeGender("male")} />
+              <PixelButton
+                label={t("network.option.gender.female")}
+                active={gender === "female"}
+                onPress={() => onChangeGender("female")}
+              />
+              <PixelButton label={t("network.option.gender.other")} active={gender === "other"} onPress={() => onChangeGender("other")} />
+            </View>
+            {!!errors.gender ? (
+              <PixelText variant="body" style={styles.errorText}>
+                {t(errors.gender)}
+              </PixelText>
+            ) : null}
+
+            <View style={styles.buttonRow}>
+              <View style={styles.halfInput}>
+                <PixelText variant="label" style={styles.fieldLabel}>
+                  {t("network.fields.region")}
                 </PixelText>
-                <PixelText variant="body" style={styles.listMeta}>
-                  {`Region: ${item.preferences.region ?? "-"}`}
+                <TextInput
+                  value={locationInput}
+                  onChangeText={onChangeLocationInput}
+                  placeholder={t("network.placeholders.region")}
+                  placeholderTextColor={placeholderTextColor}
+                  style={styles.input}
+                />
+              </View>
+
+              <View style={styles.halfInput}>
+                <PixelText variant="label" style={styles.fieldLabel}>
+                  {t("network.fields.jobTitle")}
                 </PixelText>
-                <PixelText variant="body" style={styles.listMeta}>
-                  {`Job: ${item.preferences.jobTitle ?? "-"}`}
+                <TextInput
+                  value={jobTitleInput}
+                  onChangeText={onChangeJobTitleInput}
+                  placeholder={t("network.placeholders.jobTitle")}
+                  placeholderTextColor={placeholderTextColor}
+                  style={styles.input}
+                />
+              </View>
+            </View>
+
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.hobbies")}
+            </PixelText>
+            <TextInput
+              value={hobbiesInput}
+              onChangeText={onChangeHobbiesInput}
+              placeholder={t("network.placeholders.hobbies")}
+              placeholderTextColor={placeholderTextColor}
+              style={styles.input}
+            />
+
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.bio")}
+            </PixelText>
+            <TextInput
+              value={bio}
+              onChangeText={onChangeBio}
+              multiline
+              placeholder={t("network.placeholders.bio")}
+              placeholderTextColor={placeholderTextColor}
+              style={[styles.input, styles.multilineInput]}
+            />
+
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.smoking")}
+            </PixelText>
+            <View style={styles.buttonRow}>
+              <PixelButton
+                label={t("network.option.smoking.none")}
+                active={smokingHabit === "none"}
+                onPress={() => onChangeSmokingHabit("none")}
+              />
+              <PixelButton
+                label={t("network.option.smoking.sometimes")}
+                active={smokingHabit === "sometimes"}
+                onPress={() => onChangeSmokingHabit("sometimes")}
+              />
+              <PixelButton
+                label={t("network.option.smoking.often")}
+                active={smokingHabit === "often"}
+                onPress={() => onChangeSmokingHabit("often")}
+              />
+            </View>
+
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.drinking")}
+            </PixelText>
+            <View style={styles.buttonRow}>
+              <PixelButton
+                label={t("network.option.drinking.never")}
+                active={drinkingHabit === "never"}
+                onPress={() => onChangeDrinkingHabit("never")}
+              />
+              <PixelButton
+                label={t("network.option.drinking.social")}
+                active={drinkingHabit === "social"}
+                onPress={() => onChangeDrinkingHabit("social")}
+              />
+              <PixelButton
+                label={t("network.option.drinking.often")}
+                active={drinkingHabit === "often"}
+                onPress={() => onChangeDrinkingHabit("often")}
+              />
+            </View>
+
+            <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+              {t("network.sections.preferences")}
+            </PixelText>
+
+            <View style={styles.buttonRow}>
+              <View style={styles.halfInput}>
+                <PixelText variant="label" style={styles.fieldLabel}>
+                  {t("network.fields.preferredAge")}
                 </PixelText>
-                <PixelText variant="body" style={styles.listMeta}>
-                  {`Lifestyle: ${item.preferences.smokingHabit ?? "-"} / ${item.preferences.drinkingHabit ?? "-"}`}
+                <TextInput
+                  value={preferredAgeMinInput}
+                  onChangeText={onChangePreferredAgeMinInput}
+                  keyboardType="numeric"
+                  placeholder={t("network.placeholders.rangeMin")}
+                  placeholderTextColor={placeholderTextColor}
+                  style={styles.input}
+                />
+              </View>
+              <View style={styles.halfInput}>
+                <PixelText variant="label" style={styles.fieldLabel}>
+                  {t("network.fields.preferredAgeMax")}
                 </PixelText>
-                <PixelText variant="body" style={styles.listMeta}>
-                  {`Bio: ${item.bio || "-"}`}
+                <TextInput
+                  value={preferredAgeMaxInput}
+                  onChangeText={onChangePreferredAgeMaxInput}
+                  keyboardType="numeric"
+                  placeholder={t("network.placeholders.rangeMax")}
+                  placeholderTextColor={placeholderTextColor}
+                  style={styles.input}
+                />
+              </View>
+            </View>
+            {!!errors.preferredAgeRange ? (
+              <PixelText variant="body" style={styles.errorText}>
+                {t(errors.preferredAgeRange)}
+              </PixelText>
+            ) : null}
+
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.preferredRegions")}
+            </PixelText>
+            <TextInput
+              value={preferredRegionsInput}
+              onChangeText={onChangePreferredRegionsInput}
+              placeholder={t("network.placeholders.preferredRegions")}
+              placeholderTextColor={placeholderTextColor}
+              style={styles.input}
+            />
+
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.preferredGender")}
+            </PixelText>
+            <View style={styles.buttonRow}>
+              <PixelButton
+                label={t("network.option.preferredGender.any")}
+                active={preferredGender === "any"}
+                onPress={() => onChangePreferredGender("any")}
+              />
+              <PixelButton
+                label={t("network.option.preferredGender.male")}
+                active={preferredGender === "male"}
+                onPress={() => onChangePreferredGender("male")}
+              />
+              <PixelButton
+                label={t("network.option.preferredGender.female")}
+                active={preferredGender === "female"}
+                onPress={() => onChangePreferredGender("female")}
+              />
+              <PixelButton
+                label={t("network.option.preferredGender.other")}
+                active={preferredGender === "other"}
+                onPress={() => onChangePreferredGender("other")}
+              />
+            </View>
+
+            <View style={styles.buttonRow}>
+              <View style={styles.halfInput}>
+                <PixelText variant="label" style={styles.fieldLabel}>
+                  {t("network.fields.preferredHeight")}
                 </PixelText>
-              </PixelBox>
-            ))
-          )}
+                <TextInput
+                  value={preferredHeightMinInput}
+                  onChangeText={onChangePreferredHeightMinInput}
+                  keyboardType="numeric"
+                  placeholder={t("network.placeholders.rangeMin")}
+                  placeholderTextColor={placeholderTextColor}
+                  style={styles.input}
+                />
+              </View>
+              <View style={styles.halfInput}>
+                <PixelText variant="label" style={styles.fieldLabel}>
+                  {t("network.fields.preferredHeightMax")}
+                </PixelText>
+                <TextInput
+                  value={preferredHeightMaxInput}
+                  onChangeText={onChangePreferredHeightMaxInput}
+                  keyboardType="numeric"
+                  placeholder={t("network.placeholders.rangeMax")}
+                  placeholderTextColor={placeholderTextColor}
+                  style={styles.input}
+                />
+              </View>
+            </View>
+            {!!errors.preferredHeightRange ? (
+              <PixelText variant="body" style={styles.errorText}>
+                {t(errors.preferredHeightRange)}
+              </PixelText>
+            ) : null}
+
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.preferredSmoking")}
+            </PixelText>
+            <View style={styles.buttonRow}>
+              <PixelButton
+                label={t("network.option.preferredSmoking.none_only")}
+                active={preferredSmoking === "none_only"}
+                onPress={() => onChangePreferredSmoking("none_only")}
+              />
+              <PixelButton
+                label={t("network.option.preferredSmoking.ok")}
+                active={preferredSmoking === "ok"}
+                onPress={() => onChangePreferredSmoking("ok")}
+              />
+              <PixelButton
+                label={t("network.option.preferredSmoking.any")}
+                active={preferredSmoking === "any"}
+                onPress={() => onChangePreferredSmoking("any")}
+              />
+            </View>
+
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.preferredDrinking")}
+            </PixelText>
+            <View style={styles.buttonRow}>
+              <PixelButton
+                label={t("network.option.preferredDrinking.never")}
+                active={preferredDrinking === "never"}
+                onPress={() => onChangePreferredDrinking("never")}
+              />
+              <PixelButton
+                label={t("network.option.preferredDrinking.social")}
+                active={preferredDrinking === "social"}
+                onPress={() => onChangePreferredDrinking("social")}
+              />
+              <PixelButton
+                label={t("network.option.preferredDrinking.often")}
+                active={preferredDrinking === "often"}
+                onPress={() => onChangePreferredDrinking("often")}
+              />
+              <PixelButton
+                label={t("network.option.preferredDrinking.any")}
+                active={preferredDrinking === "any"}
+                onPress={() => onChangePreferredDrinking("any")}
+              />
+            </View>
+
+            <View style={styles.buttonRow}>
+              <PixelButton
+                label={isMutatingNetwork ? t("network.actions.saving") : t("network.actions.saveCupidate")}
+                variant="primary"
+                disabled={!!isMutatingNetwork}
+                onPress={() => {
+                  void onSaveCupidate();
+                }}
+              />
+            </View>
+          </PixelBox>
         </>
       ) : (
         <>
-          <PixelText variant="label" style={styles.fieldLabel}>
-            Search Cupid by Nickname
-          </PixelText>
-          <TextInput
-            value={connectionSearchQuery}
-            onChangeText={onChangeConnectionSearchQuery}
-            placeholder="e.g. connected_a"
-            placeholderTextColor={placeholderTextColor}
-            style={styles.input}
-          />
-
-          {isSearchingCupids ? (
-            <StateCard tone="loading" title="SEARCHING CUPIDS" description="Scanning available network candidates." />
-          ) : null}
-
-          {connectionSearchQuery.trim().length > 0 && connectionSearchResults.length === 0 && !isSearchingCupids ? (
-            <StateCard tone="empty" title="NO MATCHED CUPID" description="No available cupid found for this query." />
-          ) : null}
-
-          {connectionSearchResults.map((candidate) => {
-            const selected = selectedConnectionCupidId === candidate.cupidId;
-
-            return (
-              <PixelBox key={candidate.cupidId} style={styles.listCard} contentStyle={styles.listCardContent}>
-                <PixelText variant="sectionTitle" style={styles.listName}>
-                  {candidate.nickname}
-                </PixelText>
-                <PixelText variant="body" style={styles.listMeta}>
-                  {`Cupid ID: ${candidate.cupidId}`}
-                </PixelText>
-                <View style={styles.buttonRow}>
-                  <PixelButton
-                    label={selected ? "Selected" : "Select"}
-                    variant={selected ? "success" : "secondary"}
-                    onPress={() => onSelectConnectionCupid(candidate.cupidId)}
-                  />
-                </View>
-              </PixelBox>
-            );
-          })}
-
-          <PixelButton
-            label={isMutatingNetwork ? "Adding..." : "Add Connection Request"}
-            variant="warning"
-            onPress={onAddConnection}
-          />
-
           <PixelText variant="sectionTitle" style={styles.sectionTitle}>
-            Connected Cupid List
+            {t("network.sections.connectedRoster")}
           </PixelText>
           {connections.length === 0 ? (
             <StateCard
               tone="empty"
-              title="NO CONNECTIONS YET"
-              description="Send your first connection request from the search results."
+              title={t("network.empty.connectionsTitle")}
+              description={t("network.empty.connectionsDescription")}
             />
           ) : (
-            connections.map((connection) => (
-              <PixelBox key={connection.cupidId} style={styles.listCard} contentStyle={styles.listCardContent}>
-                <PixelText variant="sectionTitle" style={styles.listName}>
-                  {connection.name}
-                </PixelText>
-                <PixelText variant="body" style={styles.listMeta}>
-                  {`Cupid ID: ${connection.cupidId}`}
-                </PixelText>
-                <PixelText variant="body" style={styles.listMeta}>
-                  {`Status: ${connection.status}`}
-                </PixelText>
-              </PixelBox>
-            ))
+            <PixelBox style={styles.networkRosterCard} contentStyle={styles.networkRosterContent}>
+              {connections.map((item) => (
+                <View key={item.cupidId} style={styles.networkRosterItem}>
+                  <View style={styles.networkRosterItemHeader}>
+                    <View style={styles.networkRosterMain}>
+                      <PixelText variant="body" style={styles.listName}>
+                        {item.name}
+                      </PixelText>
+                      <PixelText variant="caption" style={styles.networkRosterMeta}>
+                        {t("network.connection.id", { id: item.cupidId })}
+                      </PixelText>
+                      <PixelText variant="caption" style={styles.networkRosterMeta}>
+                        {item.region === "-" ? t("network.meta.cupid") : item.region}
+                      </PixelText>
+                    </View>
+                    <View style={[styles.networkStatusChip, rosterStatusStyle(resolveConnectionTone(item.status))]}>
+                      <PixelText variant="caption" style={styles.networkStatusText}>
+                        {t(connectionStatusKey(item.status))}
+                      </PixelText>
+                    </View>
+                  </View>
+                </View>
+              ))}
+            </PixelBox>
           )}
+          <PixelText variant="sectionTitle" style={styles.sectionTitle}>
+            {t("network.sections.discovery")}
+          </PixelText>
+          <PixelBox style={styles.networkFormCard} contentStyle={styles.networkFormContent}>
+            <PixelText variant="caption" style={styles.fieldHint}>
+              {t("network.discovery.caption")}
+            </PixelText>
+
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.searchCupid")}
+            </PixelText>
+            <TextInput
+              value={connectionSearchQuery}
+              onChangeText={onChangeConnectionSearchQuery}
+              placeholder={t("network.placeholders.searchCupid")}
+              placeholderTextColor={placeholderTextColor}
+              style={styles.input}
+            />
+
+            {isSearchingCupids ? (
+              <StateCard
+                tone="loading"
+                title={t("network.discovery.loadingTitle")}
+                description={t("network.discovery.loadingDescription")}
+              />
+            ) : null}
+
+            {showSearchEmptyState ? (
+              <StateCard
+                tone="empty"
+                title={t("network.empty.searchTitle")}
+                description={t("network.empty.searchDescription")}
+              />
+            ) : null}
+
+            {connectionSearchResults.length > 0 ? (
+              <View style={styles.networkSearchResults}>
+                {connectionSearchResults.map((item) => {
+                  const isSelected = selectedConnectionCupidId === item.cupidId;
+
+                  return (
+                    <PixelBox
+                      key={item.cupidId}
+                      style={styles.networkRosterCard}
+                      contentStyle={styles.networkRosterContent}
+                    >
+                      <View style={styles.networkRosterItemHeader}>
+                        <View style={styles.networkRosterMain}>
+                          <PixelText variant="body" style={styles.listName}>
+                            {item.nickname}
+                          </PixelText>
+                          <PixelText variant="caption" style={styles.networkRosterMeta}>
+                            {t("network.connection.id", { id: item.cupidId })}
+                          </PixelText>
+                        </View>
+                        <PixelButton
+                          label={isSelected ? t("network.actions.selected") : t("network.actions.select")}
+                          variant={isSelected ? "success" : "secondary"}
+                          onPress={() => onSelectConnectionCupid(item.cupidId)}
+                        />
+                      </View>
+                    </PixelBox>
+                  );
+                })}
+              </View>
+            ) : null}
+
+            <View style={styles.buttonRow}>
+              <PixelButton
+                label={t("network.actions.addConnection")}
+                variant="primary"
+                disabled={!selectedConnectionCupidId || !!isMutatingNetwork}
+                onPress={() => {
+                  void onAddConnection();
+                }}
+              />
+            </View>
+          </PixelBox>
         </>
       )}
     </ScrollView>

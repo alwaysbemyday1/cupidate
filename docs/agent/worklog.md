@@ -560,3 +560,31 @@ Verification:
 
 Notes:
 - This closes the SafeArea deprecation cleanup from the previous round and moves the rebuilt surface to Home/My/Auth + shell.
+
+### Task 2026-03-29-06 - Network View Prototype Rebuild + i18n Expansion
+Status: Completed
+
+Changes:
+- Rebuilt `src/features/app/views/NetworkView.tsx` around the current prototype PRD:
+  - top `Network Board`
+  - `MASTER CUPID` root card
+  - connected node board with status badges
+  - `Match Proposal` stat card
+  - `Legend` card
+  - segmented lower management area for `My Cupidates` / `Connected Cupids`
+- Preserved functional management flows while moving them below the visual board:
+  - cupidate registration form
+  - connection search / select / request flow
+- Expanded i18n coverage to Network:
+  - added Network copy to `src/features/i18n/messages.ts`
+  - moved network validation errors in `useCupidateAppState` to translation keys
+- Updated app composition to pass Network-specific summary props from `App.tsx`.
+- Extended shared style map for board/node/legend/roster layouts.
+- Updated app tests to align with the rebuilt Network structure.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand` passed (13 suites / 32 tests).
+
+Notes:
+- This closes the Network portion of the current rebuild track and moves the remaining visual focus to Matching.
