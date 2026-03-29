@@ -566,6 +566,7 @@ function CupidateProfilePanel({
                 {t("network.fields.region")}
               </PixelText>
               <TextInput
+                testID="profile-edit-region"
                 value={editState.locationInput}
                 onChangeText={(value) => setEditState((current) => ({ ...current, locationInput: value }))}
                 placeholder={t("network.placeholders.region")}
@@ -579,6 +580,7 @@ function CupidateProfilePanel({
                 {t("network.fields.jobTitle")}
               </PixelText>
               <TextInput
+                testID="profile-edit-job-title"
                 value={editState.jobTitleInput}
                 onChangeText={(value) => setEditState((current) => ({ ...current, jobTitleInput: value }))}
                 placeholder={t("network.placeholders.jobTitle")}
@@ -705,6 +707,7 @@ function CupidateProfilePanel({
             {t("network.fields.preferredJobGroups")}
           </PixelText>
           <TextInput
+            testID="profile-edit-preferred-job-groups"
             value={editState.preferredJobGroupsInput}
             onChangeText={(value) => setEditState((current) => ({ ...current, preferredJobGroupsInput: value }))}
             placeholder={t("network.placeholders.preferredJobGroups")}
@@ -843,6 +846,7 @@ function CupidateProfilePanel({
             <PixelButton
               label={isSaving ? t("profile.actions.saving") : t("profile.actions.save")}
               variant="primary"
+              testID="profile-sheet-save"
               disabled={!!isSaving || !editState.displayName.trim()}
               onPress={() => {
                 void handleSave();
@@ -876,7 +880,12 @@ export function ProfileView({
             <PixelText testID="profile-sheet-title" variant="screenTitle" style={styles.profileSheetTitle}>
               {profile.kind === "cupid" ? t("profile.title.cupid") : t("profile.title.cupidate")}
             </PixelText>
-            <PixelButton label={t("profile.actions.close")} variant="secondary" onPress={onClose} />
+            <PixelButton
+              label={t("profile.actions.close")}
+              variant="secondary"
+              testID="profile-sheet-close"
+              onPress={onClose}
+            />
           </View>
 
           <ScrollView style={styles.profileSheetScroll} contentContainerStyle={styles.profileSheetScrollContent}>

@@ -157,4 +157,36 @@ describe("Profile overlay flow", () => {
       expect(screen.getByText("Romance Conversions")).toBeTruthy();
     });
   });
+
+  it("persists structured profile edits from the cupidate overlay", async () => {
+    render(<App />);
+
+    fireEvent.press(screen.getByTestId("tab-network"));
+    fireEvent.press(screen.getByTestId("network-segment-cupidates"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("profile-open-cupidate-mine-1")).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByTestId("profile-open-cupidate-mine-1"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("profile-edit-region")).toBeTruthy();
+    });
+
+    fireEvent.changeText(screen.getByTestId("profile-edit-region"), "busan");
+    fireEvent.changeText(screen.getByTestId("profile-edit-job-title"), "Product Designer");
+    fireEvent.changeText(screen.getByTestId("profile-edit-preferred-job-groups"), "finance, strategy");
+
+    fireEvent.press(screen.getByTestId("profile-sheet-save"));
+    fireEvent.press(screen.getByTestId("profile-sheet-close"));
+
+    fireEvent.press(screen.getByTestId("profile-open-cupidate-mine-1"));
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("busan")).toBeTruthy();
+      expect(screen.getByDisplayValue("Product Designer")).toBeTruthy();
+      expect(screen.getByDisplayValue("finance, strategy")).toBeTruthy();
+    });
+  });
 });
