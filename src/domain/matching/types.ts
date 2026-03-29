@@ -12,6 +12,7 @@ export type PreferenceData = {
   drinking?: "never" | "social" | "often" | "any";
   region?: string;
   preferredRegions?: string[];
+  preferredJobGroups?: string[];
   smokingHabit?: SmokingHabit;
   drinkingHabit?: DrinkingHabit;
   preferredSmoking?: SmokingPreference;
@@ -23,11 +24,38 @@ export type PreferenceData = {
   mbti?: string;
 };
 
+export type StructuredCupidateFields = {
+  region?: string | null;
+  jobTitle?: string | null;
+  heightCm?: number | null;
+  smokingHabit?: SmokingHabit | null;
+  drinkingHabit?: DrinkingHabit | null;
+  preferredAgeRange?: [number, number] | null;
+  preferredRegions?: string[];
+  preferredJobGroups?: string[];
+  preferredSmoking?: SmokingPreference | null;
+  preferredDrinking?: DrinkingPreference | null;
+  preferredGenders?: GenderPreference[];
+  preferredHeightRange?: [number, number] | null;
+};
+
 export type CupidateProfile = {
   cupidateId: string;
   ownerCupidId: string;
   birthYear: number | null;
   gender?: string | null;
+  region?: string | null;
+  jobTitle?: string | null;
+  heightCm?: number | null;
+  smokingHabit?: SmokingHabit | null;
+  drinkingHabit?: DrinkingHabit | null;
+  preferredAgeRange?: [number, number] | null;
+  preferredRegions?: string[];
+  preferredJobGroups?: string[];
+  preferredSmoking?: SmokingPreference | null;
+  preferredDrinking?: DrinkingPreference | null;
+  preferredGenders?: GenderPreference[];
+  preferredHeightRange?: [number, number] | null;
   preferences: PreferenceData;
 };
 

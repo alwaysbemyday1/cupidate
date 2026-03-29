@@ -5,6 +5,8 @@ const source: CupidateProfile = {
   cupidateId: "source",
   ownerCupidId: "cupid-a",
   birthYear: 1998,
+  jobTitle: "Brand Strategist",
+  preferredJobGroups: ["engineer", "product"],
   preferences: {
     ageRange: [25, 33],
     hobbies: ["hiking", "music"],
@@ -19,6 +21,8 @@ const targets: CupidateProfile[] = [
     cupidateId: "target-1",
     ownerCupidId: "cupid-b",
     birthYear: 1997,
+    jobTitle: "Product Engineer",
+    preferredJobGroups: ["brand"],
     preferences: {
       ageRange: [24, 32],
       hobbies: ["music", "hiking"],
@@ -31,6 +35,8 @@ const targets: CupidateProfile[] = [
     cupidateId: "target-2",
     ownerCupidId: "cupid-c",
     birthYear: 1992,
+    jobTitle: "Chef",
+    preferredJobGroups: ["medical"],
     preferences: {
       ageRange: [28, 36],
       hobbies: ["travel"],
@@ -43,6 +49,8 @@ const targets: CupidateProfile[] = [
     cupidateId: "target-3",
     ownerCupidId: "cupid-x",
     birthYear: 1996,
+    jobTitle: "Product Designer",
+    preferredJobGroups: ["brand"],
     preferences: {
       ageRange: [24, 31],
       hobbies: ["music"],

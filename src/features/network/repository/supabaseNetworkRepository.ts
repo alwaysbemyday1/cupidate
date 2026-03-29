@@ -1,5 +1,10 @@
-﻿import type { SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
+import {
+  createFlexiblePreferencePayload,
+  extractStructuredCupidateFields,
+  hydrateCupidatePreferences
+} from "./cupidateFields";
 import type {
   CreateConnectionInput,
   CreateCupidateInput,
@@ -22,6 +27,11 @@ type CupidateRow = {
   gender: string | null;
   bio: string | null;
   is_active: boolean;
+  region: string | null;
+  job_title: string | null;
+  height_cm: number | null;
+  smoking_habit: NetworkCupidate["smokingHabit"];
+  drinking_habit: NetworkCupidate["drinkingHabit"];
   created_at: string;
   updated_at: string;
 };
@@ -29,6 +39,15 @@ type CupidateRow = {
 type CupidatePreferenceRow = {
   cupidate_id: string;
   preferences: JsonValue;
+  preferred_age_min: number | null;
+  preferred_age_max: number | null;
+  preferred_height_min_cm: number | null;
+  preferred_height_max_cm: number | null;
+  preferred_regions: string[] | null;
+  preferred_job_groups: string[] | null;
+  preferred_smoking: NetworkCupidate["preferredSmoking"];
+  preferred_drinking: NetworkCupidate["preferredDrinking"];
+  preferred_genders: NetworkCupidate["preferredGenders"] | null;
 };
 
 type CupidRow = {
@@ -54,6 +73,14 @@ function asPreferenceData(value: JsonValue | null | undefined): NetworkCupidate[
   return value as NetworkCupidate["preferences"];
 }
 
+function preferenceRange(min: number | null, max: number | null): [number, number] | null {
+  if (min === null || max === null) {
+    return null;
+  }
+
+  return [Math.min(min, max), Math.max(min, max)];
+}
+
 async function getRequiredUserId(client: SupabaseClient) {
   const { data, error } = await client.auth.getUser();
   if (error) {
@@ -68,7 +95,29 @@ async function getRequiredUserId(client: SupabaseClient) {
   return userId;
 }
 
-function mapCupidateRow(row: CupidateRow, preferences: NetworkCupidate["preferences"]): NetworkCupidate {
+function mapCupidateRow(
+  row: CupidateRow,
+  preferenceRow: CupidatePreferenceRow | null | undefined
+): NetworkCupidate {
+  const structured = {
+    region: row.region,
+    jobTitle: row.job_title,
+    heightCm: row.height_cm,
+    smokingHabit: row.smoking_habit,
+    drinkingHabit: row.drinking_habit,
+    preferredAgeRange: preferenceRow
+      ? preferenceRange(preferenceRow.preferred_age_min, preferenceRow.preferred_age_max)
+      : null,
+    preferredRegions: preferenceRow?.preferred_regions ?? [],
+    preferredJobGroups: preferenceRow?.preferred_job_groups ?? [],
+    preferredSmoking: preferenceRow?.preferred_smoking ?? null,
+    preferredDrinking: preferenceRow?.preferred_drinking ?? null,
+    preferredGenders: preferenceRow?.preferred_genders ?? [],
+    preferredHeightRange: preferenceRow
+      ? preferenceRange(preferenceRow.preferred_height_min_cm, preferenceRow.preferred_height_max_cm)
+      : null
+  } as const;
+
   return {
     id: row.id,
     ownerCupidId: row.owner_cupid_id,
@@ -77,7 +126,19 @@ function mapCupidateRow(row: CupidateRow, preferences: NetworkCupidate["preferen
     gender: row.gender,
     bio: row.bio,
     isActive: row.is_active,
-    preferences,
+    region: structured.region,
+    jobTitle: structured.jobTitle,
+    heightCm: structured.heightCm,
+    smokingHabit: structured.smokingHabit,
+    drinkingHabit: structured.drinkingHabit,
+    preferredAgeRange: structured.preferredAgeRange,
+    preferredRegions: structured.preferredRegions,
+    preferredJobGroups: structured.preferredJobGroups,
+    preferredSmoking: structured.preferredSmoking,
+    preferredDrinking: structured.preferredDrinking,
+    preferredGenders: structured.preferredGenders,
+    preferredHeightRange: structured.preferredHeightRange,
+    preferences: hydrateCupidatePreferences(asPreferenceData(preferenceRow?.preferences), structured),
     createdAt: row.created_at,
     updatedAt: row.updated_at
   };
@@ -102,6 +163,29 @@ function mapConnectionRow(
     direction: outbound ? "outbound" : "inbound",
     counterpartCupidId,
     counterpartNickname: nicknames.get(counterpartCupidId) ?? null
+  };
+}
+
+function buildPreferenceRowPayload(cupidateId: string, input: CreateCupidateInput | UpdateCupidateInput) {
+  const structured = extractStructuredCupidateFields(input);
+  const flexiblePreferences = createFlexiblePreferencePayload(input.preferences, structured);
+
+  return {
+    structured,
+    flexiblePreferences,
+    row: {
+      cupidate_id: cupidateId,
+      preferences: flexiblePreferences,
+      preferred_age_min: structured.preferredAgeRange?.[0] ?? null,
+      preferred_age_max: structured.preferredAgeRange?.[1] ?? null,
+      preferred_height_min_cm: structured.preferredHeightRange?.[0] ?? null,
+      preferred_height_max_cm: structured.preferredHeightRange?.[1] ?? null,
+      preferred_regions: structured.preferredRegions,
+      preferred_job_groups: structured.preferredJobGroups,
+      preferred_smoking: structured.preferredSmoking,
+      preferred_drinking: structured.preferredDrinking,
+      preferred_genders: structured.preferredGenders
+    }
   };
 }
 
@@ -199,7 +283,9 @@ export class SupabaseNetworkRepository implements NetworkRepository {
     const cupidateIds = cupidateRows.map((item) => item.id);
     const { data: preferenceRows, error: preferencesError } = await this.client
       .from("cupidate_preferences")
-      .select("cupidate_id,preferences")
+      .select(
+        "cupidate_id,preferences,preferred_age_min,preferred_age_max,preferred_height_min_cm,preferred_height_max_cm,preferred_regions,preferred_job_groups,preferred_smoking,preferred_drinking,preferred_genders"
+      )
       .in("cupidate_id", cupidateIds)
       .returns<CupidatePreferenceRow[]>();
 
@@ -207,15 +293,17 @@ export class SupabaseNetworkRepository implements NetworkRepository {
       throw preferencesError;
     }
 
-    const preferenceMap = new Map<string, NetworkCupidate["preferences"]>(
-      preferenceRows.map((item) => [item.cupidate_id, asPreferenceData(item.preferences)])
+    const preferenceMap = new Map<string, CupidatePreferenceRow>(
+      preferenceRows.map((item) => [item.cupidate_id, item])
     );
 
-    return cupidateRows.map((row) => mapCupidateRow(row, preferenceMap.get(row.id) ?? {}));
+    return cupidateRows.map((row) => mapCupidateRow(row, preferenceMap.get(row.id)));
   }
 
   async createCupidate(input: CreateCupidateInput): Promise<NetworkCupidate> {
     const userId = await getRequiredUserId(this.client);
+    const preferencePayload = buildPreferenceRowPayload("", input);
+
     const { data: cupidateRow, error: cupidateError } = await this.client
       .from("cupidates")
       .insert({
@@ -224,7 +312,12 @@ export class SupabaseNetworkRepository implements NetworkRepository {
         birth_year: input.birthYear ?? null,
         gender: input.gender ?? null,
         bio: input.bio ?? "",
-        is_active: input.isActive ?? false
+        is_active: input.isActive ?? false,
+        region: preferencePayload.structured.region,
+        job_title: preferencePayload.structured.jobTitle,
+        height_cm: preferencePayload.structured.heightCm,
+        smoking_habit: preferencePayload.structured.smokingHabit,
+        drinking_habit: preferencePayload.structured.drinkingHabit
       })
       .select("*")
       .single<CupidateRow>();
@@ -233,24 +326,52 @@ export class SupabaseNetworkRepository implements NetworkRepository {
       throw cupidateError;
     }
 
-    const preferencesPayload = input.preferences ?? {};
-    const { error: preferenceError } = await this.client.from("cupidate_preferences").upsert(
-      {
-        cupidate_id: cupidateRow.id,
-        preferences: preferencesPayload
-      },
-      { onConflict: "cupidate_id" }
-    );
+    const fullPreferencePayload = buildPreferenceRowPayload(cupidateRow.id, input);
+    const { error: preferenceError } = await this.client.from("cupidate_preferences").upsert(fullPreferencePayload.row, {
+      onConflict: "cupidate_id"
+    });
 
     if (preferenceError) {
       throw preferenceError;
     }
 
-    return mapCupidateRow(cupidateRow, preferencesPayload);
+    return mapCupidateRow(cupidateRow, fullPreferencePayload.row);
   }
 
   async updateCupidate(input: UpdateCupidateInput): Promise<NetworkCupidate> {
-    const updatePayload: Record<string, string | number | boolean | null> = {};
+    const current = await this.fetchCupidateSnapshot(input.cupidateId);
+    if (!current) {
+      throw new Error(`Cupidate not found: ${input.cupidateId}`);
+    }
+
+    const mergedPreferences = {
+      ...current.preferences,
+      ...(input.preferences ?? {})
+    };
+
+    if (input.region === undefined) {
+      if (input.preferences?.region !== undefined) {
+        mergedPreferences.region = input.preferences.region;
+        mergedPreferences.location = input.preferences.region;
+      } else if (input.preferences?.location !== undefined) {
+        mergedPreferences.region = input.preferences.location;
+        mergedPreferences.location = input.preferences.location;
+      }
+    }
+
+    const mergedInput: UpdateCupidateInput = {
+      ...input,
+      preferences: mergedPreferences
+    };
+
+    const preferencePayload = buildPreferenceRowPayload(input.cupidateId, mergedInput);
+    const updatePayload: Record<string, string | number | boolean | null> = {
+      region: preferencePayload.structured.region,
+      job_title: preferencePayload.structured.jobTitle,
+      height_cm: preferencePayload.structured.heightCm,
+      smoking_habit: preferencePayload.structured.smokingHabit,
+      drinking_habit: preferencePayload.structured.drinkingHabit
+    };
 
     if (input.displayName !== undefined) {
       updatePayload.display_name = input.displayName.trim();
@@ -283,37 +404,15 @@ export class SupabaseNetworkRepository implements NetworkRepository {
       throw cupidateError;
     }
 
-    let preferencesPayload = input.preferences;
+    const { error: preferenceError } = await this.client.from("cupidate_preferences").upsert(preferencePayload.row, {
+      onConflict: "cupidate_id"
+    });
 
-    if (preferencesPayload !== undefined) {
-      const { error: preferenceError } = await this.client.from("cupidate_preferences").upsert(
-        {
-          cupidate_id: input.cupidateId,
-          preferences: preferencesPayload
-        },
-        { onConflict: "cupidate_id" }
-      );
-
-      if (preferenceError) {
-        throw preferenceError;
-      }
+    if (preferenceError) {
+      throw preferenceError;
     }
 
-    if (preferencesPayload === undefined) {
-      const { data: preferenceRow, error: preferenceError } = await this.client
-        .from("cupidate_preferences")
-        .select("cupidate_id,preferences")
-        .eq("cupidate_id", input.cupidateId)
-        .maybeSingle<CupidatePreferenceRow>();
-
-      if (preferenceError) {
-        throw preferenceError;
-      }
-
-      preferencesPayload = asPreferenceData(preferenceRow?.preferences);
-    }
-
-    return mapCupidateRow(cupidateRow, preferencesPayload ?? {});
+    return mapCupidateRow(cupidateRow, preferencePayload.row);
   }
 
   async listConnections(): Promise<NetworkConnection[]> {
@@ -387,6 +486,36 @@ export class SupabaseNetworkRepository implements NetworkRepository {
     const counterpartId = row.requester_cupid_id === userId ? row.addressee_cupid_id : row.requester_cupid_id;
     const nicknameMap = await this.fetchNicknames([counterpartId]);
     return mapConnectionRow(row, userId, nicknameMap);
+  }
+
+  private async fetchCupidateSnapshot(cupidateId: string): Promise<NetworkCupidate | null> {
+    const { data: cupidateRow, error: cupidateError } = await this.client
+      .from("cupidates")
+      .select("*")
+      .eq("id", cupidateId)
+      .maybeSingle<CupidateRow>();
+
+    if (cupidateError) {
+      throw cupidateError;
+    }
+
+    if (!cupidateRow) {
+      return null;
+    }
+
+    const { data: preferenceRow, error: preferenceError } = await this.client
+      .from("cupidate_preferences")
+      .select(
+        "cupidate_id,preferences,preferred_age_min,preferred_age_max,preferred_height_min_cm,preferred_height_max_cm,preferred_regions,preferred_job_groups,preferred_smoking,preferred_drinking,preferred_genders"
+      )
+      .eq("cupidate_id", cupidateId)
+      .maybeSingle<CupidatePreferenceRow>();
+
+    if (preferenceError) {
+      throw preferenceError;
+    }
+
+    return mapCupidateRow(cupidateRow, preferenceRow);
   }
 
   private async fetchNicknames(cupidIds: string[]): Promise<Map<string, string>> {

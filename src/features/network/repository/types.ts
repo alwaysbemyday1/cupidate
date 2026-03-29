@@ -1,4 +1,11 @@
-﻿import type { PreferenceData } from "../../../domain/matching/types";
+import type {
+  DrinkingHabit,
+  DrinkingPreference,
+  GenderPreference,
+  PreferenceData,
+  SmokingHabit,
+  SmokingPreference
+} from "../../../domain/matching/types";
 
 export type ConnectionStatus = "pending" | "accepted" | "rejected" | "blocked";
 
@@ -20,6 +27,18 @@ export type NetworkCupidate = {
   gender: string | null;
   bio: string | null;
   isActive: boolean;
+  region: string | null;
+  jobTitle: string | null;
+  heightCm: number | null;
+  smokingHabit: SmokingHabit | null;
+  drinkingHabit: DrinkingHabit | null;
+  preferredAgeRange: [number, number] | null;
+  preferredRegions: string[];
+  preferredJobGroups: string[];
+  preferredSmoking: SmokingPreference | null;
+  preferredDrinking: DrinkingPreference | null;
+  preferredGenders: GenderPreference[];
+  preferredHeightRange: [number, number] | null;
   preferences: PreferenceData;
   createdAt: string;
   updatedAt: string;
@@ -44,6 +63,18 @@ export type CreateCupidateInput = {
   gender?: string | null;
   bio?: string | null;
   isActive?: boolean;
+  region?: string | null;
+  jobTitle?: string | null;
+  heightCm?: number | null;
+  smokingHabit?: SmokingHabit | null;
+  drinkingHabit?: DrinkingHabit | null;
+  preferredAgeRange?: [number, number] | null;
+  preferredRegions?: string[];
+  preferredJobGroups?: string[];
+  preferredSmoking?: SmokingPreference | null;
+  preferredDrinking?: DrinkingPreference | null;
+  preferredGenders?: GenderPreference[];
+  preferredHeightRange?: [number, number] | null;
   preferences?: PreferenceData;
 };
 
@@ -54,6 +85,18 @@ export type UpdateCupidateInput = {
   gender?: string | null;
   bio?: string | null;
   isActive?: boolean;
+  region?: string | null;
+  jobTitle?: string | null;
+  heightCm?: number | null;
+  smokingHabit?: SmokingHabit | null;
+  drinkingHabit?: DrinkingHabit | null;
+  preferredAgeRange?: [number, number] | null;
+  preferredRegions?: string[];
+  preferredJobGroups?: string[];
+  preferredSmoking?: SmokingPreference | null;
+  preferredDrinking?: DrinkingPreference | null;
+  preferredGenders?: GenderPreference[];
+  preferredHeightRange?: [number, number] | null;
   preferences?: PreferenceData;
 };
 

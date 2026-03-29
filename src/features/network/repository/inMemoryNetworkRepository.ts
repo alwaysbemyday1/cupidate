@@ -1,4 +1,9 @@
-﻿import type {
+import {
+  createFlexiblePreferencePayload,
+  extractStructuredCupidateFields,
+  hydrateCupidatePreferences
+} from "./cupidateFields";
+import type {
   CreateConnectionInput,
   CreateCupidateInput,
   CurrentCupid,
@@ -21,6 +26,37 @@ type InMemoryNetworkRepositoryOptions = {
 
 function randomId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 10_000)}`;
+}
+
+function hydrateCupidate(input: CreateCupidateInput, ownerCupidId: string): NetworkCupidate {
+  const now = NOW();
+  const structured = extractStructuredCupidateFields(input);
+  const flexiblePreferences = createFlexiblePreferencePayload(input.preferences, structured);
+
+  return {
+    id: randomId("cupidate"),
+    ownerCupidId,
+    displayName: input.displayName.trim(),
+    birthYear: input.birthYear ?? null,
+    gender: input.gender ?? null,
+    bio: input.bio ?? "",
+    isActive: input.isActive ?? false,
+    region: structured.region,
+    jobTitle: structured.jobTitle,
+    heightCm: structured.heightCm,
+    smokingHabit: structured.smokingHabit,
+    drinkingHabit: structured.drinkingHabit,
+    preferredAgeRange: structured.preferredAgeRange,
+    preferredRegions: structured.preferredRegions,
+    preferredJobGroups: structured.preferredJobGroups,
+    preferredSmoking: structured.preferredSmoking,
+    preferredDrinking: structured.preferredDrinking,
+    preferredGenders: structured.preferredGenders,
+    preferredHeightRange: structured.preferredHeightRange,
+    preferences: hydrateCupidatePreferences(flexiblePreferences, structured),
+    createdAt: now,
+    updatedAt: now
+  };
 }
 
 export class InMemoryNetworkRepository implements NetworkRepository {
@@ -94,20 +130,7 @@ export class InMemoryNetworkRepository implements NetworkRepository {
   }
 
   async createCupidate(input: CreateCupidateInput): Promise<NetworkCupidate> {
-    const now = NOW();
-    const next: NetworkCupidate = {
-      id: randomId("cupidate"),
-      ownerCupidId: this.currentCupid.id,
-      displayName: input.displayName.trim(),
-      birthYear: input.birthYear ?? null,
-      gender: input.gender ?? null,
-      bio: input.bio ?? "",
-      isActive: input.isActive ?? false,
-      preferences: input.preferences ?? {},
-      createdAt: now,
-      updatedAt: now
-    };
-
+    const next = hydrateCupidate(input, this.currentCupid.id);
     this.cupidates = [next, ...this.cupidates];
     return next;
   }
@@ -122,6 +145,39 @@ export class InMemoryNetworkRepository implements NetworkRepository {
       throw new Error("Forbidden cupidate update");
     }
 
+    const mergedPreferences = {
+      ...found.preferences,
+      ...(input.preferences ?? {})
+    };
+
+    if (input.region === undefined) {
+      if (input.preferences?.region !== undefined) {
+        mergedPreferences.region = input.preferences.region;
+        mergedPreferences.location = input.preferences.region;
+      } else if (input.preferences?.location !== undefined) {
+        mergedPreferences.region = input.preferences.location;
+        mergedPreferences.location = input.preferences.location;
+      }
+    }
+
+    const structured = extractStructuredCupidateFields({
+      region: input.region,
+      jobTitle: input.jobTitle,
+      heightCm: input.heightCm,
+      smokingHabit: input.smokingHabit,
+      drinkingHabit: input.drinkingHabit,
+      preferredAgeRange: input.preferredAgeRange,
+      preferredRegions: input.preferredRegions,
+      preferredJobGroups: input.preferredJobGroups,
+      preferredSmoking: input.preferredSmoking,
+      preferredDrinking: input.preferredDrinking,
+      preferredGenders: input.preferredGenders,
+      preferredHeightRange: input.preferredHeightRange,
+      preferences: mergedPreferences
+    });
+
+    const flexiblePreferences = createFlexiblePreferencePayload(mergedPreferences, structured);
+
     const updated: NetworkCupidate = {
       ...found,
       displayName: input.displayName !== undefined ? input.displayName.trim() : found.displayName,
@@ -129,7 +185,19 @@ export class InMemoryNetworkRepository implements NetworkRepository {
       gender: input.gender !== undefined ? input.gender ?? null : found.gender,
       bio: input.bio !== undefined ? input.bio ?? "" : found.bio,
       isActive: input.isActive !== undefined ? input.isActive : found.isActive,
-      preferences: input.preferences ?? found.preferences,
+      region: structured.region,
+      jobTitle: structured.jobTitle,
+      heightCm: structured.heightCm,
+      smokingHabit: structured.smokingHabit,
+      drinkingHabit: structured.drinkingHabit,
+      preferredAgeRange: structured.preferredAgeRange,
+      preferredRegions: structured.preferredRegions,
+      preferredJobGroups: structured.preferredJobGroups,
+      preferredSmoking: structured.preferredSmoking,
+      preferredDrinking: structured.preferredDrinking,
+      preferredGenders: structured.preferredGenders,
+      preferredHeightRange: structured.preferredHeightRange,
+      preferences: hydrateCupidatePreferences(flexiblePreferences, structured),
       updatedAt: NOW()
     };
 

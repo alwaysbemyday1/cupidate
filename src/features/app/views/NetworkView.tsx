@@ -56,6 +56,8 @@ type NetworkViewProps = {
   onChangePreferredAgeMaxInput: (value: string) => void;
   preferredRegionsInput: string;
   onChangePreferredRegionsInput: (value: string) => void;
+  preferredJobGroupsInput: string;
+  onChangePreferredJobGroupsInput: (value: string) => void;
   preferredSmoking: "none_only" | "ok" | "any";
   onChangePreferredSmoking: (value: "none_only" | "ok" | "any") => void;
   preferredDrinking: "never" | "social" | "often" | "any";
@@ -228,6 +230,8 @@ export function NetworkView({
   onChangePreferredAgeMaxInput,
   preferredRegionsInput,
   onChangePreferredRegionsInput,
+  preferredJobGroupsInput,
+  onChangePreferredJobGroupsInput,
   preferredSmoking,
   onChangePreferredSmoking,
   preferredDrinking,
@@ -274,7 +278,7 @@ export function NetworkView({
       myCupidates.map((item) => ({
         id: item.cupidateId,
         name: item.displayName,
-        subtitle: `${ageLabel(item.birthYear)} · ${item.preferences.location ?? item.preferences.region ?? "--"}`,
+        subtitle: `${ageLabel(item.birthYear)} · ${item.region ?? item.preferences.location ?? item.preferences.region ?? "--"}`,
         tone: resolveCupidateTone(item.cupidateId, requests),
         role: "cupidate"
       })),
@@ -602,11 +606,11 @@ export function NetworkView({
                         </PixelText>
                         <PixelText variant="caption" style={styles.networkRosterMeta}>
                           {`${t(genderKey(item.gender))} · ${ageLabel(item.birthYear)} · ${
-                            item.preferences.location ?? item.preferences.region ?? "--"
+                            item.region ?? item.preferences.location ?? item.preferences.region ?? "--"
                           }`}
                         </PixelText>
                         <PixelText variant="caption" style={styles.networkRosterMeta}>
-                          {item.preferences.jobTitle ?? t("network.meta.awaitingProfile")}
+                          {item.jobTitle ?? item.preferences.jobTitle ?? t("network.meta.awaitingProfile")}
                         </PixelText>
                       </View>
                       <View style={[styles.networkStatusChip, rosterStatusStyle(tone)]}>
@@ -849,6 +853,17 @@ export function NetworkView({
               value={preferredRegionsInput}
               onChangeText={onChangePreferredRegionsInput}
               placeholder={t("network.placeholders.preferredRegions")}
+              placeholderTextColor={placeholderTextColor}
+              style={styles.input}
+            />
+
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.preferredJobGroups")}
+            </PixelText>
+            <TextInput
+              value={preferredJobGroupsInput}
+              onChangeText={onChangePreferredJobGroupsInput}
+              placeholder={t("network.placeholders.preferredJobGroups")}
               placeholderTextColor={placeholderTextColor}
               style={styles.input}
             />

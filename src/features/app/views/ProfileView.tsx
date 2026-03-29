@@ -30,9 +30,14 @@ type CupidateEditState = {
   jobTitleInput: string;
   heightInput: string;
   hobbiesInput: string;
+  smokingHabit: "none" | "sometimes" | "often";
+  drinkingHabit: "never" | "social" | "often";
   preferredAgeMinInput: string;
   preferredAgeMaxInput: string;
   preferredRegionsInput: string;
+  preferredJobGroupsInput: string;
+  preferredSmoking: "none_only" | "ok" | "any";
+  preferredDrinking: "never" | "social" | "often" | "any";
   preferredGender: "any" | "male" | "female" | "other";
   preferredHeightMinInput: string;
   preferredHeightMaxInput: string;
@@ -70,6 +75,80 @@ function genderText(gender: string, t: ReturnType<typeof useI18n>["t"]) {
 
   if (gender === "other") {
     return t("network.option.gender.other");
+  }
+
+  return t("network.option.unspecified");
+}
+
+function smokingText(smokingHabit: string | null | undefined, t: ReturnType<typeof useI18n>["t"]) {
+  if (smokingHabit === "none") {
+    return t("network.option.smoking.none");
+  }
+
+  if (smokingHabit === "sometimes") {
+    return t("network.option.smoking.sometimes");
+  }
+
+  if (smokingHabit === "often") {
+    return t("network.option.smoking.often");
+  }
+
+  return t("network.option.unspecified");
+}
+
+function drinkingText(drinkingHabit: string | null | undefined, t: ReturnType<typeof useI18n>["t"]) {
+  if (drinkingHabit === "never") {
+    return t("network.option.drinking.never");
+  }
+
+  if (drinkingHabit === "social") {
+    return t("network.option.drinking.social");
+  }
+
+  if (drinkingHabit === "often") {
+    return t("network.option.drinking.often");
+  }
+
+  return t("network.option.unspecified");
+}
+
+function preferredSmokingText(
+  preferredSmoking: string | null | undefined,
+  t: ReturnType<typeof useI18n>["t"]
+) {
+  if (preferredSmoking === "none_only") {
+    return t("network.option.preferredSmoking.none_only");
+  }
+
+  if (preferredSmoking === "ok") {
+    return t("network.option.preferredSmoking.ok");
+  }
+
+  if (preferredSmoking === "any") {
+    return t("network.option.preferredSmoking.any");
+  }
+
+  return t("network.option.unspecified");
+}
+
+function preferredDrinkingText(
+  preferredDrinking: string | null | undefined,
+  t: ReturnType<typeof useI18n>["t"]
+) {
+  if (preferredDrinking === "never") {
+    return t("network.option.preferredDrinking.never");
+  }
+
+  if (preferredDrinking === "social") {
+    return t("network.option.preferredDrinking.social");
+  }
+
+  if (preferredDrinking === "often") {
+    return t("network.option.preferredDrinking.often");
+  }
+
+  if (preferredDrinking === "any") {
+    return t("network.option.preferredDrinking.any");
   }
 
   return t("network.option.unspecified");
@@ -139,22 +218,42 @@ function buildEditState(profile: CupidateProfileSummary): CupidateEditState {
     birthYearInput: profile.birthYear ? String(profile.birthYear) : "",
     gender: profile.gender,
     bio: profile.bio,
-    locationInput: profile.preferences.location ?? profile.preferences.region ?? "",
-    jobTitleInput: profile.preferences.jobTitle ?? "",
-    heightInput: profile.preferences.heightCm ? String(profile.preferences.heightCm) : "",
+    locationInput: profile.region ?? profile.preferences.location ?? profile.preferences.region ?? "",
+    jobTitleInput: profile.jobTitle ?? profile.preferences.jobTitle ?? "",
+    heightInput: profile.heightCm ? String(profile.heightCm) : profile.preferences.heightCm ? String(profile.preferences.heightCm) : "",
     hobbiesInput: profile.preferences.hobbies?.join(", ") ?? "",
-    preferredAgeMinInput: profile.preferences.ageRange ? String(profile.preferences.ageRange[0]) : "",
-    preferredAgeMaxInput: profile.preferences.ageRange ? String(profile.preferences.ageRange[1]) : "",
-    preferredRegionsInput: profile.preferences.preferredRegions?.join(", ") ?? "",
+    smokingHabit: profile.smokingHabit ?? profile.preferences.smokingHabit ?? "none",
+    drinkingHabit: profile.drinkingHabit ?? profile.preferences.drinkingHabit ?? "social",
+    preferredAgeMinInput: profile.preferredAgeRange
+      ? String(profile.preferredAgeRange[0])
+      : profile.preferences.ageRange
+        ? String(profile.preferences.ageRange[0])
+        : "",
+    preferredAgeMaxInput: profile.preferredAgeRange
+      ? String(profile.preferredAgeRange[1])
+      : profile.preferences.ageRange
+        ? String(profile.preferences.ageRange[1])
+        : "",
+    preferredRegionsInput: profile.preferredRegions?.join(", ") ?? profile.preferences.preferredRegions?.join(", ") ?? "",
+    preferredJobGroupsInput:
+      profile.preferredJobGroups?.join(", ") ?? profile.preferences.preferredJobGroups?.join(", ") ?? "",
+    preferredSmoking: profile.preferredSmoking ?? profile.preferences.preferredSmoking ?? "any",
+    preferredDrinking: profile.preferredDrinking ?? profile.preferences.preferredDrinking ?? "any",
     preferredGender:
-      profile.preferences.preferredGenders && profile.preferences.preferredGenders.length > 0
-        ? profile.preferences.preferredGenders[0]
+      profile.preferredGenders && profile.preferredGenders.length > 0
+        ? profile.preferredGenders[0]
+        : profile.preferences.preferredGenders && profile.preferences.preferredGenders.length > 0
+          ? profile.preferences.preferredGenders[0]
         : "any",
-    preferredHeightMinInput: profile.preferences.preferredHeightRange
-      ? String(profile.preferences.preferredHeightRange[0])
+    preferredHeightMinInput: profile.preferredHeightRange
+      ? String(profile.preferredHeightRange[0])
+      : profile.preferences.preferredHeightRange
+        ? String(profile.preferences.preferredHeightRange[0])
       : "",
-    preferredHeightMaxInput: profile.preferences.preferredHeightRange
-      ? String(profile.preferences.preferredHeightRange[1])
+    preferredHeightMaxInput: profile.preferredHeightRange
+      ? String(profile.preferredHeightRange[1])
+      : profile.preferences.preferredHeightRange
+        ? String(profile.preferences.preferredHeightRange[1])
       : "",
     isActive: profile.isActive
   };
@@ -233,11 +332,23 @@ function CupidateProfilePanel({
     () => parseTags(editState.preferredRegionsInput).join(", ") || "-",
     [editState.preferredRegionsInput]
   );
+  const jobGroups = useMemo(
+    () => parseTags(editState.preferredJobGroupsInput).join(", ") || "-",
+    [editState.preferredJobGroupsInput]
+  );
 
   const preferredGenderLabel =
     editState.preferredGender === "any"
       ? t("network.option.preferredGender.any")
       : genderText(editState.preferredGender, t);
+  const lifestyleLabel = `${smokingText(profile.smokingHabit ?? profile.preferences.smokingHabit, t)} / ${drinkingText(
+    profile.drinkingHabit ?? profile.preferences.drinkingHabit,
+    t
+  )}`;
+  const preferredLifestyleLabel = `${preferredSmokingText(editState.preferredSmoking, t)} / ${preferredDrinkingText(
+    editState.preferredDrinking,
+    t
+  )}`;
   const preferredAgeRange = parseRange(editState.preferredAgeMinInput, editState.preferredAgeMaxInput);
   const preferredHeightRange = parseRange(
     editState.preferredHeightMinInput,
@@ -252,6 +363,8 @@ function CupidateProfilePanel({
     const birthYear = parseOptionalNumber(editState.birthYearInput) ?? null;
     const heightCm = parseOptionalNumber(editState.heightInput);
     const location = editState.locationInput.trim().toLowerCase();
+    const preferredRegions = parseTags(editState.preferredRegionsInput);
+    const preferredJobGroups = parseTags(editState.preferredJobGroupsInput);
 
     await onSave({
       cupidateId: profile.cupidateId,
@@ -260,6 +373,18 @@ function CupidateProfilePanel({
       gender: editState.gender,
       bio: editState.bio,
       isActive: editState.isActive,
+      region: location || null,
+      jobTitle: editState.jobTitleInput.trim() || null,
+      heightCm: heightCm ?? null,
+      smokingHabit: editState.smokingHabit,
+      drinkingHabit: editState.drinkingHabit,
+      preferredAgeRange,
+      preferredRegions,
+      preferredJobGroups,
+      preferredSmoking: editState.preferredSmoking,
+      preferredDrinking: editState.preferredDrinking,
+      preferredGenders: editState.preferredGender === "any" ? [] : [editState.preferredGender],
+      preferredHeightRange,
       preferences: {
         ...profile.preferences,
         location: location || undefined,
@@ -267,8 +392,13 @@ function CupidateProfilePanel({
         jobTitle: editState.jobTitleInput.trim() || undefined,
         heightCm,
         hobbies: parseTags(editState.hobbiesInput),
+        smokingHabit: editState.smokingHabit,
+        drinkingHabit: editState.drinkingHabit,
         ageRange: preferredAgeRange,
-        preferredRegions: parseTags(editState.preferredRegionsInput),
+        preferredRegions,
+        preferredJobGroups,
+        preferredSmoking: editState.preferredSmoking,
+        preferredDrinking: editState.preferredDrinking,
         preferredGenders: editState.preferredGender === "any" ? [] : [editState.preferredGender],
         preferredHeightRange
       }
@@ -302,11 +432,11 @@ function CupidateProfilePanel({
         <View style={styles.profileSheetMetaList}>
           {renderMetaLine(t("profile.meta.age"), ageLabel(profile.birthYear))}
           {renderMetaLine(t("profile.meta.gender"), genderText(profile.gender, t))}
-          {renderMetaLine(t("profile.meta.region"), profile.preferences.location ?? profile.preferences.region ?? "-")}
-          {renderMetaLine(t("profile.meta.job"), profile.preferences.jobTitle ?? "-")}
+          {renderMetaLine(t("profile.meta.region"), profile.region ?? profile.preferences.location ?? profile.preferences.region ?? "-")}
+          {renderMetaLine(t("profile.meta.job"), profile.jobTitle ?? profile.preferences.jobTitle ?? "-")}
           {renderMetaLine(
             t("profile.meta.height"),
-            profile.preferences.heightCm ? `${profile.preferences.heightCm} cm` : "-"
+            profile.heightCm ?? profile.preferences.heightCm ? `${profile.heightCm ?? profile.preferences.heightCm} cm` : "-"
           )}
         </View>
       </PixelBox>
@@ -323,10 +453,7 @@ function CupidateProfilePanel({
         </PixelText>
         <View style={styles.profileDivider} />
         {renderMetaLine(t("profile.meta.hobbies"), hobbies)}
-        {renderMetaLine(
-          t("profile.meta.lifestyle"),
-          `${profile.preferences.smokingHabit ?? "-"} / ${profile.preferences.drinkingHabit ?? "-"}`
-        )}
+        {renderMetaLine(t("profile.meta.lifestyle"), lifestyleLabel)}
       </PixelBox>
 
       <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
@@ -339,6 +466,8 @@ function CupidateProfilePanel({
         )}
         {renderMetaLine(t("profile.meta.preferredGender"), preferredGenderLabel)}
         {renderMetaLine(t("profile.meta.preferredRegions"), regions)}
+        {renderMetaLine(t("profile.meta.preferredJobs"), jobGroups)}
+        {renderMetaLine(t("profile.meta.preferredLifestyle"), preferredLifestyleLabel)}
         {renderMetaLine(
           t("profile.meta.preferredHeight"),
           preferredHeightRange ? `${preferredHeightRange[0]} - ${preferredHeightRange[1]} cm` : "-"
@@ -482,6 +611,48 @@ function CupidateProfilePanel({
             style={[styles.input, styles.multilineInput]}
           />
 
+          <PixelText variant="label" style={styles.fieldLabel}>
+            {t("network.fields.smoking")}
+          </PixelText>
+          <View style={styles.buttonRow}>
+            <PixelButton
+              label={t("network.option.smoking.none")}
+              active={editState.smokingHabit === "none"}
+              onPress={() => setEditState((current) => ({ ...current, smokingHabit: "none" }))}
+            />
+            <PixelButton
+              label={t("network.option.smoking.sometimes")}
+              active={editState.smokingHabit === "sometimes"}
+              onPress={() => setEditState((current) => ({ ...current, smokingHabit: "sometimes" }))}
+            />
+            <PixelButton
+              label={t("network.option.smoking.often")}
+              active={editState.smokingHabit === "often"}
+              onPress={() => setEditState((current) => ({ ...current, smokingHabit: "often" }))}
+            />
+          </View>
+
+          <PixelText variant="label" style={styles.fieldLabel}>
+            {t("network.fields.drinking")}
+          </PixelText>
+          <View style={styles.buttonRow}>
+            <PixelButton
+              label={t("network.option.drinking.never")}
+              active={editState.drinkingHabit === "never"}
+              onPress={() => setEditState((current) => ({ ...current, drinkingHabit: "never" }))}
+            />
+            <PixelButton
+              label={t("network.option.drinking.social")}
+              active={editState.drinkingHabit === "social"}
+              onPress={() => setEditState((current) => ({ ...current, drinkingHabit: "social" }))}
+            />
+            <PixelButton
+              label={t("network.option.drinking.often")}
+              active={editState.drinkingHabit === "often"}
+              onPress={() => setEditState((current) => ({ ...current, drinkingHabit: "often" }))}
+            />
+          </View>
+
           <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
             {t("network.form.preferenceTitle")}
           </PixelText>
@@ -526,6 +697,17 @@ function CupidateProfilePanel({
             value={editState.preferredRegionsInput}
             onChangeText={(value) => setEditState((current) => ({ ...current, preferredRegionsInput: value }))}
             placeholder={t("network.placeholders.preferredRegions")}
+            placeholderTextColor={placeholderTextColor}
+            style={styles.input}
+          />
+
+          <PixelText variant="label" style={styles.fieldLabel}>
+            {t("network.fields.preferredJobGroups")}
+          </PixelText>
+          <TextInput
+            value={editState.preferredJobGroupsInput}
+            onChangeText={(value) => setEditState((current) => ({ ...current, preferredJobGroupsInput: value }))}
+            placeholder={t("network.placeholders.preferredJobGroups")}
             placeholderTextColor={placeholderTextColor}
             style={styles.input}
           />
@@ -587,6 +769,53 @@ function CupidateProfilePanel({
                 style={styles.input}
               />
             </View>
+          </View>
+
+          <PixelText variant="label" style={styles.fieldLabel}>
+            {t("network.fields.preferredSmoking")}
+          </PixelText>
+          <View style={styles.buttonRow}>
+            <PixelButton
+              label={t("network.option.preferredSmoking.none_only")}
+              active={editState.preferredSmoking === "none_only"}
+              onPress={() => setEditState((current) => ({ ...current, preferredSmoking: "none_only" }))}
+            />
+            <PixelButton
+              label={t("network.option.preferredSmoking.ok")}
+              active={editState.preferredSmoking === "ok"}
+              onPress={() => setEditState((current) => ({ ...current, preferredSmoking: "ok" }))}
+            />
+            <PixelButton
+              label={t("network.option.preferredSmoking.any")}
+              active={editState.preferredSmoking === "any"}
+              onPress={() => setEditState((current) => ({ ...current, preferredSmoking: "any" }))}
+            />
+          </View>
+
+          <PixelText variant="label" style={styles.fieldLabel}>
+            {t("network.fields.preferredDrinking")}
+          </PixelText>
+          <View style={styles.buttonRow}>
+            <PixelButton
+              label={t("network.option.preferredDrinking.never")}
+              active={editState.preferredDrinking === "never"}
+              onPress={() => setEditState((current) => ({ ...current, preferredDrinking: "never" }))}
+            />
+            <PixelButton
+              label={t("network.option.preferredDrinking.social")}
+              active={editState.preferredDrinking === "social"}
+              onPress={() => setEditState((current) => ({ ...current, preferredDrinking: "social" }))}
+            />
+            <PixelButton
+              label={t("network.option.preferredDrinking.often")}
+              active={editState.preferredDrinking === "often"}
+              onPress={() => setEditState((current) => ({ ...current, preferredDrinking: "often" }))}
+            />
+            <PixelButton
+              label={t("network.option.preferredDrinking.any")}
+              active={editState.preferredDrinking === "any"}
+              onPress={() => setEditState((current) => ({ ...current, preferredDrinking: "any" }))}
+            />
           </View>
 
           <PixelText variant="label" style={styles.fieldLabel}>

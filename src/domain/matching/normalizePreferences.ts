@@ -61,6 +61,18 @@ function normalizeRegions(regions?: string[]): string[] {
   return Array.from(new Set(normalized));
 }
 
+function normalizeJobGroups(values?: string[]): string[] {
+  if (!values?.length) {
+    return [];
+  }
+
+  const normalized = values
+    .map((value) => value.trim().toLowerCase())
+    .filter(Boolean);
+
+  return Array.from(new Set(normalized));
+}
+
 function normalizeGenderPreferences(values?: string[]): GenderPreference[] {
   if (!values?.length) {
     return [];
@@ -149,6 +161,7 @@ function normalizeHeight(value: number | null | undefined): number | undefined {
 export function normalizePreferenceData(input: PreferenceData): PreferenceData {
   const region = (input.region ?? input.location)?.trim().toLowerCase() || undefined;
   const preferredRegions = normalizeRegions(input.preferredRegions);
+  const preferredJobGroups = normalizeJobGroups(input.preferredJobGroups);
 
   return {
     ageRange: clampAgeRange(input.ageRange),
@@ -156,6 +169,7 @@ export function normalizePreferenceData(input: PreferenceData): PreferenceData {
     hobbies: normalizeTags(input.hobbies),
     region,
     preferredRegions: preferredRegions.length > 0 ? preferredRegions : region ? [region] : [],
+    preferredJobGroups,
     smokingHabit: normalizeSmokingHabit(input.smokingHabit ?? input.smoking),
     drinkingHabit: normalizeDrinkingHabit(input.drinkingHabit ?? input.drinking),
     preferredSmoking: normalizeSmokingPreference(input.preferredSmoking ?? input.smoking),

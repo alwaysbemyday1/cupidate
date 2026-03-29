@@ -92,13 +92,91 @@ begin
       responded_at = excluded.responded_at,
       updated_at = now();
 
-  insert into public.cupidates (id, owner_cupid_id, display_name, birth_year, gender, bio, is_active)
+  insert into public.cupidates (
+    id,
+    owner_cupid_id,
+    display_name,
+    birth_year,
+    gender,
+    bio,
+    is_active,
+    region,
+    job_title,
+    height_cm,
+    smoking_habit,
+    drinking_habit
+  )
   values
-    (my_mina_id, base_cupid_id, 'Mina', 1998, 'female', 'Coffee, calm walks, and thoughtful conversations.', true),
-    (my_dohun_id, base_cupid_id, 'Dohun', 1994, 'male', 'Weekend runner with a warm and steady style.', true),
-    (my_hana_id, base_cupid_id, 'Hana', 1996, 'female', 'Currently paused from matching while focusing on work.', false),
-    (remote_yuna_id, connected_cupid_id, 'Yuna', 1997, 'female', 'Designer energy, bright humor, and city-date vibes.', true),
-    (remote_jin_id, connected_cupid_id, 'Jin', 1993, 'male', 'Product-minded foodie who likes honest communication.', true)
+    (
+      my_mina_id,
+      base_cupid_id,
+      'Mina',
+      1998,
+      'female',
+      'Coffee, calm walks, and thoughtful conversations.',
+      true,
+      'seoul',
+      'Brand Strategist',
+      164,
+      'none',
+      'social'
+    ),
+    (
+      my_dohun_id,
+      base_cupid_id,
+      'Dohun',
+      1994,
+      'male',
+      'Weekend runner with a warm and steady style.',
+      true,
+      'seoul',
+      'Frontend Engineer',
+      178,
+      'none',
+      'social'
+    ),
+    (
+      my_hana_id,
+      base_cupid_id,
+      'Hana',
+      1996,
+      'female',
+      'Currently paused from matching while focusing on work.',
+      false,
+      'seoul',
+      'Finance Manager',
+      165,
+      'none',
+      'social'
+    ),
+    (
+      remote_yuna_id,
+      connected_cupid_id,
+      'Yuna',
+      1997,
+      'female',
+      'Designer energy, bright humor, and city-date vibes.',
+      true,
+      'seoul',
+      'Product Designer',
+      166,
+      'none',
+      'social'
+    ),
+    (
+      remote_jin_id,
+      connected_cupid_id,
+      'Jin',
+      1993,
+      'male',
+      'Product-minded foodie who likes honest communication.',
+      true,
+      'bundang',
+      'PM',
+      181,
+      'none',
+      'social'
+    )
   on conflict (id) do update
   set owner_cupid_id = excluded.owner_cupid_id,
       display_name = excluded.display_name,
@@ -106,97 +184,113 @@ begin
       gender = excluded.gender,
       bio = excluded.bio,
       is_active = excluded.is_active,
+      region = excluded.region,
+      job_title = excluded.job_title,
+      height_cm = excluded.height_cm,
+      smoking_habit = excluded.smoking_habit,
+      drinking_habit = excluded.drinking_habit,
       updated_at = now();
 
-  insert into public.cupidate_preferences (cupidate_id, preferences)
+  insert into public.cupidate_preferences (
+    cupidate_id,
+    preferences,
+    preferred_age_min,
+    preferred_age_max,
+    preferred_height_min_cm,
+    preferred_height_max_cm,
+    preferred_regions,
+    preferred_job_groups,
+    preferred_smoking,
+    preferred_drinking,
+    preferred_genders
+  )
   values
     (
       my_mina_id,
       '{
-        "location":"seoul",
-        "jobTitle":"Brand Strategist",
-        "hobbies":["coffee","exhibition","walking"],
-        "heightCm":164,
-        "smoking":"none",
-        "drinking":"social",
-        "preferredGender":"male",
-        "preferredAgeRange":[29,35],
-        "preferredRegions":["seoul","bundang"],
-        "preferredHeightRange":[172,184],
-        "preferredSmoking":"none_only",
-        "preferredDrinking":"social"
-      }'::jsonb
+        "hobbies":["coffee","exhibition","walking"]
+      }'::jsonb,
+      29,
+      35,
+      172,
+      184,
+      array['seoul','bundang'],
+      array['engineer','pm','product'],
+      'none_only',
+      'social',
+      array['male']
     ),
     (
       my_dohun_id,
       '{
-        "location":"seoul",
-        "jobTitle":"Frontend Engineer",
-        "hobbies":["running","ramen","travel"],
-        "heightCm":178,
-        "smoking":"none",
-        "drinking":"social",
-        "preferredGender":"female",
-        "preferredAgeRange":[25,33],
-        "preferredRegions":["seoul"],
-        "preferredHeightRange":[158,170],
-        "preferredSmoking":"none_only",
-        "preferredDrinking":"any"
-      }'::jsonb
+        "hobbies":["running","ramen","travel"]
+      }'::jsonb,
+      25,
+      33,
+      158,
+      170,
+      array['seoul'],
+      array['designer','brand','marketing'],
+      'none_only',
+      'any',
+      array['female']
     ),
     (
       my_hana_id,
       '{
-        "location":"seoul",
-        "jobTitle":"Finance Manager",
-        "hobbies":["pilates","brunch","reading"],
-        "heightCm":165,
-        "smoking":"none",
-        "drinking":"social",
-        "preferredGender":"male",
-        "preferredAgeRange":[29,36],
-        "preferredRegions":["seoul","bundang"],
-        "preferredHeightRange":[173,185],
-        "preferredSmoking":"none_only",
-        "preferredDrinking":"social"
-      }'::jsonb
+        "hobbies":["pilates","brunch","reading"]
+      }'::jsonb,
+      29,
+      36,
+      173,
+      185,
+      array['seoul','bundang'],
+      array['finance','consulting','strategy'],
+      'none_only',
+      'social',
+      array['male']
     ),
     (
       remote_yuna_id,
       '{
-        "location":"seoul",
-        "jobTitle":"Product Designer",
-        "hobbies":["coffee","travel","exhibition"],
-        "heightCm":166,
-        "smoking":"none",
-        "drinking":"social",
-        "preferredGender":"male",
-        "preferredAgeRange":[28,36],
-        "preferredRegions":["seoul","bundang"],
-        "preferredHeightRange":[173,185],
-        "preferredSmoking":"none_only",
-        "preferredDrinking":"social"
-      }'::jsonb
+        "hobbies":["coffee","travel","exhibition"]
+      }'::jsonb,
+      28,
+      36,
+      173,
+      185,
+      array['seoul','bundang'],
+      array['engineer','pm','product'],
+      'none_only',
+      'social',
+      array['male']
     ),
     (
       remote_jin_id,
       '{
-        "location":"bundang",
-        "jobTitle":"PM",
-        "hobbies":["running","ramen","movie"],
-        "heightCm":181,
-        "smoking":"none",
-        "drinking":"social",
-        "preferredGender":"female",
-        "preferredAgeRange":[24,32],
-        "preferredRegions":["seoul","bundang"],
-        "preferredHeightRange":[158,170],
-        "preferredSmoking":"ok",
-        "preferredDrinking":"social"
-      }'::jsonb
+        "hobbies":["running","ramen","movie"]
+      }'::jsonb,
+      24,
+      32,
+      158,
+      170,
+      array['seoul','bundang'],
+      array['designer','brand','marketing'],
+      'ok',
+      'social',
+      array['female']
     )
   on conflict (cupidate_id) do update
   set preferences = excluded.preferences,
+      preferred_age_min = excluded.preferred_age_min,
+      preferred_age_max = excluded.preferred_age_max,
+      preferred_height_min_cm = excluded.preferred_height_min_cm,
+      preferred_height_max_cm = excluded.preferred_height_max_cm,
+      preferred_regions = excluded.preferred_regions,
+      preferred_job_groups = excluded.preferred_job_groups,
+      preferred_smoking = excluded.preferred_smoking,
+      preferred_drinking = excluded.preferred_drinking,
+      preferred_genders = excluded.preferred_genders,
       updated_at = now();
 
   insert into public.match_candidates (

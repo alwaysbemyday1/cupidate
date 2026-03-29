@@ -88,6 +88,18 @@ export type CupidateProfileSummary = {
   gender: string;
   bio: string;
   isActive: boolean;
+  region: CupidateRecord["region"];
+  jobTitle: CupidateRecord["jobTitle"];
+  heightCm: CupidateRecord["heightCm"];
+  smokingHabit: CupidateRecord["smokingHabit"];
+  drinkingHabit: CupidateRecord["drinkingHabit"];
+  preferredAgeRange: CupidateRecord["preferredAgeRange"];
+  preferredRegions: CupidateRecord["preferredRegions"];
+  preferredJobGroups: CupidateRecord["preferredJobGroups"];
+  preferredSmoking: CupidateRecord["preferredSmoking"];
+  preferredDrinking: CupidateRecord["preferredDrinking"];
+  preferredGenders: CupidateRecord["preferredGenders"];
+  preferredHeightRange: CupidateRecord["preferredHeightRange"];
   preferences: CupidateRecord["preferences"];
   canEdit: boolean;
   stats: {
@@ -106,5 +118,17 @@ export type CupidateProfileDraft = {
   gender: string;
   bio: string;
   isActive: boolean;
+  region?: CupidateRecord["region"];
+  jobTitle?: CupidateRecord["jobTitle"];
+  heightCm?: CupidateRecord["heightCm"];
+  smokingHabit?: CupidateRecord["smokingHabit"];
+  drinkingHabit?: CupidateRecord["drinkingHabit"];
+  preferredAgeRange?: CupidateRecord["preferredAgeRange"];
+  preferredRegions?: CupidateRecord["preferredRegions"];
+  preferredJobGroups?: CupidateRecord["preferredJobGroups"];
+  preferredSmoking?: CupidateRecord["preferredSmoking"];
+  preferredDrinking?: CupidateRecord["preferredDrinking"];
+  preferredGenders?: CupidateRecord["preferredGenders"];
+  preferredHeightRange?: CupidateRecord["preferredHeightRange"];
   preferences: CupidateRecord["preferences"];
 };

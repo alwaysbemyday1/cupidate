@@ -1,4 +1,4 @@
-import { normalizePreferenceData } from "./normalizePreferences";
+import { resolveCupidateProfilePreferences } from "./resolveCupidatePreferenceData";
 import type {
   CupidateProfile,
   DrinkingHabit,
@@ -157,13 +157,53 @@ function heightFit(preferredHeightRange?: [number, number] | null, targetHeight?
   return Math.max(0, 1 - distance / 25);
 }
 
+function normalizeSearchText(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9\u3131-\uD79D\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function jobGroupFit(preferredJobGroups: string[], targetJobTitle?: string): number {
+  if (!preferredJobGroups.length) {
+    return 0.6;
+  }
+
+  if (!targetJobTitle) {
+    return 0.5;
+  }
+
+  const normalizedTarget = normalizeSearchText(targetJobTitle);
+  if (!normalizedTarget) {
+    return 0.5;
+  }
+
+  const targetTokens = new Set(normalizedTarget.split(" "));
+  const matched = preferredJobGroups.some((jobGroup) => {
+    const normalizedGroup = normalizeSearchText(jobGroup);
+    if (!normalizedGroup) {
+      return false;
+    }
+
+    if (normalizedTarget.includes(normalizedGroup) || normalizedGroup.includes(normalizedTarget)) {
+      return true;
+    }
+
+    return normalizedGroup.split(" ").some((token) => targetTokens.has(token));
+  });
+
+  return matched ? 1 : 0.2;
+}
+
 export function calculateMatchScore(
   source: CupidateProfile,
   target: CupidateProfile,
   currentYear = new Date().getFullYear()
 ): MatchScoreResult {
-  const sourcePref = normalizePreferenceData(source.preferences);
-  const targetPref = normalizePreferenceData(target.preferences);
+  const sourcePref = resolveCupidateProfilePreferences(source);
+  const targetPref = resolveCupidateProfilePreferences(target);
 
   const sourceAge = computeAgeFromBirthYear(source.birthYear, currentYear);
   const targetAge = computeAgeFromBirthYear(target.birthYear, currentYear);
@@ -191,8 +231,18 @@ export function calculateMatchScore(
   const targetToSourceGender = genderFit(targetPref.preferredGenders || [], normalizeGender(source.gender));
   const sourceToTargetHeight = heightFit(sourcePref.preferredHeightRange, targetPref.heightCm);
   const targetToSourceHeight = heightFit(targetPref.preferredHeightRange, sourcePref.heightCm);
+  const sourceToTargetJob = jobGroupFit(sourcePref.preferredJobGroups || [], targetPref.jobTitle);
+  const targetToSourceJob = jobGroupFit(targetPref.preferredJobGroups || [], sourcePref.jobTitle);
   const profileScore =
-    ((sourceToTargetGender + targetToSourceGender + sourceToTargetHeight + targetToSourceHeight) / 4) *
+    (
+      sourceToTargetGender +
+      targetToSourceGender +
+      sourceToTargetHeight +
+      targetToSourceHeight +
+      sourceToTargetJob +
+      targetToSourceJob
+    ) /
+    6 *
     WEIGHTS.profile;
 
   const rawScore = ageScore + hobbyScore + lifestyleScore + locationScore + profileScore;

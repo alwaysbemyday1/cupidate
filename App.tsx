@@ -166,6 +166,8 @@ function CupidateAppShell() {
                 onChangePreferredAgeMaxInput={state.setPreferredAgeMaxInput}
                 preferredRegionsInput={state.preferredRegionsInput}
                 onChangePreferredRegionsInput={state.setPreferredRegionsInput}
+                preferredJobGroupsInput={state.preferredJobGroupsInput}
+                onChangePreferredJobGroupsInput={state.setPreferredJobGroupsInput}
                 preferredSmoking={state.preferredSmoking}
                 onChangePreferredSmoking={state.setPreferredSmoking}
                 preferredDrinking={state.preferredDrinking}

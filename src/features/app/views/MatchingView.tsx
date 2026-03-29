@@ -69,6 +69,15 @@ function buildAvatarSeed(label: string) {
   return Array.from(trimmed.replace(/\s+/g, "")).slice(0, 2).join("").toUpperCase();
 }
 
+function buildCupidateSubtitle(cupidate?: CupidateRecord) {
+  if (!cupidate) {
+    return undefined;
+  }
+
+  const parts = [cupidate.region, cupidate.jobTitle].filter(Boolean);
+  return parts.length > 0 ? parts.join(" · ") : undefined;
+}
+
 function formatDateLabel(value: string) {
   const date = new Date(value);
 
@@ -326,11 +335,19 @@ export function MatchingView({
               backgroundColor={designTokens.color.surface}
             >
               <View style={styles.matchingCardTopRow}>
-                {renderMiniProfile(item.sourceCupidateId, item.sourceName)}
+                {renderMiniProfile(
+                  item.sourceCupidateId,
+                  item.sourceName,
+                  buildCupidateSubtitle(cupidateMap.get(item.sourceCupidateId))
+                )}
                 <PixelText variant="screenTitle" style={styles.recommendationHeart}>
                   ♥
                 </PixelText>
-                {renderMiniProfile(item.targetCupidateId, item.targetName)}
+                {renderMiniProfile(
+                  item.targetCupidateId,
+                  item.targetName,
+                  buildCupidateSubtitle(cupidateMap.get(item.targetCupidateId))
+                )}
               </View>
 
               <View style={styles.matchingCardMetaBlock}>

@@ -215,6 +215,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
   const [preferredAgeMinInput, setPreferredAgeMinInput] = useState("24");
   const [preferredAgeMaxInput, setPreferredAgeMaxInput] = useState("35");
   const [preferredRegionsInput, setPreferredRegionsInput] = useState("seoul");
+  const [preferredJobGroupsInput, setPreferredJobGroupsInput] = useState("");
   const [preferredSmoking, setPreferredSmoking] = useState<"none_only" | "ok" | "any">("any");
   const [preferredDrinking, setPreferredDrinking] = useState<"never" | "social" | "often" | "any">("any");
   const [preferredGender, setPreferredGender] = useState<"any" | "male" | "female" | "other">("any");
@@ -269,6 +270,18 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
         gender: item.gender ?? "unknown",
         bio: item.bio ?? "",
         isActive: item.isActive,
+        region: item.region,
+        jobTitle: item.jobTitle,
+        heightCm: item.heightCm,
+        smokingHabit: item.smokingHabit,
+        drinkingHabit: item.drinkingHabit,
+        preferredAgeRange: item.preferredAgeRange,
+        preferredRegions: item.preferredRegions,
+        preferredJobGroups: item.preferredJobGroups,
+        preferredSmoking: item.preferredSmoking,
+        preferredDrinking: item.preferredDrinking,
+        preferredGenders: item.preferredGenders,
+        preferredHeightRange: item.preferredHeightRange,
         preferences: item.preferences
       })),
     [cupidatesQuery.data]
@@ -462,6 +475,18 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       gender: cupidate.gender,
       bio: cupidate.bio,
       isActive: cupidate.isActive,
+      region: cupidate.region,
+      jobTitle: cupidate.jobTitle,
+      heightCm: cupidate.heightCm,
+      smokingHabit: cupidate.smokingHabit,
+      drinkingHabit: cupidate.drinkingHabit,
+      preferredAgeRange: cupidate.preferredAgeRange,
+      preferredRegions: cupidate.preferredRegions,
+      preferredJobGroups: cupidate.preferredJobGroups,
+      preferredSmoking: cupidate.preferredSmoking,
+      preferredDrinking: cupidate.preferredDrinking,
+      preferredGenders: cupidate.preferredGenders,
+      preferredHeightRange: cupidate.preferredHeightRange,
       preferences: cupidate.preferences,
       canEdit: cupidate.ownerCupidId === myCupidId,
       stats: {
@@ -573,6 +598,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     const parsedBirthYear = birthYearInput ? Number(birthYearInput) : null;
     const region = locationInput.trim().toLowerCase() || "seoul";
     const preferredRegions = parseHobbies(preferredRegionsInput);
+    const preferredJobGroups = parseHobbies(preferredJobGroupsInput);
 
     await createCupidateMutation.mutateAsync({
       displayName: displayName.trim(),
@@ -580,20 +606,20 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       gender,
       bio: bio.trim(),
       isActive: false,
+      region,
+      jobTitle: jobTitleInput.trim() || null,
+      heightCm: parsedHeight ?? null,
+      smokingHabit,
+      drinkingHabit,
+      preferredAgeRange,
+      preferredRegions: preferredRegions.length ? preferredRegions : [region],
+      preferredJobGroups,
+      preferredSmoking,
+      preferredDrinking,
+      preferredGenders: preferredGender === "any" ? [] : [preferredGender],
+      preferredHeightRange,
       preferences: {
-        ageRange: preferredAgeRange,
-        hobbies: parseHobbies(hobbiesInput),
-        region,
-        location: region,
-        preferredRegions: preferredRegions.length ? preferredRegions : [region],
-        jobTitle: jobTitleInput.trim() || undefined,
-        heightCm: parsedHeight,
-        smokingHabit,
-        drinkingHabit,
-        preferredSmoking,
-        preferredDrinking,
-        preferredGenders: preferredGender === "any" ? [] : [preferredGender],
-        preferredHeightRange
+        hobbies: parseHobbies(hobbiesInput)
       } as CupidateRecord["preferences"]
     });
 
@@ -610,6 +636,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     setPreferredAgeMinInput("24");
     setPreferredAgeMaxInput("35");
     setPreferredRegionsInput("seoul");
+    setPreferredJobGroupsInput("");
     setPreferredSmoking("any");
     setPreferredDrinking("any");
     setPreferredGender("any");
@@ -727,6 +754,18 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       gender: draft.gender,
       bio: draft.bio.trim(),
       isActive: draft.isActive,
+      region: draft.region,
+      jobTitle: draft.jobTitle,
+      heightCm: draft.heightCm,
+      smokingHabit: draft.smokingHabit,
+      drinkingHabit: draft.drinkingHabit,
+      preferredAgeRange: draft.preferredAgeRange,
+      preferredRegions: draft.preferredRegions,
+      preferredJobGroups: draft.preferredJobGroups,
+      preferredSmoking: draft.preferredSmoking,
+      preferredDrinking: draft.preferredDrinking,
+      preferredGenders: draft.preferredGenders,
+      preferredHeightRange: draft.preferredHeightRange,
       preferences: draft.preferences
     });
   };
@@ -844,6 +883,8 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       setPreferredAgeMaxInput,
       preferredRegionsInput,
       setPreferredRegionsInput,
+      preferredJobGroupsInput,
+      setPreferredJobGroupsInput,
       preferredSmoking,
       setPreferredSmoking,
       preferredDrinking,

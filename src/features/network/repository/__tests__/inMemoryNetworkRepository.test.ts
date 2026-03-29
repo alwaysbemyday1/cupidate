@@ -9,10 +9,20 @@ describe("InMemoryNetworkRepository", () => {
       birthYear: 1998,
       gender: "female",
       bio: "coffee and books",
+      region: "seoul",
+      jobTitle: "Product Designer",
+      heightCm: 164,
+      smokingHabit: "none",
+      drinkingHabit: "social",
+      preferredAgeRange: [26, 34],
+      preferredRegions: ["seoul", "bundang"],
+      preferredJobGroups: ["engineer", "pm"],
+      preferredSmoking: "none_only",
+      preferredDrinking: "social",
+      preferredGenders: ["male"],
       preferences: {
-        ageRange: [26, 34],
         hobbies: ["coffee", "travel"],
-        location: "seoul"
+        mbti: "INFJ"
       }
     });
 
@@ -21,6 +31,10 @@ describe("InMemoryNetworkRepository", () => {
     expect(cupidates).toHaveLength(1);
     expect(cupidates[0].displayName).toBe("Mina");
     expect(cupidates[0].isActive).toBe(false);
+    expect(cupidates[0].region).toBe("seoul");
+    expect(cupidates[0].jobTitle).toBe("Product Designer");
+    expect(cupidates[0].preferredJobGroups).toEqual(["engineer", "pm"]);
+    expect(cupidates[0].preferences.mbti).toBe("INFJ");
     expect(cupidates[0].preferences.hobbies).toEqual(["coffee", "travel"]);
   });
 
@@ -48,7 +62,8 @@ describe("InMemoryNetworkRepository", () => {
 
     expect(updated.displayName).toBe("Mina Kim");
     expect(updated.isActive).toBe(true);
-    expect(updated.preferences.location).toBe("busan");
+    expect(updated.region).toBe("busan");
+    expect(updated.preferences.region).toBe("busan");
   });
 
   it("creates outbound connection with counterpart metadata", async () => {
