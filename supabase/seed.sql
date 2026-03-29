@@ -202,7 +202,8 @@ begin
     preferred_job_groups,
     preferred_smoking,
     preferred_drinking,
-    preferred_genders
+    preferred_genders,
+    must_have_condition_keys
   )
   values
     (
@@ -218,7 +219,8 @@ begin
       array['engineer','pm','product'],
       'none_only',
       'social',
-      array['male']
+      array['male'],
+      array['preferred_regions','preferred_job_groups','preferred_smoking']::public.preference_condition_key[]
     ),
     (
       my_dohun_id,
@@ -233,7 +235,8 @@ begin
       array['designer','brand','marketing'],
       'none_only',
       'any',
-      array['female']
+      array['female'],
+      array['shared_hobbies','preferred_regions']::public.preference_condition_key[]
     ),
     (
       my_hana_id,
@@ -248,7 +251,8 @@ begin
       array['finance','consulting','strategy'],
       'none_only',
       'social',
-      array['male']
+      array['male'],
+      array['preferred_regions','preferred_job_groups','preferred_height_range']::public.preference_condition_key[]
     ),
     (
       remote_yuna_id,
@@ -263,7 +267,8 @@ begin
       array['engineer','pm','product'],
       'none_only',
       'social',
-      array['male']
+      array['male'],
+      array['preferred_regions','preferred_job_groups','shared_hobbies']::public.preference_condition_key[]
     ),
     (
       remote_jin_id,
@@ -278,7 +283,8 @@ begin
       array['designer','brand','marketing'],
       'ok',
       'social',
-      array['female']
+      array['female'],
+      array['shared_hobbies','preferred_height_range']::public.preference_condition_key[]
     )
   on conflict (cupidate_id) do update
   set preferences = excluded.preferences,
@@ -291,6 +297,7 @@ begin
       preferred_smoking = excluded.preferred_smoking,
       preferred_drinking = excluded.preferred_drinking,
       preferred_genders = excluded.preferred_genders,
+      must_have_condition_keys = excluded.must_have_condition_keys,
       updated_at = now();
 
   insert into public.match_candidates (

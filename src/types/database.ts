@@ -116,6 +116,16 @@ export type Database = {
           preferred_smoking: "none_only" | "ok" | "any" | null;
           preferred_drinking: "never" | "social" | "often" | "any" | null;
           preferred_genders: ("female" | "male" | "other")[];
+          must_have_condition_keys: (
+            | "age_range"
+            | "shared_hobbies"
+            | "preferred_regions"
+            | "preferred_job_groups"
+            | "preferred_smoking"
+            | "preferred_drinking"
+            | "preferred_gender"
+            | "preferred_height_range"
+          )[];
           created_at: string;
           updated_at: string;
         };
@@ -132,6 +142,16 @@ export type Database = {
           preferred_smoking?: "none_only" | "ok" | "any" | null;
           preferred_drinking?: "never" | "social" | "often" | "any" | null;
           preferred_genders?: ("female" | "male" | "other")[];
+          must_have_condition_keys?: (
+            | "age_range"
+            | "shared_hobbies"
+            | "preferred_regions"
+            | "preferred_job_groups"
+            | "preferred_smoking"
+            | "preferred_drinking"
+            | "preferred_gender"
+            | "preferred_height_range"
+          )[];
           created_at?: string;
           updated_at?: string;
         };
@@ -148,6 +168,16 @@ export type Database = {
           preferred_smoking?: "none_only" | "ok" | "any" | null;
           preferred_drinking?: "never" | "social" | "often" | "any" | null;
           preferred_genders?: ("female" | "male" | "other")[];
+          must_have_condition_keys?: (
+            | "age_range"
+            | "shared_hobbies"
+            | "preferred_regions"
+            | "preferred_job_groups"
+            | "preferred_smoking"
+            | "preferred_drinking"
+            | "preferred_gender"
+            | "preferred_height_range"
+          )[];
           created_at?: string;
           updated_at?: string;
         };

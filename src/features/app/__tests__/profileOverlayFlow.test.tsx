@@ -41,6 +41,7 @@ describe("Profile overlay flow", () => {
             preferredDrinking: "social",
             preferredGenders: ["male"],
             preferredHeightRange: [172, 184],
+            mustHaveConditionKeys: ["preferred_job_groups", "preferred_regions"],
             preferences: {
               ageRange: [25, 34],
               hobbies: ["coffee", "books"],
@@ -69,6 +70,7 @@ describe("Profile overlay flow", () => {
             preferredDrinking: "social",
             preferredGenders: ["female"],
             preferredHeightRange: [158, 172],
+            mustHaveConditionKeys: ["shared_hobbies"],
             preferences: {
               ageRange: [24, 35],
               hobbies: ["coffee", "music"],
@@ -187,6 +189,32 @@ describe("Profile overlay flow", () => {
       expect(screen.getByDisplayValue("busan")).toBeTruthy();
       expect(screen.getByDisplayValue("Product Designer")).toBeTruthy();
       expect(screen.getByDisplayValue("finance, strategy")).toBeTruthy();
+    });
+  });
+
+  it("caps must-have condition selection at five items", async () => {
+    render(<App />);
+
+    fireEvent.press(screen.getByTestId("tab-network"));
+    fireEvent.press(screen.getByTestId("network-segment-cupidates"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("profile-open-cupidate-mine-1")).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByTestId("profile-open-cupidate-mine-1"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("profile-must-have-shared_hobbies")).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByTestId("profile-must-have-shared_hobbies"));
+    fireEvent.press(screen.getByTestId("profile-must-have-preferred_smoking"));
+    fireEvent.press(screen.getByTestId("profile-must-have-preferred_drinking"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Five are already selected. Uncheck one to choose another.")).toBeTruthy();
+      expect(screen.getByTestId("profile-must-have-preferred_height_range").props.accessibilityState.disabled).toBe(true);
     });
   });
 });

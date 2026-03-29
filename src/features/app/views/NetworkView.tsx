@@ -1,6 +1,11 @@
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, TextInput, View, useWindowDimensions } from "react-native";
 
+import {
+  MAX_MUST_HAVE_CONDITIONS,
+  PREFERENCE_CONDITION_KEYS,
+  type PreferenceConditionKey
+} from "../../../domain/matching/types";
 import { useI18n } from "../../i18n/context";
 import { PixelBox } from "../components/PixelBox";
 import { PixelButton } from "../components/PixelButton";
@@ -68,6 +73,8 @@ type NetworkViewProps = {
   onChangePreferredHeightMinInput: (value: string) => void;
   preferredHeightMaxInput: string;
   onChangePreferredHeightMaxInput: (value: string) => void;
+  mustHaveConditionKeys: PreferenceConditionKey[];
+  onChangeMustHaveConditionKeys: (value: PreferenceConditionKey[]) => void;
   bio: string;
   onChangeBio: (value: string) => void;
   errors: ValidationErrors;
@@ -246,6 +253,8 @@ export function NetworkView({
   onChangePreferredHeightMinInput,
   preferredHeightMaxInput,
   onChangePreferredHeightMaxInput,
+  mustHaveConditionKeys,
+  onChangeMustHaveConditionKeys,
   bio,
   onChangeBio,
   errors,
@@ -271,6 +280,15 @@ export function NetworkView({
   const [cupidSubview, setCupidSubview] = useState<DetailSubview>("register");
   const isWideHero = width >= 410;
   const boardColumns = width < 360 ? 3 : 4;
+  const mustHaveItems = useMemo(
+    () =>
+      PREFERENCE_CONDITION_KEYS.map((key) => ({
+        key,
+        label: t(`network.option.mustHave.${key}`)
+      })),
+    [t]
+  );
+  const isMustHaveLimitReached = mustHaveConditionKeys.length >= MAX_MUST_HAVE_CONDITIONS;
 
   const myCupidates = useMemo(
     () => cupidates.filter((item) => item.ownerCupidId === currentCupidId),
@@ -413,6 +431,19 @@ export function NetworkView({
         </PixelBox>
       </Pressable>
     );
+  }
+
+  function toggleMustHaveCondition(key: PreferenceConditionKey) {
+    if (mustHaveConditionKeys.includes(key)) {
+      onChangeMustHaveConditionKeys(mustHaveConditionKeys.filter((item) => item !== key));
+      return;
+    }
+
+    if (isMustHaveLimitReached) {
+      return;
+    }
+
+    onChangeMustHaveConditionKeys([...mustHaveConditionKeys, key]);
   }
 
   return (
@@ -994,6 +1025,35 @@ export function NetworkView({
                 active={preferredDrinking === "any"}
                 onPress={() => onChangePreferredDrinking("any")}
               />
+            </View>
+
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.mustHave")}
+            </PixelText>
+            <PixelText variant="caption" style={styles.fieldHint}>
+              {t("network.fields.mustHaveHint", { count: MAX_MUST_HAVE_CONDITIONS })}
+            </PixelText>
+            {isMustHaveLimitReached ? (
+              <PixelText variant="caption" style={styles.errorText}>
+                {t("network.fields.mustHaveLimit")}
+              </PixelText>
+            ) : null}
+            <View style={styles.buttonRow}>
+              {mustHaveItems.map((item) => {
+                const selected = mustHaveConditionKeys.includes(item.key);
+
+                return (
+                  <PixelButton
+                    key={item.key}
+                    label={item.label}
+                    variant={selected ? "primary" : "secondary"}
+                    active={selected}
+                    disabled={!selected && isMustHaveLimitReached}
+                    testID={`network-must-have-${item.key}`}
+                    onPress={() => toggleMustHaveCondition(item.key)}
+                  />
+                );
+              })}
             </View>
 
             <View style={styles.buttonRow}>

@@ -180,6 +180,8 @@ function CupidateAppShell() {
                 onChangePreferredHeightMinInput={state.setPreferredHeightMinInput}
                 preferredHeightMaxInput={state.preferredHeightMaxInput}
                 onChangePreferredHeightMaxInput={state.setPreferredHeightMaxInput}
+                mustHaveConditionKeys={state.mustHaveConditionKeys}
+                onChangeMustHaveConditionKeys={state.setMustHaveConditionKeys}
                 bio={state.bio}
                 onChangeBio={state.setBio}
                 errors={state.errors}

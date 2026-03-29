@@ -27,7 +27,8 @@ export function resolveCupidatePreferenceData(
     preferredSmoking: structured?.preferredSmoking ?? preferences.preferredSmoking,
     preferredDrinking: structured?.preferredDrinking ?? preferences.preferredDrinking,
     preferredGenders: withFallbackArray(structured?.preferredGenders, preferences.preferredGenders),
-    preferredHeightRange: structured?.preferredHeightRange ?? preferences.preferredHeightRange
+    preferredHeightRange: structured?.preferredHeightRange ?? preferences.preferredHeightRange,
+    mustHaveConditionKeys: withFallbackArray(structured?.mustHaveConditionKeys, preferences.mustHaveConditionKeys)
   });
 }
 
@@ -44,6 +45,7 @@ export function resolveCupidateProfilePreferences(profile: CupidateProfile): Pre
     preferredSmoking: profile.preferredSmoking,
     preferredDrinking: profile.preferredDrinking,
     preferredGenders: profile.preferredGenders,
-    preferredHeightRange: profile.preferredHeightRange
+    preferredHeightRange: profile.preferredHeightRange,
+    mustHaveConditionKeys: profile.mustHaveConditionKeys
   });
 }

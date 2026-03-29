@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, TextInput, View } from "react-native";
 
+import {
+  MAX_MUST_HAVE_CONDITIONS,
+  PREFERENCE_CONDITION_KEYS,
+  type PreferenceConditionKey
+} from "../../../domain/matching/types";
 import { useI18n } from "../../i18n/context";
 import { PixelBox } from "../components/PixelBox";
 import { PixelButton } from "../components/PixelButton";
@@ -41,6 +46,7 @@ type CupidateEditState = {
   preferredGender: "any" | "male" | "female" | "other";
   preferredHeightMinInput: string;
   preferredHeightMaxInput: string;
+  mustHaveConditionKeys: PreferenceConditionKey[];
   isActive: boolean;
 };
 
@@ -255,6 +261,7 @@ function buildEditState(profile: CupidateProfileSummary): CupidateEditState {
       : profile.preferences.preferredHeightRange
         ? String(profile.preferences.preferredHeightRange[1])
       : "",
+    mustHaveConditionKeys: profile.mustHaveConditionKeys ?? profile.preferences.mustHaveConditionKeys ?? [],
     isActive: profile.isActive
   };
 }
@@ -341,6 +348,22 @@ function CupidateProfilePanel({
     editState.preferredGender === "any"
       ? t("network.option.preferredGender.any")
       : genderText(editState.preferredGender, t);
+  const mustHaveLabels = useMemo(
+    () =>
+      (editState.mustHaveConditionKeys ?? [])
+        .map((key) => t(`network.option.mustHave.${key}`))
+        .join(", ") || "-",
+    [editState.mustHaveConditionKeys, t]
+  );
+  const mustHaveItems = useMemo(
+    () =>
+      PREFERENCE_CONDITION_KEYS.map((key) => ({
+        key,
+        label: t(`network.option.mustHave.${key}`)
+      })),
+    [t]
+  );
+  const isMustHaveLimitReached = editState.mustHaveConditionKeys.length >= MAX_MUST_HAVE_CONDITIONS;
   const lifestyleLabel = `${smokingText(profile.smokingHabit ?? profile.preferences.smokingHabit, t)} / ${drinkingText(
     profile.drinkingHabit ?? profile.preferences.drinkingHabit,
     t
@@ -354,6 +377,26 @@ function CupidateProfilePanel({
     editState.preferredHeightMinInput,
     editState.preferredHeightMaxInput
   );
+
+  function toggleMustHaveCondition(key: PreferenceConditionKey) {
+    setEditState((current) => {
+      if (current.mustHaveConditionKeys.includes(key)) {
+        return {
+          ...current,
+          mustHaveConditionKeys: current.mustHaveConditionKeys.filter((item) => item !== key)
+        };
+      }
+
+      if (current.mustHaveConditionKeys.length >= MAX_MUST_HAVE_CONDITIONS) {
+        return current;
+      }
+
+      return {
+        ...current,
+        mustHaveConditionKeys: [...current.mustHaveConditionKeys, key]
+      };
+    });
+  }
 
   async function handleSave() {
     if (!onSave) {
@@ -385,6 +428,7 @@ function CupidateProfilePanel({
       preferredDrinking: editState.preferredDrinking,
       preferredGenders: editState.preferredGender === "any" ? [] : [editState.preferredGender],
       preferredHeightRange,
+      mustHaveConditionKeys: editState.mustHaveConditionKeys,
       preferences: {
         ...profile.preferences,
         location: location || undefined,
@@ -400,7 +444,8 @@ function CupidateProfilePanel({
         preferredSmoking: editState.preferredSmoking,
         preferredDrinking: editState.preferredDrinking,
         preferredGenders: editState.preferredGender === "any" ? [] : [editState.preferredGender],
-        preferredHeightRange
+        preferredHeightRange,
+        mustHaveConditionKeys: editState.mustHaveConditionKeys
       }
     });
   }
@@ -472,6 +517,7 @@ function CupidateProfilePanel({
           t("profile.meta.preferredHeight"),
           preferredHeightRange ? `${preferredHeightRange[0]} - ${preferredHeightRange[1]} cm` : "-"
         )}
+        {renderMetaLine(t("profile.meta.mustHave"), mustHaveLabels)}
       </PixelBox>
 
       <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
@@ -819,6 +865,35 @@ function CupidateProfilePanel({
               active={editState.preferredDrinking === "any"}
               onPress={() => setEditState((current) => ({ ...current, preferredDrinking: "any" }))}
             />
+          </View>
+
+          <PixelText variant="label" style={styles.fieldLabel}>
+            {t("network.fields.mustHave")}
+          </PixelText>
+          <PixelText variant="caption" style={styles.profileMetaText}>
+            {t("profile.manage.mustHaveHint")}
+          </PixelText>
+          {isMustHaveLimitReached ? (
+            <PixelText variant="caption" style={styles.errorText}>
+              {t("network.fields.mustHaveLimit")}
+            </PixelText>
+          ) : null}
+          <View style={styles.buttonRow}>
+            {mustHaveItems.map((item) => {
+              const selected = editState.mustHaveConditionKeys.includes(item.key);
+
+              return (
+                <PixelButton
+                  key={item.key}
+                  label={item.label}
+                  variant={selected ? "primary" : "secondary"}
+                  active={selected}
+                  disabled={!selected && isMustHaveLimitReached}
+                  testID={`profile-must-have-${item.key}`}
+                  onPress={() => toggleMustHaveCondition(item.key)}
+                />
+              );
+            })}
           </View>
 
           <PixelText variant="label" style={styles.fieldLabel}>

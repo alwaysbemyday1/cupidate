@@ -1,3 +1,8 @@
+import {
+  MAX_MUST_HAVE_CONDITIONS,
+  PREFERENCE_CONDITION_KEYS,
+  type PreferenceConditionKey
+} from "./types";
 import type {
   DrinkingHabit,
   DrinkingPreference,
@@ -6,6 +11,8 @@ import type {
   SmokingHabit,
   SmokingPreference
 } from "./types";
+
+const MUST_HAVE_CONDITION_SET = new Set<PreferenceConditionKey>(PREFERENCE_CONDITION_KEYS);
 
 function clampAgeRange(range?: [number, number] | null): [number, number] | null {
   if (!range) {
@@ -86,6 +93,20 @@ function normalizeGenderPreferences(values?: string[]): GenderPreference[] {
         .filter((value): value is GenderPreference => allowed.has(value as GenderPreference))
     )
   );
+}
+
+function normalizeMustHaveConditionKeys(values?: string[]): PreferenceConditionKey[] {
+  if (!values?.length) {
+    return [];
+  }
+
+  return Array.from(
+    new Set(
+      values
+        .map((value) => value.trim().toLowerCase())
+        .filter((value): value is PreferenceConditionKey => MUST_HAVE_CONDITION_SET.has(value as PreferenceConditionKey))
+    )
+  ).slice(0, MAX_MUST_HAVE_CONDITIONS);
 }
 
 function normalizeSmokingHabit(value: unknown): SmokingHabit | undefined {
@@ -177,6 +198,7 @@ export function normalizePreferenceData(input: PreferenceData): PreferenceData {
     preferredGenders: normalizeGenderPreferences(input.preferredGenders),
     jobTitle: input.jobTitle?.trim(),
     heightCm: normalizeHeight(input.heightCm),
-    mbti: input.mbti?.trim().toUpperCase()
+    mbti: input.mbti?.trim().toUpperCase(),
+    mustHaveConditionKeys: normalizeMustHaveConditionKeys(input.mustHaveConditionKeys)
   };
 }

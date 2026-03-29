@@ -74,6 +74,7 @@ export function PixelButton({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityState={{ disabled: !!disabled, selected: !!active }}
       disabled={disabled}
       onPress={onPress}
       style={localStyles.pressable}

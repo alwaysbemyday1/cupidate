@@ -41,6 +41,7 @@ describe("Activation gate flow", () => {
             preferredDrinking: "social",
             preferredGenders: ["male"],
             preferredHeightRange: [173, 185],
+            mustHaveConditionKeys: ["preferred_regions", "preferred_job_groups"],
             preferences: {
               hobbies: ["reading", "brunch"],
               mbti: "ISFJ"
@@ -68,6 +69,7 @@ describe("Activation gate flow", () => {
             preferredDrinking: "social",
             preferredGenders: ["female"],
             preferredHeightRange: [158, 170],
+            mustHaveConditionKeys: ["shared_hobbies"],
             preferences: {
               hobbies: ["reading", "travel"],
               mbti: "INTJ"

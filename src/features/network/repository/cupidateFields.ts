@@ -1,5 +1,10 @@
 import { normalizePreferenceData } from "../../../domain/matching/normalizePreferences";
 import { resolveCupidatePreferenceData } from "../../../domain/matching/resolveCupidatePreferenceData";
+import {
+  MAX_MUST_HAVE_CONDITIONS,
+  PREFERENCE_CONDITION_KEYS,
+  type PreferenceConditionKey
+} from "../../../domain/matching/types";
 import type {
   DrinkingHabit,
   DrinkingPreference,
@@ -23,10 +28,12 @@ type CupidateFieldInput = {
   preferredDrinking?: DrinkingPreference | null;
   preferredGenders?: GenderPreference[];
   preferredHeightRange?: [number, number] | null;
+  mustHaveConditionKeys?: PreferenceConditionKey[];
   preferences?: PreferenceData;
 };
 
 type ArrayFieldInput = string[] | undefined;
+const MUST_HAVE_CONDITION_SET = new Set<PreferenceConditionKey>(PREFERENCE_CONDITION_KEYS);
 
 function normalizeOptionalText(value: string | null | undefined, lowercase = false) {
   if (value === undefined) {
@@ -161,6 +168,19 @@ function normalizeGenderPreferenceValues(
   );
 }
 
+function normalizeMustHaveConditionKeys(
+  value: PreferenceConditionKey[] | undefined
+): PreferenceConditionKey[] | undefined {
+  const normalized = normalizeStringArray(value, true);
+  if (normalized === undefined) {
+    return undefined;
+  }
+
+  return normalized
+    .filter((item): item is PreferenceConditionKey => MUST_HAVE_CONDITION_SET.has(item as PreferenceConditionKey))
+    .slice(0, MAX_MUST_HAVE_CONDITIONS);
+}
+
 function normalizeFlexiblePreferencePayload(preferences?: PreferenceData): PreferenceData {
   if (!preferences) {
     return {};
@@ -182,6 +202,7 @@ function normalizeFlexiblePreferencePayload(preferences?: PreferenceData): Prefe
     heightCm,
     preferredHeightRange,
     preferredGenders,
+    mustHaveConditionKeys,
     ...rest
   } = preferences;
 
@@ -203,6 +224,7 @@ function normalizeFlexiblePreferencePayload(preferences?: PreferenceData): Prefe
 
   delete next.preferredGender;
   delete next.preferredAgeRange;
+  delete next.mustHaveConditionKeys;
 
   return next as PreferenceData;
 }
@@ -258,7 +280,11 @@ export function extractStructuredCupidateFields(input: CupidateFieldInput): Requ
     preferredHeightRange:
       input.preferredHeightRange !== undefined
         ? (normalizeRange(input.preferredHeightRange, 120, 230) ?? null)
-        : (normalizedFromPreferences.preferredHeightRange ?? null)
+        : (normalizedFromPreferences.preferredHeightRange ?? null),
+    mustHaveConditionKeys:
+      input.mustHaveConditionKeys !== undefined
+        ? (normalizeMustHaveConditionKeys(input.mustHaveConditionKeys) ?? [])
+        : (normalizedFromPreferences.mustHaveConditionKeys ?? [])
   };
 }
 

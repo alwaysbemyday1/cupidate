@@ -53,6 +53,7 @@ function hydrateCupidate(input: CreateCupidateInput, ownerCupidId: string): Netw
     preferredDrinking: structured.preferredDrinking,
     preferredGenders: structured.preferredGenders,
     preferredHeightRange: structured.preferredHeightRange,
+    mustHaveConditionKeys: structured.mustHaveConditionKeys,
     preferences: hydrateCupidatePreferences(flexiblePreferences, structured),
     createdAt: now,
     updatedAt: now
@@ -197,6 +198,7 @@ export class InMemoryNetworkRepository implements NetworkRepository {
       preferredDrinking: structured.preferredDrinking,
       preferredGenders: structured.preferredGenders,
       preferredHeightRange: structured.preferredHeightRange,
+      mustHaveConditionKeys: structured.mustHaveConditionKeys,
       preferences: hydrateCupidatePreferences(flexiblePreferences, structured),
       updatedAt: NOW()
     };

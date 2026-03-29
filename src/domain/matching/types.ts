@@ -3,6 +3,28 @@ export type DrinkingHabit = "never" | "social" | "often";
 export type SmokingPreference = "none_only" | "ok" | "any";
 export type DrinkingPreference = "never" | "social" | "often" | "any";
 export type GenderPreference = "female" | "male" | "other";
+export type PreferenceConditionKey =
+  | "age_range"
+  | "shared_hobbies"
+  | "preferred_regions"
+  | "preferred_job_groups"
+  | "preferred_smoking"
+  | "preferred_drinking"
+  | "preferred_gender"
+  | "preferred_height_range";
+
+export const PREFERENCE_CONDITION_KEYS: PreferenceConditionKey[] = [
+  "age_range",
+  "shared_hobbies",
+  "preferred_regions",
+  "preferred_job_groups",
+  "preferred_smoking",
+  "preferred_drinking",
+  "preferred_gender",
+  "preferred_height_range"
+];
+
+export const MAX_MUST_HAVE_CONDITIONS = 5;
 
 export type PreferenceData = {
   ageRange?: [number, number] | null;
@@ -22,6 +44,7 @@ export type PreferenceData = {
   preferredHeightRange?: [number, number] | null;
   preferredGenders?: GenderPreference[];
   mbti?: string;
+  mustHaveConditionKeys?: PreferenceConditionKey[];
 };
 
 export type StructuredCupidateFields = {
@@ -37,6 +60,7 @@ export type StructuredCupidateFields = {
   preferredDrinking?: DrinkingPreference | null;
   preferredGenders?: GenderPreference[];
   preferredHeightRange?: [number, number] | null;
+  mustHaveConditionKeys?: PreferenceConditionKey[];
 };
 
 export type CupidateProfile = {
@@ -56,6 +80,7 @@ export type CupidateProfile = {
   preferredDrinking?: DrinkingPreference | null;
   preferredGenders?: GenderPreference[];
   preferredHeightRange?: [number, number] | null;
+  mustHaveConditionKeys?: PreferenceConditionKey[];
   preferences: PreferenceData;
 };
 
@@ -71,6 +96,7 @@ export type MatchScoreResult = {
   score: number;
   breakdown: ScoreBreakdown;
   matchedHobbies: string[];
+  priorityMatches: PreferenceConditionKey[];
 };
 
 export type MatchCandidate = {
@@ -80,5 +106,6 @@ export type MatchCandidate = {
   reason: {
     breakdown: ScoreBreakdown;
     matchedHobbies: string[];
+    priorityMatches: PreferenceConditionKey[];
   };
 };

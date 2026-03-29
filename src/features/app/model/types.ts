@@ -100,6 +100,7 @@ export type CupidateProfileSummary = {
   preferredDrinking: CupidateRecord["preferredDrinking"];
   preferredGenders: CupidateRecord["preferredGenders"];
   preferredHeightRange: CupidateRecord["preferredHeightRange"];
+  mustHaveConditionKeys: CupidateRecord["mustHaveConditionKeys"];
   preferences: CupidateRecord["preferences"];
   canEdit: boolean;
   stats: {
@@ -130,5 +131,6 @@ export type CupidateProfileDraft = {
   preferredDrinking?: CupidateRecord["preferredDrinking"];
   preferredGenders?: CupidateRecord["preferredGenders"];
   preferredHeightRange?: CupidateRecord["preferredHeightRange"];
+  mustHaveConditionKeys?: CupidateRecord["mustHaveConditionKeys"];
   preferences: CupidateRecord["preferences"];
 };

@@ -1,6 +1,7 @@
 ﻿import { useEffect, useMemo, useState } from "react";
 
 import { buildMatchCandidates } from "../../../domain/matching/buildMatchCandidates";
+import type { PreferenceConditionKey } from "../../../domain/matching/types";
 import {
   useMarkContactSharedMutation,
   useMatchCandidatesQuery,
@@ -221,6 +222,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
   const [preferredGender, setPreferredGender] = useState<"any" | "male" | "female" | "other">("any");
   const [preferredHeightMinInput, setPreferredHeightMinInput] = useState("");
   const [preferredHeightMaxInput, setPreferredHeightMaxInput] = useState("");
+  const [mustHaveConditionKeys, setMustHaveConditionKeys] = useState<PreferenceConditionKey[]>([]);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [connectionSearchQuery, setConnectionSearchQuery] = useState("");
   const [selectedConnectionCupidId, setSelectedConnectionCupidId] = useState<string | null>(null);
@@ -282,6 +284,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
         preferredDrinking: item.preferredDrinking,
         preferredGenders: item.preferredGenders,
         preferredHeightRange: item.preferredHeightRange,
+        mustHaveConditionKeys: item.mustHaveConditionKeys,
         preferences: item.preferences
       })),
     [cupidatesQuery.data]
@@ -492,6 +495,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       preferredDrinking: cupidate.preferredDrinking,
       preferredGenders: cupidate.preferredGenders,
       preferredHeightRange: cupidate.preferredHeightRange,
+      mustHaveConditionKeys: cupidate.mustHaveConditionKeys,
       preferences: cupidate.preferences,
       canEdit: cupidate.ownerCupidId === myCupidId,
       stats: {
@@ -623,6 +627,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       preferredDrinking,
       preferredGenders: preferredGender === "any" ? [] : [preferredGender],
       preferredHeightRange,
+      mustHaveConditionKeys,
       preferences: {
         hobbies: parseHobbies(hobbiesInput)
       } as CupidateRecord["preferences"]
@@ -647,6 +652,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     setPreferredGender("any");
     setPreferredHeightMinInput("");
     setPreferredHeightMaxInput("");
+    setMustHaveConditionKeys([]);
     setErrors({});
   };
 
@@ -705,6 +711,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       reason: {
         breakdown: recommendation.reason.breakdown,
         matchedHobbies: recommendation.reason.matchedHobbies,
+        priorityMatches: recommendation.reason.priorityMatches,
         requestedAt: new Date().toISOString()
       }
     });
@@ -771,6 +778,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       preferredDrinking: draft.preferredDrinking,
       preferredGenders: draft.preferredGenders,
       preferredHeightRange: draft.preferredHeightRange,
+      mustHaveConditionKeys: draft.mustHaveConditionKeys,
       preferences: draft.preferences
     });
   };
@@ -900,6 +908,8 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       setPreferredHeightMinInput,
       preferredHeightMaxInput,
       setPreferredHeightMaxInput,
+      mustHaveConditionKeys,
+      setMustHaveConditionKeys,
     errors,
     cupidates,
     connections,

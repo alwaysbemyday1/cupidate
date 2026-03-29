@@ -41,6 +41,7 @@ describe("Matching flow", () => {
             preferredDrinking: "any",
             preferredGenders: ["male"],
             preferredHeightRange: [172, 184],
+            mustHaveConditionKeys: ["preferred_regions", "preferred_job_groups"],
             preferences: {
               ageRange: [25, 34],
               hobbies: ["coffee", "books"],
@@ -71,6 +72,7 @@ describe("Matching flow", () => {
             preferredDrinking: "any",
             preferredGenders: ["female"],
             preferredHeightRange: [158, 172],
+            mustHaveConditionKeys: ["shared_hobbies"],
             preferences: {
               ageRange: [24, 35],
               hobbies: ["coffee", "music"],

@@ -48,6 +48,7 @@ type CupidatePreferenceRow = {
   preferred_smoking: NetworkCupidate["preferredSmoking"];
   preferred_drinking: NetworkCupidate["preferredDrinking"];
   preferred_genders: NetworkCupidate["preferredGenders"] | null;
+  must_have_condition_keys: NetworkCupidate["mustHaveConditionKeys"] | null;
 };
 
 type CupidRow = {
@@ -113,6 +114,7 @@ function mapCupidateRow(
     preferredSmoking: preferenceRow?.preferred_smoking ?? null,
     preferredDrinking: preferenceRow?.preferred_drinking ?? null,
     preferredGenders: preferenceRow?.preferred_genders ?? [],
+    mustHaveConditionKeys: preferenceRow?.must_have_condition_keys ?? [],
     preferredHeightRange: preferenceRow
       ? preferenceRange(preferenceRow.preferred_height_min_cm, preferenceRow.preferred_height_max_cm)
       : null
@@ -138,6 +140,7 @@ function mapCupidateRow(
     preferredDrinking: structured.preferredDrinking,
     preferredGenders: structured.preferredGenders,
     preferredHeightRange: structured.preferredHeightRange,
+    mustHaveConditionKeys: structured.mustHaveConditionKeys,
     preferences: hydrateCupidatePreferences(asPreferenceData(preferenceRow?.preferences), structured),
     createdAt: row.created_at,
     updatedAt: row.updated_at
@@ -184,7 +187,8 @@ function buildPreferenceRowPayload(cupidateId: string, input: CreateCupidateInpu
       preferred_job_groups: structured.preferredJobGroups,
       preferred_smoking: structured.preferredSmoking,
       preferred_drinking: structured.preferredDrinking,
-      preferred_genders: structured.preferredGenders
+      preferred_genders: structured.preferredGenders,
+      must_have_condition_keys: structured.mustHaveConditionKeys
     }
   };
 }
@@ -284,7 +288,7 @@ export class SupabaseNetworkRepository implements NetworkRepository {
     const { data: preferenceRows, error: preferencesError } = await this.client
       .from("cupidate_preferences")
       .select(
-        "cupidate_id,preferences,preferred_age_min,preferred_age_max,preferred_height_min_cm,preferred_height_max_cm,preferred_regions,preferred_job_groups,preferred_smoking,preferred_drinking,preferred_genders"
+        "cupidate_id,preferences,preferred_age_min,preferred_age_max,preferred_height_min_cm,preferred_height_max_cm,preferred_regions,preferred_job_groups,preferred_smoking,preferred_drinking,preferred_genders,must_have_condition_keys"
       )
       .in("cupidate_id", cupidateIds)
       .returns<CupidatePreferenceRow[]>();
@@ -506,7 +510,7 @@ export class SupabaseNetworkRepository implements NetworkRepository {
     const { data: preferenceRow, error: preferenceError } = await this.client
       .from("cupidate_preferences")
       .select(
-        "cupidate_id,preferences,preferred_age_min,preferred_age_max,preferred_height_min_cm,preferred_height_max_cm,preferred_regions,preferred_job_groups,preferred_smoking,preferred_drinking,preferred_genders"
+        "cupidate_id,preferences,preferred_age_min,preferred_age_max,preferred_height_min_cm,preferred_height_max_cm,preferred_regions,preferred_job_groups,preferred_smoking,preferred_drinking,preferred_genders,must_have_condition_keys"
       )
       .eq("cupidate_id", cupidateId)
       .maybeSingle<CupidatePreferenceRow>();

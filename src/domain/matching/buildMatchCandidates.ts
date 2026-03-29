@@ -33,7 +33,8 @@ export function buildMatchCandidates({
         matchScore: score.score,
         reason: {
           breakdown: score.breakdown,
-          matchedHobbies: score.matchedHobbies
+          matchedHobbies: score.matchedHobbies,
+          priorityMatches: score.priorityMatches
         }
       };
     })

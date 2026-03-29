@@ -2,6 +2,7 @@ import type {
   DrinkingHabit,
   DrinkingPreference,
   GenderPreference,
+  PreferenceConditionKey,
   PreferenceData,
   SmokingHabit,
   SmokingPreference
@@ -39,6 +40,7 @@ export type NetworkCupidate = {
   preferredDrinking: DrinkingPreference | null;
   preferredGenders: GenderPreference[];
   preferredHeightRange: [number, number] | null;
+  mustHaveConditionKeys: PreferenceConditionKey[];
   preferences: PreferenceData;
   createdAt: string;
   updatedAt: string;
@@ -75,6 +77,7 @@ export type CreateCupidateInput = {
   preferredDrinking?: DrinkingPreference | null;
   preferredGenders?: GenderPreference[];
   preferredHeightRange?: [number, number] | null;
+  mustHaveConditionKeys?: PreferenceConditionKey[];
   preferences?: PreferenceData;
 };
 
@@ -97,6 +100,7 @@ export type UpdateCupidateInput = {
   preferredDrinking?: DrinkingPreference | null;
   preferredGenders?: GenderPreference[];
   preferredHeightRange?: [number, number] | null;
+  mustHaveConditionKeys?: PreferenceConditionKey[];
   preferences?: PreferenceData;
 };
 

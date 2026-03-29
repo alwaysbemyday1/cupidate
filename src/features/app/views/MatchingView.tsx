@@ -39,6 +39,7 @@ type MatchingCardItem = {
   matchScore: number;
   breakdown: ScoreBreakdown;
   matchedHobbies: string[];
+  priorityMatches: string[];
   request?: MatchRequest;
   createdAt: string;
 };
@@ -163,6 +164,7 @@ export function MatchingView({
           matchScore: item.matchScore,
           breakdown: item.reason.breakdown,
           matchedHobbies: item.reason.matchedHobbies,
+          priorityMatches: item.reason.priorityMatches,
           createdAt: new Date().toISOString()
         })),
     [cupidateMap, recommendations, requestByPair]
@@ -184,6 +186,7 @@ export function MatchingView({
             matchScore: recommendation?.matchScore ?? 0,
             breakdown: recommendation?.reason.breakdown ?? EMPTY_BREAKDOWN,
             matchedHobbies: recommendation?.reason.matchedHobbies ?? [],
+            priorityMatches: recommendation?.reason.priorityMatches ?? [],
             request,
             createdAt: request.createdAt
           };
@@ -218,6 +221,14 @@ export function MatchingView({
       items.push(
         t("matching.feedback.hobbies", {
           value: focusCard.matchedHobbies.join(", ")
+        })
+      );
+    }
+
+    if (focusCard.priorityMatches.length > 0) {
+      items.push(
+        t("matching.feedback.priority", {
+          value: focusCard.priorityMatches.map((key) => t(`network.option.mustHave.${key}`)).join(", ")
         })
       );
     }

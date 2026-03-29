@@ -5,6 +5,7 @@ import type {
   DrinkingPreference,
   GenderPreference,
   MatchScoreResult,
+  PreferenceConditionKey,
   SmokingHabit,
   SmokingPreference
 } from "./types";
@@ -19,6 +20,10 @@ const WEIGHTS = {
 
 function roundToTwo(value: number): number {
   return Math.round(value * 100) / 100;
+}
+
+function clampFit(value: number): number {
+  return Math.max(0, Math.min(1, value));
 }
 
 function computeAgeFromBirthYear(birthYear: number | null, currentYear: number): number | null {
@@ -197,6 +202,83 @@ function jobGroupFit(preferredJobGroups: string[], targetJobTitle?: string): num
   return matched ? 1 : 0.2;
 }
 
+function hasPriorityCondition(
+  mustHaveConditionKeys: PreferenceConditionKey[] | undefined,
+  key: PreferenceConditionKey
+): boolean {
+  return mustHaveConditionKeys?.includes(key) ?? false;
+}
+
+function applyPriorityWeight(fit: number, isPriority: boolean): number {
+  const normalized = clampFit(fit);
+
+  if (!isPriority) {
+    return normalized;
+  }
+
+  if (normalized >= 0.9) {
+    return 1;
+  }
+
+  if (normalized >= 0.75) {
+    return Math.min(1, normalized + 0.12);
+  }
+
+  if (normalized >= 0.4) {
+    return Math.min(1, normalized + 0.06);
+  }
+
+  return normalized * 0.45;
+}
+
+function isPrioritySatisfied(
+  key: PreferenceConditionKey,
+  fit: number,
+  context?: { matchedHobbies?: string[] }
+): boolean {
+  if (key === "shared_hobbies") {
+    return (context?.matchedHobbies?.length ?? 0) > 0;
+  }
+
+  if (key === "preferred_smoking") {
+    return fit >= 0.8;
+  }
+
+  if (key === "preferred_drinking") {
+    return fit >= 0.75;
+  }
+
+  return fit >= 0.99;
+}
+
+function collectPriorityMatch(
+  matches: Set<PreferenceConditionKey>,
+  key: PreferenceConditionKey,
+  fit: number,
+  isPriority: boolean,
+  context?: { matchedHobbies?: string[] }
+) {
+  if (!isPriority) {
+    return;
+  }
+
+  if (isPrioritySatisfied(key, fit, context)) {
+    matches.add(key);
+  }
+}
+
+type WeightedCondition = {
+  fit: number;
+};
+
+function averageWeightedFit(conditions: WeightedCondition[]): number {
+  if (conditions.length === 0) {
+    return 0;
+  }
+
+  return conditions.reduce((sum, item) => sum + clampFit(item.fit), 0) / conditions.length;
+}
+
 export function calculateMatchScore(
   source: CupidateProfile,
   target: CupidateProfile,
@@ -204,46 +286,222 @@ export function calculateMatchScore(
 ): MatchScoreResult {
   const sourcePref = resolveCupidateProfilePreferences(source);
   const targetPref = resolveCupidateProfilePreferences(target);
+  const priorityMatches = new Set<PreferenceConditionKey>();
 
   const sourceAge = computeAgeFromBirthYear(source.birthYear, currentYear);
   const targetAge = computeAgeFromBirthYear(target.birthYear, currentYear);
 
-  const ageFitSource = computeRangeSatisfaction(targetAge, sourcePref.ageRange);
-  const ageFitTarget = computeRangeSatisfaction(sourceAge, targetPref.ageRange);
-  const ageScore = ((ageFitSource + ageFitTarget) / 2) * WEIGHTS.age;
+  const sourceAgeFitRaw = computeRangeSatisfaction(targetAge, sourcePref.ageRange);
+  const targetAgeFitRaw = computeRangeSatisfaction(sourceAge, targetPref.ageRange);
+  collectPriorityMatch(
+    priorityMatches,
+    "age_range",
+    sourceAgeFitRaw,
+    hasPriorityCondition(sourcePref.mustHaveConditionKeys, "age_range")
+  );
+  collectPriorityMatch(
+    priorityMatches,
+    "age_range",
+    targetAgeFitRaw,
+    hasPriorityCondition(targetPref.mustHaveConditionKeys, "age_range")
+  );
+  const ageScore =
+    averageWeightedFit([
+      {
+        fit: applyPriorityWeight(
+          sourceAgeFitRaw,
+          hasPriorityCondition(sourcePref.mustHaveConditionKeys, "age_range")
+        )
+      },
+      {
+        fit: applyPriorityWeight(
+          targetAgeFitRaw,
+          hasPriorityCondition(targetPref.mustHaveConditionKeys, "age_range")
+        )
+      }
+    ]) * WEIGHTS.age;
 
   const hobbyResult = computeHobbyScore(sourcePref.hobbies || [], targetPref.hobbies || []);
-  const hobbyScore = hobbyResult.score * WEIGHTS.hobbies;
+  const hobbyPriority =
+    hasPriorityCondition(sourcePref.mustHaveConditionKeys, "shared_hobbies") ||
+    hasPriorityCondition(targetPref.mustHaveConditionKeys, "shared_hobbies");
+  collectPriorityMatch(priorityMatches, "shared_hobbies", hobbyResult.score, hobbyPriority, {
+    matchedHobbies: hobbyResult.matched
+  });
+  const hobbyScore = applyPriorityWeight(hobbyResult.score, hobbyPriority) * WEIGHTS.hobbies;
 
-  const sourceToTargetSmoking = smokingPreferenceFit(sourcePref.preferredSmoking ?? "any", targetPref.smokingHabit);
-  const targetToSourceSmoking = smokingPreferenceFit(targetPref.preferredSmoking ?? "any", sourcePref.smokingHabit);
-  const sourceToTargetDrinking = drinkingPreferenceFit(sourcePref.preferredDrinking ?? "any", targetPref.drinkingHabit);
-  const targetToSourceDrinking = drinkingPreferenceFit(targetPref.preferredDrinking ?? "any", sourcePref.drinkingHabit);
+  const sourceToTargetSmokingRaw = smokingPreferenceFit(sourcePref.preferredSmoking ?? "any", targetPref.smokingHabit);
+  const targetToSourceSmokingRaw = smokingPreferenceFit(targetPref.preferredSmoking ?? "any", sourcePref.smokingHabit);
+  collectPriorityMatch(
+    priorityMatches,
+    "preferred_smoking",
+    sourceToTargetSmokingRaw,
+    hasPriorityCondition(sourcePref.mustHaveConditionKeys, "preferred_smoking")
+  );
+  collectPriorityMatch(
+    priorityMatches,
+    "preferred_smoking",
+    targetToSourceSmokingRaw,
+    hasPriorityCondition(targetPref.mustHaveConditionKeys, "preferred_smoking")
+  );
+
+  const sourceToTargetDrinkingRaw = drinkingPreferenceFit(sourcePref.preferredDrinking ?? "any", targetPref.drinkingHabit);
+  const targetToSourceDrinkingRaw = drinkingPreferenceFit(targetPref.preferredDrinking ?? "any", sourcePref.drinkingHabit);
+  collectPriorityMatch(
+    priorityMatches,
+    "preferred_drinking",
+    sourceToTargetDrinkingRaw,
+    hasPriorityCondition(sourcePref.mustHaveConditionKeys, "preferred_drinking")
+  );
+  collectPriorityMatch(
+    priorityMatches,
+    "preferred_drinking",
+    targetToSourceDrinkingRaw,
+    hasPriorityCondition(targetPref.mustHaveConditionKeys, "preferred_drinking")
+  );
+
   const lifestyleScore =
-    ((sourceToTargetSmoking + targetToSourceSmoking + sourceToTargetDrinking + targetToSourceDrinking) / 4) *
-    WEIGHTS.lifestyle;
+    averageWeightedFit([
+      {
+        fit: applyPriorityWeight(
+          sourceToTargetSmokingRaw,
+          hasPriorityCondition(sourcePref.mustHaveConditionKeys, "preferred_smoking")
+        )
+      },
+      {
+        fit: applyPriorityWeight(
+          targetToSourceSmokingRaw,
+          hasPriorityCondition(targetPref.mustHaveConditionKeys, "preferred_smoking")
+        )
+      },
+      {
+        fit: applyPriorityWeight(
+          sourceToTargetDrinkingRaw,
+          hasPriorityCondition(sourcePref.mustHaveConditionKeys, "preferred_drinking")
+        )
+      },
+      {
+        fit: applyPriorityWeight(
+          targetToSourceDrinkingRaw,
+          hasPriorityCondition(targetPref.mustHaveConditionKeys, "preferred_drinking")
+        )
+      }
+    ]) * WEIGHTS.lifestyle;
 
-  const sourceToTargetLocation = locationFit(sourcePref.preferredRegions || [], targetPref.region);
-  const targetToSourceLocation = locationFit(targetPref.preferredRegions || [], sourcePref.region);
-  const locationScore = ((sourceToTargetLocation + targetToSourceLocation) / 2) * WEIGHTS.location;
+  const sourceToTargetLocationRaw = locationFit(sourcePref.preferredRegions || [], targetPref.region);
+  const targetToSourceLocationRaw = locationFit(targetPref.preferredRegions || [], sourcePref.region);
+  collectPriorityMatch(
+    priorityMatches,
+    "preferred_regions",
+    sourceToTargetLocationRaw,
+    hasPriorityCondition(sourcePref.mustHaveConditionKeys, "preferred_regions")
+  );
+  collectPriorityMatch(
+    priorityMatches,
+    "preferred_regions",
+    targetToSourceLocationRaw,
+    hasPriorityCondition(targetPref.mustHaveConditionKeys, "preferred_regions")
+  );
+  const locationScore =
+    averageWeightedFit([
+      {
+        fit: applyPriorityWeight(
+          sourceToTargetLocationRaw,
+          hasPriorityCondition(sourcePref.mustHaveConditionKeys, "preferred_regions")
+        )
+      },
+      {
+        fit: applyPriorityWeight(
+          targetToSourceLocationRaw,
+          hasPriorityCondition(targetPref.mustHaveConditionKeys, "preferred_regions")
+        )
+      }
+    ]) * WEIGHTS.location;
 
-  const sourceToTargetGender = genderFit(sourcePref.preferredGenders || [], normalizeGender(target.gender));
-  const targetToSourceGender = genderFit(targetPref.preferredGenders || [], normalizeGender(source.gender));
-  const sourceToTargetHeight = heightFit(sourcePref.preferredHeightRange, targetPref.heightCm);
-  const targetToSourceHeight = heightFit(targetPref.preferredHeightRange, sourcePref.heightCm);
-  const sourceToTargetJob = jobGroupFit(sourcePref.preferredJobGroups || [], targetPref.jobTitle);
-  const targetToSourceJob = jobGroupFit(targetPref.preferredJobGroups || [], sourcePref.jobTitle);
+  const sourceToTargetGenderRaw = genderFit(sourcePref.preferredGenders || [], normalizeGender(target.gender));
+  const targetToSourceGenderRaw = genderFit(targetPref.preferredGenders || [], normalizeGender(source.gender));
+  collectPriorityMatch(
+    priorityMatches,
+    "preferred_gender",
+    sourceToTargetGenderRaw,
+    hasPriorityCondition(sourcePref.mustHaveConditionKeys, "preferred_gender")
+  );
+  collectPriorityMatch(
+    priorityMatches,
+    "preferred_gender",
+    targetToSourceGenderRaw,
+    hasPriorityCondition(targetPref.mustHaveConditionKeys, "preferred_gender")
+  );
+
+  const sourceToTargetHeightRaw = heightFit(sourcePref.preferredHeightRange, target.heightCm ?? undefined);
+  const targetToSourceHeightRaw = heightFit(targetPref.preferredHeightRange, source.heightCm ?? undefined);
+  collectPriorityMatch(
+    priorityMatches,
+    "preferred_height_range",
+    sourceToTargetHeightRaw,
+    hasPriorityCondition(sourcePref.mustHaveConditionKeys, "preferred_height_range")
+  );
+  collectPriorityMatch(
+    priorityMatches,
+    "preferred_height_range",
+    targetToSourceHeightRaw,
+    hasPriorityCondition(targetPref.mustHaveConditionKeys, "preferred_height_range")
+  );
+
+  const sourceToTargetJobRaw = jobGroupFit(sourcePref.preferredJobGroups || [], target.jobTitle ?? undefined);
+  const targetToSourceJobRaw = jobGroupFit(targetPref.preferredJobGroups || [], source.jobTitle ?? undefined);
+  collectPriorityMatch(
+    priorityMatches,
+    "preferred_job_groups",
+    sourceToTargetJobRaw,
+    hasPriorityCondition(sourcePref.mustHaveConditionKeys, "preferred_job_groups")
+  );
+  collectPriorityMatch(
+    priorityMatches,
+    "preferred_job_groups",
+    targetToSourceJobRaw,
+    hasPriorityCondition(targetPref.mustHaveConditionKeys, "preferred_job_groups")
+  );
+
   const profileScore =
-    (
-      sourceToTargetGender +
-      targetToSourceGender +
-      sourceToTargetHeight +
-      targetToSourceHeight +
-      sourceToTargetJob +
-      targetToSourceJob
-    ) /
-    6 *
-    WEIGHTS.profile;
+    averageWeightedFit([
+      {
+        fit: applyPriorityWeight(
+          sourceToTargetGenderRaw,
+          hasPriorityCondition(sourcePref.mustHaveConditionKeys, "preferred_gender")
+        )
+      },
+      {
+        fit: applyPriorityWeight(
+          targetToSourceGenderRaw,
+          hasPriorityCondition(targetPref.mustHaveConditionKeys, "preferred_gender")
+        )
+      },
+      {
+        fit: applyPriorityWeight(
+          sourceToTargetHeightRaw,
+          hasPriorityCondition(sourcePref.mustHaveConditionKeys, "preferred_height_range")
+        )
+      },
+      {
+        fit: applyPriorityWeight(
+          targetToSourceHeightRaw,
+          hasPriorityCondition(targetPref.mustHaveConditionKeys, "preferred_height_range")
+        )
+      },
+      {
+        fit: applyPriorityWeight(
+          sourceToTargetJobRaw,
+          hasPriorityCondition(sourcePref.mustHaveConditionKeys, "preferred_job_groups")
+        )
+      },
+      {
+        fit: applyPriorityWeight(
+          targetToSourceJobRaw,
+          hasPriorityCondition(targetPref.mustHaveConditionKeys, "preferred_job_groups")
+        )
+      }
+    ]) * WEIGHTS.profile;
 
   const rawScore = ageScore + hobbyScore + lifestyleScore + locationScore + profileScore;
   const score = roundToTwo(rawScore);
@@ -257,6 +515,7 @@ export function calculateMatchScore(
       location: roundToTwo(locationScore),
       profile: roundToTwo(profileScore)
     },
-    matchedHobbies: hobbyResult.matched
+    matchedHobbies: hobbyResult.matched,
+    priorityMatches: Array.from(priorityMatches)
   };
 }
