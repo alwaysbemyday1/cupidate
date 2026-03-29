@@ -169,6 +169,9 @@ export function MyView({
         <PixelText variant="caption" style={styles.profileMetaText}>
           {t("my.fields.languageHint")}
         </PixelText>
+        <PixelText variant="caption" style={styles.profileMetaText}>
+          {t("my.locale.persistence")}
+        </PixelText>
         <View style={styles.languageButtonRow}>
           <PixelButton
             label={t("my.buttons.english")}

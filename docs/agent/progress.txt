@@ -49,9 +49,10 @@ Completed Work
 - [x] Safe-area modernization + Home/Auth rebuild (Task 2026-03-29-05)
 - [x] Network view prototype rebuild + i18n expansion (Task 2026-03-29-06)
 - [x] Matching view prototype rebuild + score insight redesign (Task 2026-03-29-07)
+- [x] Locale persistence with device storage (Task 2026-03-29-08A)
 
 Next Tasks (Rebuild Track)
- - Task 2026-03-29-08: Locale persistence + My preference persistence expansion
+ - Task 2026-03-29-08B: My preference persistence expansion
  - Task 2026-03-29-09: Network action hardening (edit/block/unblock flows)
  - Task 2026-03-29-10: Matching action hardening + completed-state persistence QA
 

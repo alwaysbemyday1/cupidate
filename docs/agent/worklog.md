@@ -624,3 +624,30 @@ Notes:
   - recent request
   - suggested match
 - This keeps the insight panel populated even after a match reaches the completed state.
+
+### Task 2026-03-29-08A - Locale Persistence with Device Storage
+Status: Completed
+
+Changes:
+- Added device-level locale persistence for the app-wide i18n layer.
+- Installed storage dependency:
+  - `@react-native-async-storage/async-storage`
+- Added locale storage helper:
+  - `src/features/i18n/storage.ts`
+- Updated `I18nProvider` to:
+  - load the stored locale on mount
+  - persist locale changes immediately when the user switches language
+- Updated `MyView` language section to communicate that the selected language is saved on-device.
+- Added AsyncStorage Jest mock wiring in `jest.setup.ts`.
+- Extended i18n flow coverage to verify:
+  - Korean switch applies immediately
+  - the selected locale is written to storage
+  - the locale survives an app remount
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand src/features/app/__tests__/i18nFlow.test.tsx src/features/app/__tests__/matchingFlow.test.tsx` passed.
+
+Notes:
+- Persistence is currently device-local.
+- A later step can sync the locale into account-level preferences if we want cross-device continuity.

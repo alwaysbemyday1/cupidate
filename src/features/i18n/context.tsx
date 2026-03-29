@@ -1,6 +1,7 @@
-import { createContext, useContext, useMemo, useState, type PropsWithChildren } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type PropsWithChildren } from "react";
 
 import { messages } from "./messages";
+import { loadStoredLocale, persistLocale } from "./storage";
 import type { Locale, TranslationKey, TranslationParams } from "./types";
 
 type I18nContextValue = {
@@ -33,16 +34,37 @@ const I18nContext = createContext<I18nContextValue>(defaultContext);
 export function I18nProvider({ children, initialLocale = fallbackLocale }: PropsWithChildren<{ initialLocale?: Locale }>) {
   const [locale, setLocale] = useState<Locale>(initialLocale);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    void loadStoredLocale().then((storedLocale) => {
+      if (!isMounted || !storedLocale) {
+        return;
+      }
+
+      setLocale((currentLocale) => (currentLocale === storedLocale ? currentLocale : storedLocale));
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const handleSetLocale = useCallback((nextLocale: Locale) => {
+    setLocale(nextLocale);
+    void persistLocale(nextLocale);
+  }, []);
+
   const value = useMemo<I18nContextValue>(
     () => ({
       locale,
-      setLocale,
+      setLocale: handleSetLocale,
       t: (key, params) => {
         const template = messages[locale][key] ?? messages[fallbackLocale][key] ?? key;
         return interpolate(template, params);
       }
     }),
-    [locale]
+    [handleSetLocale, locale]
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

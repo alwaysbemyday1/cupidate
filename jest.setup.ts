@@ -2,6 +2,9 @@ import { act } from "@testing-library/react-native";
 import { notifyManager } from "@tanstack/query-core";
 
 jest.mock("react-native-reanimated", () => require("react-native-reanimated/mock"));
+jest.mock("@react-native-async-storage/async-storage", () =>
+  require("@react-native-async-storage/async-storage/jest/async-storage-mock")
+);
 jest.mock("react-native-safe-area-context", () => {
   const React = require("react");
   const { View } = require("react-native");

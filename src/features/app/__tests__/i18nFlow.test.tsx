@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 
 import App from "../../../../App";
@@ -6,20 +7,23 @@ import { createInMemoryMatchingRepository } from "../../matching/repository/inMe
 import { setNetworkRepositoryForTest } from "../../network/repository/createNetworkRepository";
 import { createInMemoryNetworkRepository } from "../../network/repository/inMemoryNetworkRepository";
 import { messages } from "../../i18n/messages";
+import { LOCALE_STORAGE_KEY } from "../../i18n/storage";
 
 describe("App i18n flow", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    await AsyncStorage.clear();
     setNetworkRepositoryForTest(createInMemoryNetworkRepository());
     setMatchingRepositoryForTest(createInMemoryMatchingRepository());
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    await AsyncStorage.clear();
     setNetworkRepositoryForTest(null);
     setMatchingRepositoryForTest(null);
   });
 
-  it("applies Korean copy after language switch in My view", async () => {
-    render(<App />);
+  it("applies Korean copy after language switch in My view and persists it across remount", async () => {
+    const rendered = render(<App />);
 
     fireEvent.press(screen.getByTestId("tab-my"));
 
@@ -33,6 +37,9 @@ describe("App i18n flow", () => {
       expect(screen.getByText(messages.ko["my.sections.profileOverview"])).toBeTruthy();
       expect(screen.getByText(`Cupidate: ${messages.ko["app.views.my"]}`)).toBeTruthy();
     });
+    await waitFor(() => {
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith(LOCALE_STORAGE_KEY, "ko");
+    });
 
     fireEvent.press(screen.getByTestId("tab-home"));
 
@@ -40,6 +47,14 @@ describe("App i18n flow", () => {
       expect(screen.getByText(messages.ko["home.sections.alarmFeed"])).toBeTruthy();
       expect(screen.getByText(messages.ko["home.sections.quickActions"])).toBeTruthy();
       expect(screen.getByText(`Cupidate: ${messages.ko["app.views.home"]}`)).toBeTruthy();
+    });
+
+    rendered.unmount();
+    render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByText(`Cupidate: ${messages.ko["app.views.home"]}`)).toBeTruthy();
+      expect(screen.getByText(messages.ko["home.sections.alarmFeed"])).toBeTruthy();
     });
   });
 });
