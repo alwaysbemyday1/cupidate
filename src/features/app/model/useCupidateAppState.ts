@@ -14,6 +14,7 @@ import {
   useCupidatesQuery,
   useCurrentCupidQuery,
   useSearchCupidsQuery,
+  useUpdateCupidateMutation,
   useUpsertCurrentCupidNicknameMutation
 } from "../../network/hooks/useNetworkData";
 import {
@@ -21,6 +22,7 @@ import {
   type CupidConnection,
   type CupidProfileSummary,
   type CupidateRecord,
+  type CupidateProfileDraft,
   type CupidateProfileSummary,
   type HomeNotification,
   type HomeSummary,
@@ -235,6 +237,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
   const matchCandidatesQuery = useMatchCandidatesQuery({ enabled: isDataAccessEnabled });
 
   const createCupidateMutation = useCreateCupidateMutation();
+  const updateCupidateMutation = useUpdateCupidateMutation();
   const createConnectionMutation = useCreateConnectionMutation();
   const upsertNicknameMutation = useUpsertCurrentCupidNicknameMutation();
 
@@ -309,11 +312,21 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     [cupidates, myCupidId]
   );
 
+  const activeMyCupidates = useMemo(
+    () => myCupidates.filter((item) => item.isActive),
+    [myCupidates]
+  );
+
+  const activeConnectedCupidates = useMemo(
+    () => connectedCupidates.filter((item) => item.isActive),
+    [connectedCupidates]
+  );
+
   const recommendations = useMemo(() => {
-    const matches = myCupidates.flatMap((source) =>
+    const matches = activeMyCupidates.flatMap((source) =>
       buildMatchCandidates({
         source,
-        targets: connectedCupidates,
+        targets: activeConnectedCupidates,
         currentYear: 2026,
         isConnected: (sourceOwnerCupidId, targetOwnerCupidId) =>
           sourceOwnerCupidId === myCupidId &&
@@ -324,7 +337,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     );
 
     return matches.slice(0, 20);
-  }, [connectedCupidates, connections, myCupidId, myCupidates]);
+  }, [activeConnectedCupidates, activeMyCupidates, connections, myCupidId]);
 
   const requests = useMemo<MatchRequest[]>(
     () =>
@@ -494,6 +507,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
         connectionsQuery.error,
         cupidSearchQuery.error,
         createCupidateMutation.error,
+        updateCupidateMutation.error,
         createConnectionMutation.error
       ]),
     [
@@ -502,7 +516,8 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       createCupidateMutation.error,
       currentCupidQuery.error,
       cupidSearchQuery.error,
-      cupidatesQuery.error
+      cupidatesQuery.error,
+      updateCupidateMutation.error
     ]
   );
 
@@ -564,6 +579,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       birthYear: parsedBirthYear,
       gender,
       bio: bio.trim(),
+      isActive: false,
       preferences: {
         ageRange: preferredAgeRange,
         hobbies: parseHobbies(hobbiesInput),
@@ -699,6 +715,22 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     }
   };
 
+  const onSaveCupidateProfile = async (draft: CupidateProfileDraft) => {
+    if (!isDataAccessEnabled) {
+      return;
+    }
+
+    await updateCupidateMutation.mutateAsync({
+      cupidateId: draft.cupidateId,
+      displayName: draft.displayName.trim(),
+      birthYear: draft.birthYear,
+      gender: draft.gender,
+      bio: draft.bio.trim(),
+      isActive: draft.isActive,
+      preferences: draft.preferences
+    });
+  };
+
   const onOpenCupidProfile = (cupidId: string) => {
     setSelectedProfileTarget({
       kind: "cupid",
@@ -723,6 +755,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     }
 
     createCupidateMutation.reset();
+    updateCupidateMutation.reset();
     createConnectionMutation.reset();
     requestMatchMutation.reset();
     updateMatchStatusMutation.reset();
@@ -742,6 +775,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     }
 
     createCupidateMutation.reset();
+    updateCupidateMutation.reset();
     createConnectionMutation.reset();
 
     const tasks: Promise<unknown>[] = [
@@ -848,7 +882,8 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     homeError: firstErrorMessage([networkError, matchingError]),
     isNetworkLoading: cupidatesQuery.isLoading || connectionsQuery.isLoading,
     isSearchingCupids: cupidSearchQuery.isLoading,
-    isMutatingNetwork: createCupidateMutation.isPending || createConnectionMutation.isPending,
+    isMutatingNetwork:
+      createCupidateMutation.isPending || updateCupidateMutation.isPending || createConnectionMutation.isPending,
     networkError,
     isMatchingLoading: matchCandidatesQuery.isLoading,
     isMutatingMatching:
@@ -859,6 +894,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     myError,
     isDataAccessEnabled,
     onRegisterCupidate,
+    onSaveCupidateProfile,
     onAddConnection,
     onSaveNickname,
     onSendRequest,

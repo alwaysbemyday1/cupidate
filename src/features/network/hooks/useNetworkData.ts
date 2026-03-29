@@ -4,6 +4,7 @@ import { getNetworkRepository } from "../repository/createNetworkRepository";
 import type {
   CreateConnectionInput,
   CreateCupidateInput,
+  UpdateCupidateInput,
   UpdateConnectionStatusInput
 } from "../repository/types";
 
@@ -58,6 +59,20 @@ export function useCreateCupidateMutation() {
     mutationFn: (input: CreateCupidateInput) => getNetworkRepository().createCupidate(input),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: networkQueryKeys.cupidates() });
+    }
+  });
+}
+
+export function useUpdateCupidateMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: UpdateCupidateInput) => getNetworkRepository().updateCupidate(input),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: networkQueryKeys.cupidates() }),
+        queryClient.invalidateQueries({ queryKey: networkQueryKeys.connections() })
+      ]);
     }
   });
 }

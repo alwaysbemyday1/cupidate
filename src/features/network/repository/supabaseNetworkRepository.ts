@@ -8,6 +8,7 @@ import type {
   NetworkConnection,
   NetworkCupidate,
   NetworkRepository,
+  UpdateCupidateInput,
   UpdateConnectionStatusInput
 } from "./types";
 
@@ -223,7 +224,7 @@ export class SupabaseNetworkRepository implements NetworkRepository {
         birth_year: input.birthYear ?? null,
         gender: input.gender ?? null,
         bio: input.bio ?? "",
-        is_active: input.isActive ?? true
+        is_active: input.isActive ?? false
       })
       .select("*")
       .single<CupidateRow>();
@@ -246,6 +247,73 @@ export class SupabaseNetworkRepository implements NetworkRepository {
     }
 
     return mapCupidateRow(cupidateRow, preferencesPayload);
+  }
+
+  async updateCupidate(input: UpdateCupidateInput): Promise<NetworkCupidate> {
+    const updatePayload: Record<string, string | number | boolean | null> = {};
+
+    if (input.displayName !== undefined) {
+      updatePayload.display_name = input.displayName.trim();
+    }
+
+    if (input.birthYear !== undefined) {
+      updatePayload.birth_year = input.birthYear ?? null;
+    }
+
+    if (input.gender !== undefined) {
+      updatePayload.gender = input.gender ?? null;
+    }
+
+    if (input.bio !== undefined) {
+      updatePayload.bio = input.bio ?? "";
+    }
+
+    if (input.isActive !== undefined) {
+      updatePayload.is_active = input.isActive;
+    }
+
+    const { data: cupidateRow, error: cupidateError } = await this.client
+      .from("cupidates")
+      .update(updatePayload)
+      .eq("id", input.cupidateId)
+      .select("*")
+      .single<CupidateRow>();
+
+    if (cupidateError) {
+      throw cupidateError;
+    }
+
+    let preferencesPayload = input.preferences;
+
+    if (preferencesPayload !== undefined) {
+      const { error: preferenceError } = await this.client.from("cupidate_preferences").upsert(
+        {
+          cupidate_id: input.cupidateId,
+          preferences: preferencesPayload
+        },
+        { onConflict: "cupidate_id" }
+      );
+
+      if (preferenceError) {
+        throw preferenceError;
+      }
+    }
+
+    if (preferencesPayload === undefined) {
+      const { data: preferenceRow, error: preferenceError } = await this.client
+        .from("cupidate_preferences")
+        .select("cupidate_id,preferences")
+        .eq("cupidate_id", input.cupidateId)
+        .maybeSingle<CupidatePreferenceRow>();
+
+      if (preferenceError) {
+        throw preferenceError;
+      }
+
+      preferencesPayload = asPreferenceData(preferenceRow?.preferences);
+    }
+
+    return mapCupidateRow(cupidateRow, preferencesPayload ?? {});
   }
 
   async listConnections(): Promise<NetworkConnection[]> {

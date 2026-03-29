@@ -20,8 +20,35 @@ describe("InMemoryNetworkRepository", () => {
 
     expect(cupidates).toHaveLength(1);
     expect(cupidates[0].displayName).toBe("Mina");
-    expect(cupidates[0].isActive).toBe(true);
+    expect(cupidates[0].isActive).toBe(false);
     expect(cupidates[0].preferences.hobbies).toEqual(["coffee", "travel"]);
+  });
+
+  it("updates cupidate activation and profile fields", async () => {
+    const repository = new InMemoryNetworkRepository();
+
+    const created = await repository.createCupidate({
+      displayName: "Mina",
+      birthYear: 1998,
+      gender: "female",
+      bio: "coffee and books",
+      preferences: {
+        location: "seoul"
+      }
+    });
+
+    const updated = await repository.updateCupidate({
+      cupidateId: created.id,
+      displayName: "Mina Kim",
+      isActive: true,
+      preferences: {
+        location: "busan"
+      }
+    });
+
+    expect(updated.displayName).toBe("Mina Kim");
+    expect(updated.isActive).toBe(true);
+    expect(updated.preferences.location).toBe("busan");
   });
 
   it("creates outbound connection with counterpart metadata", async () => {

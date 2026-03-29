@@ -240,7 +240,12 @@ function CupidateAppShell() {
         </View>
 
         <PixelTabBar activeKey={state.activeView} items={tabItems} onSelect={state.setActiveView} />
-        <ProfileView profile={state.selectedProfile} onClose={state.onCloseProfile} />
+        <ProfileView
+          profile={state.selectedProfile}
+          onClose={state.onCloseProfile}
+          onSaveCupidateProfile={state.onSaveCupidateProfile}
+          isSavingCupidateProfile={state.isMutatingNetwork}
+        />
       </View>
     </SafeAreaView>
   );

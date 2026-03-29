@@ -1,7 +1,7 @@
 ﻿-- Cupidate POC fake data seed
 -- Uses the earliest existing auth user as the base tester account.
 -- Adds one accepted connected cupid, one discoverable cupid,
--- two owned cupidates, two connected cupidates, and two match candidates.
+-- three owned cupidates, two connected cupidates, and two match candidates.
 
 do $$
 declare
@@ -10,6 +10,7 @@ declare
   discoverable_cupid_id constant uuid := '22222222-2222-4222-8222-222222222222';
   my_mina_id constant uuid := 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1';
   my_dohun_id constant uuid := 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2';
+  my_hana_id constant uuid := 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa3';
   remote_yuna_id constant uuid := 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb1';
   remote_jin_id constant uuid := 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2';
 begin
@@ -91,18 +92,20 @@ begin
       responded_at = excluded.responded_at,
       updated_at = now();
 
-  insert into public.cupidates (id, owner_cupid_id, display_name, birth_year, gender, bio)
+  insert into public.cupidates (id, owner_cupid_id, display_name, birth_year, gender, bio, is_active)
   values
-    (my_mina_id, base_cupid_id, 'Mina', 1998, 'female', 'Coffee, calm walks, and thoughtful conversations.'),
-    (my_dohun_id, base_cupid_id, 'Dohun', 1994, 'male', 'Weekend runner with a warm and steady style.'),
-    (remote_yuna_id, connected_cupid_id, 'Yuna', 1997, 'female', 'Designer energy, bright humor, and city-date vibes.'),
-    (remote_jin_id, connected_cupid_id, 'Jin', 1993, 'male', 'Product-minded foodie who likes honest communication.')
+    (my_mina_id, base_cupid_id, 'Mina', 1998, 'female', 'Coffee, calm walks, and thoughtful conversations.', true),
+    (my_dohun_id, base_cupid_id, 'Dohun', 1994, 'male', 'Weekend runner with a warm and steady style.', true),
+    (my_hana_id, base_cupid_id, 'Hana', 1996, 'female', 'Currently paused from matching while focusing on work.', false),
+    (remote_yuna_id, connected_cupid_id, 'Yuna', 1997, 'female', 'Designer energy, bright humor, and city-date vibes.', true),
+    (remote_jin_id, connected_cupid_id, 'Jin', 1993, 'male', 'Product-minded foodie who likes honest communication.', true)
   on conflict (id) do update
   set owner_cupid_id = excluded.owner_cupid_id,
       display_name = excluded.display_name,
       birth_year = excluded.birth_year,
       gender = excluded.gender,
       bio = excluded.bio,
+      is_active = excluded.is_active,
       updated_at = now();
 
   insert into public.cupidate_preferences (cupidate_id, preferences)
@@ -139,6 +142,23 @@ begin
         "preferredHeightRange":[158,170],
         "preferredSmoking":"none_only",
         "preferredDrinking":"any"
+      }'::jsonb
+    ),
+    (
+      my_hana_id,
+      '{
+        "location":"seoul",
+        "jobTitle":"Finance Manager",
+        "hobbies":["pilates","brunch","reading"],
+        "heightCm":165,
+        "smoking":"none",
+        "drinking":"social",
+        "preferredGender":"male",
+        "preferredAgeRange":[29,36],
+        "preferredRegions":["seoul","bundang"],
+        "preferredHeightRange":[173,185],
+        "preferredSmoking":"none_only",
+        "preferredDrinking":"social"
       }'::jsonb
     ),
     (

@@ -1,16 +1,45 @@
-import { Pressable, ScrollView, View } from "react-native";
+import { useEffect, useMemo, useState } from "react";
+import { Pressable, ScrollView, TextInput, View } from "react-native";
 
 import { useI18n } from "../../i18n/context";
 import { PixelBox } from "../components/PixelBox";
 import { PixelButton } from "../components/PixelButton";
 import { PixelText } from "../components/PixelText";
-import type { CupidProfileSummary, CupidateProfileSummary, SelectedProfileSummary } from "../model/types";
+import type {
+  CupidProfileSummary,
+  CupidateProfileDraft,
+  CupidateProfileSummary,
+  SelectedProfileSummary
+} from "../model/types";
 import { styles } from "../styles";
+import { designTokens } from "../theme/tokens";
 
 type ProfileViewProps = {
   profile: SelectedProfileSummary;
   onClose: () => void;
+  onSaveCupidateProfile?: (draft: CupidateProfileDraft) => void | Promise<void>;
+  isSavingCupidateProfile?: boolean;
 };
+
+type CupidateEditState = {
+  displayName: string;
+  birthYearInput: string;
+  gender: string;
+  bio: string;
+  locationInput: string;
+  jobTitleInput: string;
+  heightInput: string;
+  hobbiesInput: string;
+  preferredAgeMinInput: string;
+  preferredAgeMaxInput: string;
+  preferredRegionsInput: string;
+  preferredGender: "any" | "male" | "female" | "other";
+  preferredHeightMinInput: string;
+  preferredHeightMaxInput: string;
+  isActive: boolean;
+};
+
+const placeholderTextColor = designTokens.color.inkMuted;
 
 function ageLabel(birthYear: number | null) {
   if (!birthYear) {
@@ -76,6 +105,61 @@ function renderStatPill(label: string, value: string | number) {
   );
 }
 
+function parseOptionalNumber(input: string): number | undefined {
+  const trimmed = input.trim();
+  if (!trimmed) {
+    return undefined;
+  }
+
+  const parsed = Number(trimmed);
+  return Number.isNaN(parsed) ? undefined : parsed;
+}
+
+function parseRange(minInput: string, maxInput: string): [number, number] | undefined {
+  const min = parseOptionalNumber(minInput);
+  const max = parseOptionalNumber(maxInput);
+
+  if (min === undefined || max === undefined) {
+    return undefined;
+  }
+
+  return [Math.min(min, max), Math.max(min, max)];
+}
+
+function parseTags(input: string) {
+  return input
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+}
+
+function buildEditState(profile: CupidateProfileSummary): CupidateEditState {
+  return {
+    displayName: profile.displayName,
+    birthYearInput: profile.birthYear ? String(profile.birthYear) : "",
+    gender: profile.gender,
+    bio: profile.bio,
+    locationInput: profile.preferences.location ?? profile.preferences.region ?? "",
+    jobTitleInput: profile.preferences.jobTitle ?? "",
+    heightInput: profile.preferences.heightCm ? String(profile.preferences.heightCm) : "",
+    hobbiesInput: profile.preferences.hobbies?.join(", ") ?? "",
+    preferredAgeMinInput: profile.preferences.ageRange ? String(profile.preferences.ageRange[0]) : "",
+    preferredAgeMaxInput: profile.preferences.ageRange ? String(profile.preferences.ageRange[1]) : "",
+    preferredRegionsInput: profile.preferences.preferredRegions?.join(", ") ?? "",
+    preferredGender:
+      profile.preferences.preferredGenders && profile.preferences.preferredGenders.length > 0
+        ? profile.preferences.preferredGenders[0]
+        : "any",
+    preferredHeightMinInput: profile.preferences.preferredHeightRange
+      ? String(profile.preferences.preferredHeightRange[0])
+      : "",
+    preferredHeightMaxInput: profile.preferences.preferredHeightRange
+      ? String(profile.preferences.preferredHeightRange[1])
+      : "",
+    isActive: profile.isActive
+  };
+}
+
 function CupidProfilePanel({
   profile,
   t
@@ -126,17 +210,67 @@ function CupidProfilePanel({
 
 function CupidateProfilePanel({
   profile,
+  isSaving,
+  onSave,
   t
 }: {
   profile: CupidateProfileSummary;
+  isSaving?: boolean;
+  onSave?: (draft: CupidateProfileDraft) => void | Promise<void>;
   t: ReturnType<typeof useI18n>["t"];
 }) {
-  const hobbies = profile.preferences.hobbies?.join(", ") ?? "-";
-  const regions = profile.preferences.preferredRegions?.join(", ") ?? "-";
-  const preferredGender =
-    profile.preferences.preferredGenders && profile.preferences.preferredGenders.length > 0
-      ? profile.preferences.preferredGenders.map((value) => genderText(value, t)).join(", ")
-      : t("network.option.preferredGender.any");
+  const [editState, setEditState] = useState<CupidateEditState>(() => buildEditState(profile));
+
+  useEffect(() => {
+    setEditState(buildEditState(profile));
+  }, [profile]);
+
+  const hobbies = useMemo(() => parseTags(editState.hobbiesInput).join(", ") || "-", [editState.hobbiesInput]);
+  const regions = useMemo(
+    () => parseTags(editState.preferredRegionsInput).join(", ") || "-",
+    [editState.preferredRegionsInput]
+  );
+
+  const preferredGenderLabel =
+    editState.preferredGender === "any"
+      ? t("network.option.preferredGender.any")
+      : genderText(editState.preferredGender, t);
+
+  async function handleSave() {
+    if (!onSave) {
+      return;
+    }
+
+    const birthYear = parseOptionalNumber(editState.birthYearInput) ?? null;
+    const heightCm = parseOptionalNumber(editState.heightInput);
+    const preferredAgeRange = parseRange(editState.preferredAgeMinInput, editState.preferredAgeMaxInput);
+    const preferredHeightRange = parseRange(
+      editState.preferredHeightMinInput,
+      editState.preferredHeightMaxInput
+    );
+    const location = editState.locationInput.trim().toLowerCase();
+
+    await onSave({
+      cupidateId: profile.cupidateId,
+      displayName: editState.displayName,
+      birthYear,
+      gender: editState.gender,
+      bio: editState.bio,
+      isActive: editState.isActive,
+      preferences: {
+        ...profile.preferences,
+        location: location || undefined,
+        region: location || undefined,
+        jobTitle: editState.jobTitleInput.trim() || undefined,
+        heightCm,
+        hobbies: parseTags(editState.hobbiesInput),
+        ageRange: preferredAgeRange,
+        preferredRegions: parseTags(editState.preferredRegionsInput),
+        preferredGenders: editState.preferredGender === "any" ? [] : [editState.preferredGender],
+        preferredHeightRange
+      }
+    });
+  }
 
   return (
     <>
@@ -156,7 +290,7 @@ function CupidateProfilePanel({
             </PixelText>
             <View style={styles.profileSheetStatusChip}>
               <PixelText variant="caption" style={styles.networkStatusText}>
-                {profile.isActive ? t("profile.cupidate.active") : t("profile.cupidate.inactive")}
+                {editState.isActive ? t("profile.cupidate.active") : t("profile.cupidate.inactive")}
               </PixelText>
             </View>
           </View>
@@ -165,10 +299,7 @@ function CupidateProfilePanel({
         <View style={styles.profileSheetMetaList}>
           {renderMetaLine(t("profile.meta.age"), ageLabel(profile.birthYear))}
           {renderMetaLine(t("profile.meta.gender"), genderText(profile.gender, t))}
-          {renderMetaLine(
-            t("profile.meta.region"),
-            profile.preferences.location ?? profile.preferences.region ?? "-"
-          )}
+          {renderMetaLine(t("profile.meta.region"), profile.preferences.location ?? profile.preferences.region ?? "-")}
           {renderMetaLine(t("profile.meta.job"), profile.preferences.jobTitle ?? "-")}
           {renderMetaLine(
             t("profile.meta.height"),
@@ -182,7 +313,7 @@ function CupidateProfilePanel({
           {t("profile.sections.publicProfile")}
         </PixelText>
         <PixelText variant="body" style={styles.textBody}>
-          {profile.bio || t("profile.cupidate.noBio")}
+          {editState.bio || t("profile.cupidate.noBio")}
         </PixelText>
         <View style={styles.profileDivider} />
         {renderMetaLine(t("profile.meta.hobbies"), hobbies)}
@@ -198,14 +329,20 @@ function CupidateProfilePanel({
         </PixelText>
         {renderMetaLine(
           t("profile.meta.preferredAge"),
-          profile.preferences.ageRange ? `${profile.preferences.ageRange[0]} - ${profile.preferences.ageRange[1]}` : "-"
+          parseRange(editState.preferredAgeMinInput, editState.preferredAgeMaxInput)
+            ? `${parseRange(editState.preferredAgeMinInput, editState.preferredAgeMaxInput)?.[0]} - ${
+                parseRange(editState.preferredAgeMinInput, editState.preferredAgeMaxInput)?.[1]
+              }`
+            : "-"
         )}
-        {renderMetaLine(t("profile.meta.preferredGender"), preferredGender)}
+        {renderMetaLine(t("profile.meta.preferredGender"), preferredGenderLabel)}
         {renderMetaLine(t("profile.meta.preferredRegions"), regions)}
         {renderMetaLine(
           t("profile.meta.preferredHeight"),
-          profile.preferences.preferredHeightRange
-            ? `${profile.preferences.preferredHeightRange[0]} - ${profile.preferences.preferredHeightRange[1]} cm`
+          parseRange(editState.preferredHeightMinInput, editState.preferredHeightMaxInput)
+            ? `${parseRange(editState.preferredHeightMinInput, editState.preferredHeightMaxInput)?.[0]} - ${
+                parseRange(editState.preferredHeightMinInput, editState.preferredHeightMaxInput)?.[1]
+              } cm`
             : "-"
         )}
       </PixelBox>
@@ -224,11 +361,279 @@ function CupidateProfilePanel({
           )}
         </View>
       </PixelBox>
+
+      {profile.canEdit ? (
+        <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
+          <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+            {t("profile.sections.manage")}
+          </PixelText>
+          <PixelText variant="caption" style={styles.profileMetaText}>
+            {t("profile.manage.caption")}
+          </PixelText>
+
+          <PixelText variant="label" style={styles.fieldLabel}>
+            {t("network.fields.name")}
+          </PixelText>
+          <TextInput
+            value={editState.displayName}
+            onChangeText={(value) => setEditState((current) => ({ ...current, displayName: value }))}
+            placeholder={t("network.placeholders.name")}
+            placeholderTextColor={placeholderTextColor}
+            style={styles.input}
+          />
+
+          <View style={styles.buttonRow}>
+            <View style={styles.halfInput}>
+              <PixelText variant="label" style={styles.fieldLabel}>
+                {t("network.fields.birthYear")}
+              </PixelText>
+              <TextInput
+                value={editState.birthYearInput}
+                onChangeText={(value) => setEditState((current) => ({ ...current, birthYearInput: value }))}
+                keyboardType="numeric"
+                placeholder={t("network.placeholders.birthYear")}
+                placeholderTextColor={placeholderTextColor}
+                style={styles.input}
+              />
+            </View>
+
+            <View style={styles.halfInput}>
+              <PixelText variant="label" style={styles.fieldLabel}>
+                {t("network.fields.height")}
+              </PixelText>
+              <TextInput
+                value={editState.heightInput}
+                onChangeText={(value) => setEditState((current) => ({ ...current, heightInput: value }))}
+                keyboardType="numeric"
+                placeholder={t("network.placeholders.height")}
+                placeholderTextColor={placeholderTextColor}
+                style={styles.input}
+              />
+            </View>
+          </View>
+
+          <PixelText variant="label" style={styles.fieldLabel}>
+            {t("network.fields.gender")}
+          </PixelText>
+          <View style={styles.buttonRow}>
+            <PixelButton
+              label={t("network.option.gender.male")}
+              active={editState.gender === "male"}
+              onPress={() => setEditState((current) => ({ ...current, gender: "male" }))}
+            />
+            <PixelButton
+              label={t("network.option.gender.female")}
+              active={editState.gender === "female"}
+              onPress={() => setEditState((current) => ({ ...current, gender: "female" }))}
+            />
+            <PixelButton
+              label={t("network.option.gender.other")}
+              active={editState.gender === "other"}
+              onPress={() => setEditState((current) => ({ ...current, gender: "other" }))}
+            />
+          </View>
+
+          <View style={styles.buttonRow}>
+            <View style={styles.halfInput}>
+              <PixelText variant="label" style={styles.fieldLabel}>
+                {t("network.fields.region")}
+              </PixelText>
+              <TextInput
+                value={editState.locationInput}
+                onChangeText={(value) => setEditState((current) => ({ ...current, locationInput: value }))}
+                placeholder={t("network.placeholders.region")}
+                placeholderTextColor={placeholderTextColor}
+                style={styles.input}
+              />
+            </View>
+
+            <View style={styles.halfInput}>
+              <PixelText variant="label" style={styles.fieldLabel}>
+                {t("network.fields.jobTitle")}
+              </PixelText>
+              <TextInput
+                value={editState.jobTitleInput}
+                onChangeText={(value) => setEditState((current) => ({ ...current, jobTitleInput: value }))}
+                placeholder={t("network.placeholders.jobTitle")}
+                placeholderTextColor={placeholderTextColor}
+                style={styles.input}
+              />
+            </View>
+          </View>
+
+          <PixelText variant="label" style={styles.fieldLabel}>
+            {t("network.fields.hobbies")}
+          </PixelText>
+          <TextInput
+            value={editState.hobbiesInput}
+            onChangeText={(value) => setEditState((current) => ({ ...current, hobbiesInput: value }))}
+            placeholder={t("network.placeholders.hobbies")}
+            placeholderTextColor={placeholderTextColor}
+            style={styles.input}
+          />
+
+          <PixelText variant="label" style={styles.fieldLabel}>
+            {t("network.fields.bio")}
+          </PixelText>
+          <TextInput
+            value={editState.bio}
+            onChangeText={(value) => setEditState((current) => ({ ...current, bio: value }))}
+            multiline
+            placeholder={t("network.placeholders.bio")}
+            placeholderTextColor={placeholderTextColor}
+            style={[styles.input, styles.multilineInput]}
+          />
+
+          <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+            {t("network.form.preferenceTitle")}
+          </PixelText>
+
+          <View style={styles.buttonRow}>
+            <View style={styles.halfInput}>
+              <PixelText variant="label" style={styles.fieldLabel}>
+                {t("network.fields.preferredAge")}
+              </PixelText>
+              <TextInput
+                value={editState.preferredAgeMinInput}
+                onChangeText={(value) =>
+                  setEditState((current) => ({ ...current, preferredAgeMinInput: value }))
+                }
+                keyboardType="numeric"
+                placeholder={t("network.placeholders.rangeMin")}
+                placeholderTextColor={placeholderTextColor}
+                style={styles.input}
+              />
+            </View>
+            <View style={styles.halfInput}>
+              <PixelText variant="label" style={styles.fieldLabel}>
+                {t("network.fields.preferredAgeMax")}
+              </PixelText>
+              <TextInput
+                value={editState.preferredAgeMaxInput}
+                onChangeText={(value) =>
+                  setEditState((current) => ({ ...current, preferredAgeMaxInput: value }))
+                }
+                keyboardType="numeric"
+                placeholder={t("network.placeholders.rangeMax")}
+                placeholderTextColor={placeholderTextColor}
+                style={styles.input}
+              />
+            </View>
+          </View>
+
+          <PixelText variant="label" style={styles.fieldLabel}>
+            {t("network.fields.preferredRegions")}
+          </PixelText>
+          <TextInput
+            value={editState.preferredRegionsInput}
+            onChangeText={(value) => setEditState((current) => ({ ...current, preferredRegionsInput: value }))}
+            placeholder={t("network.placeholders.preferredRegions")}
+            placeholderTextColor={placeholderTextColor}
+            style={styles.input}
+          />
+
+          <PixelText variant="label" style={styles.fieldLabel}>
+            {t("network.fields.preferredGender")}
+          </PixelText>
+          <View style={styles.buttonRow}>
+            <PixelButton
+              label={t("network.option.preferredGender.any")}
+              active={editState.preferredGender === "any"}
+              onPress={() => setEditState((current) => ({ ...current, preferredGender: "any" }))}
+            />
+            <PixelButton
+              label={t("network.option.preferredGender.male")}
+              active={editState.preferredGender === "male"}
+              onPress={() => setEditState((current) => ({ ...current, preferredGender: "male" }))}
+            />
+            <PixelButton
+              label={t("network.option.preferredGender.female")}
+              active={editState.preferredGender === "female"}
+              onPress={() => setEditState((current) => ({ ...current, preferredGender: "female" }))}
+            />
+            <PixelButton
+              label={t("network.option.preferredGender.other")}
+              active={editState.preferredGender === "other"}
+              onPress={() => setEditState((current) => ({ ...current, preferredGender: "other" }))}
+            />
+          </View>
+
+          <View style={styles.buttonRow}>
+            <View style={styles.halfInput}>
+              <PixelText variant="label" style={styles.fieldLabel}>
+                {t("network.fields.preferredHeight")}
+              </PixelText>
+              <TextInput
+                value={editState.preferredHeightMinInput}
+                onChangeText={(value) =>
+                  setEditState((current) => ({ ...current, preferredHeightMinInput: value }))
+                }
+                keyboardType="numeric"
+                placeholder={t("network.placeholders.rangeMin")}
+                placeholderTextColor={placeholderTextColor}
+                style={styles.input}
+              />
+            </View>
+            <View style={styles.halfInput}>
+              <PixelText variant="label" style={styles.fieldLabel}>
+                {t("network.fields.preferredHeightMax")}
+              </PixelText>
+              <TextInput
+                value={editState.preferredHeightMaxInput}
+                onChangeText={(value) =>
+                  setEditState((current) => ({ ...current, preferredHeightMaxInput: value }))
+                }
+                keyboardType="numeric"
+                placeholder={t("network.placeholders.rangeMax")}
+                placeholderTextColor={placeholderTextColor}
+                style={styles.input}
+              />
+            </View>
+          </View>
+
+          <PixelText variant="label" style={styles.fieldLabel}>
+            {t("profile.manage.activation")}
+          </PixelText>
+          <View style={styles.buttonRow}>
+            <PixelButton
+              label={t("profile.manage.activate")}
+              variant="success"
+              active={editState.isActive}
+              onPress={() => setEditState((current) => ({ ...current, isActive: true }))}
+            />
+            <PixelButton
+              label={t("profile.manage.deactivate")}
+              variant="neutral"
+              active={!editState.isActive}
+              onPress={() => setEditState((current) => ({ ...current, isActive: false }))}
+            />
+          </View>
+          <PixelText variant="caption" style={styles.profileMetaText}>
+            {t("profile.manage.activationHint")}
+          </PixelText>
+
+          <View style={styles.buttonRow}>
+            <PixelButton
+              label={isSaving ? t("profile.actions.saving") : t("profile.actions.save")}
+              variant="primary"
+              disabled={!!isSaving || !editState.displayName.trim()}
+              onPress={() => {
+                void handleSave();
+              }}
+            />
+          </View>
+        </PixelBox>
+      ) : null}
     </>
   );
 }
 
-export function ProfileView({ profile, onClose }: ProfileViewProps) {
+export function ProfileView({
+  profile,
+  onClose,
+  onSaveCupidateProfile,
+  isSavingCupidateProfile
+}: ProfileViewProps) {
   const { t } = useI18n();
 
   if (!profile) {
@@ -251,7 +656,12 @@ export function ProfileView({ profile, onClose }: ProfileViewProps) {
             {profile.kind === "cupid" ? (
               <CupidProfilePanel profile={profile} t={t} />
             ) : (
-              <CupidateProfilePanel profile={profile} t={t} />
+              <CupidateProfilePanel
+                profile={profile}
+                isSaving={isSavingCupidateProfile}
+                onSave={onSaveCupidateProfile}
+                t={t}
+              />
             )}
           </ScrollView>
         </PixelBox>

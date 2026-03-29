@@ -6,6 +6,7 @@
   NetworkConnection,
   NetworkCupidate,
   NetworkRepository,
+  UpdateCupidateInput,
   UpdateConnectionStatusInput
 } from "./types";
 
@@ -101,7 +102,7 @@ export class InMemoryNetworkRepository implements NetworkRepository {
       birthYear: input.birthYear ?? null,
       gender: input.gender ?? null,
       bio: input.bio ?? "",
-      isActive: input.isActive ?? true,
+      isActive: input.isActive ?? false,
       preferences: input.preferences ?? {},
       createdAt: now,
       updatedAt: now
@@ -109,6 +110,31 @@ export class InMemoryNetworkRepository implements NetworkRepository {
 
     this.cupidates = [next, ...this.cupidates];
     return next;
+  }
+
+  async updateCupidate(input: UpdateCupidateInput): Promise<NetworkCupidate> {
+    const found = this.cupidates.find((item) => item.id === input.cupidateId);
+    if (!found) {
+      throw new Error(`Cupidate not found: ${input.cupidateId}`);
+    }
+
+    if (found.ownerCupidId !== this.currentCupid.id) {
+      throw new Error("Forbidden cupidate update");
+    }
+
+    const updated: NetworkCupidate = {
+      ...found,
+      displayName: input.displayName !== undefined ? input.displayName.trim() : found.displayName,
+      birthYear: input.birthYear !== undefined ? input.birthYear ?? null : found.birthYear,
+      gender: input.gender !== undefined ? input.gender ?? null : found.gender,
+      bio: input.bio !== undefined ? input.bio ?? "" : found.bio,
+      isActive: input.isActive !== undefined ? input.isActive : found.isActive,
+      preferences: input.preferences ?? found.preferences,
+      updatedAt: NOW()
+    };
+
+    this.cupidates = this.cupidates.map((item) => (item.id === input.cupidateId ? updated : item));
+    return updated;
   }
 
   async listConnections(): Promise<NetworkConnection[]> {

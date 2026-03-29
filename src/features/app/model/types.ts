@@ -98,3 +98,13 @@ export type CupidateProfileSummary = {
 };
 
 export type SelectedProfileSummary = CupidProfileSummary | CupidateProfileSummary | null;
+
+export type CupidateProfileDraft = {
+  cupidateId: string;
+  displayName: string;
+  birthYear: number | null;
+  gender: string;
+  bio: string;
+  isActive: boolean;
+  preferences: CupidateRecord["preferences"];
+};

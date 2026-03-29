@@ -47,6 +47,16 @@ export type CreateCupidateInput = {
   preferences?: PreferenceData;
 };
 
+export type UpdateCupidateInput = {
+  cupidateId: string;
+  displayName?: string;
+  birthYear?: number | null;
+  gender?: string | null;
+  bio?: string | null;
+  isActive?: boolean;
+  preferences?: PreferenceData;
+};
+
 export type CreateConnectionInput = {
   addresseeCupidId: string;
 };
@@ -62,6 +72,7 @@ export interface NetworkRepository {
   upsertCurrentCupidNickname(nickname: string): Promise<CurrentCupid>;
   listCupidates(): Promise<NetworkCupidate[]>;
   createCupidate(input: CreateCupidateInput): Promise<NetworkCupidate>;
+  updateCupidate(input: UpdateCupidateInput): Promise<NetworkCupidate>;
   listConnections(): Promise<NetworkConnection[]>;
   createConnection(input: CreateConnectionInput): Promise<NetworkConnection>;
   updateConnectionStatus(input: UpdateConnectionStatusInput): Promise<NetworkConnection>;
