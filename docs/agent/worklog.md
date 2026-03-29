@@ -588,3 +588,39 @@ Verification:
 
 Notes:
 - This closes the Network portion of the current rebuild track and moves the remaining visual focus to Matching.
+
+### Task 2026-03-29-07 - Matching View Prototype Rebuild + Score Insight Redesign
+Status: Completed
+
+Changes:
+- Rebuilt `src/features/app/views/MatchingView.tsx` around the current matching prototype PRD:
+  - `Matching Manager`
+  - `Pending Match Requests`
+  - `User Suggested Matches`
+  - `Matching Insights`
+- Replaced the earlier flat recommendation/history layout with a decision-console structure:
+  - active request cards with paired mini profiles
+  - score chip + status chip
+  - state-aware actions (`Approve`, `Reject`, `Mark Contact Shared`)
+- Added a persistent insight panel driven by the current focus pair:
+  - score breakdown chart (`age`, `hobbies`, `lifestyle`, `location`, `profile`)
+  - request timeline (`Request`, `Approval`, `Contact Shared`)
+  - feedback summary generated from shared hobbies and strongest score factors
+- Expanded i18n coverage to Matching:
+  - added localized copy to `src/features/i18n/messages.ts`
+  - removed direct static UI copy from the rebuilt screen
+- Extended shared style tokens in `src/features/app/styles.ts` for request cards, insight chart, timeline, and feedback list.
+- Updated app-level tests to match the rebuilt flow:
+  - `src/features/app/__tests__/matchingFlow.test.tsx`
+  - `src/features/app/__tests__/navigationTabs.test.tsx`
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand src/features/app/__tests__/matchingFlow.test.tsx src/features/app/__tests__/navigationTabs.test.tsx` passed.
+
+Notes:
+- The current focus card falls back in this order:
+  - active request
+  - recent request
+  - suggested match
+- This keeps the insight panel populated even after a match reaches the completed state.

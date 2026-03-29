@@ -84,17 +84,18 @@ describe("Matching flow", () => {
     fireEvent.press(screen.getByTestId("tab-matching"));
 
     await waitFor(() => {
-      expect(screen.getByText("Mina x Joon")).toBeTruthy();
-      expect(screen.getByText("Status: none")).toBeTruthy();
+      expect(screen.getByText("Mina suggested for Joon")).toBeTruthy();
+      expect(screen.getAllByText("Status: none").length).toBeGreaterThan(0);
     });
 
     fireEvent.press(screen.getByText("Request Match"));
 
     await waitFor(() => {
+      expect(screen.getByText("Mina & Joon Request")).toBeTruthy();
       expect(screen.getAllByText("Status: requested").length).toBeGreaterThan(0);
     });
 
-    fireEvent.press(screen.getByText("Accept"));
+    fireEvent.press(screen.getByText("Approve"));
 
     await waitFor(() => {
       expect(screen.getAllByText("Status: accepted").length).toBeGreaterThan(0);

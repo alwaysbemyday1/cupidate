@@ -137,7 +137,7 @@ Last Updated: 2026-03-29
   - `Home`
   - `Auth`
 - `Network`는 리빌드 완료 기준으로 같은 체계에 포함한다.
-- `Matching`의 정적 카피는 후속 리빌드 단계에서 같은 체계로 확장한다.
+- `Matching`은 리빌드 완료 기준으로 같은 체계에 포함한다.
 
 ### 8.2 Implementation Policy
 - 번역은 key 기반으로 관리한다.
@@ -151,7 +151,7 @@ Last Updated: 2026-03-29
 
 ### 8.3 Language Setting UX
 - 언어 전환은 `My` 화면에서 수행한다.
-- 변경 즉시 앱 헤더, 탭 라벨, My/Home/Auth 카피에 반영되어야 한다.
+- 변경 즉시 앱 헤더, 탭 라벨, My/Home/Auth/Network/Matching 카피에 반영되어야 한다.
 - MVP 단계에서는 세션 내 상태로 관리해도 된다.
 - 후속 단계에서 사용자 계정 또는 로컬 스토리지에 영속화한다.
 
@@ -177,8 +177,14 @@ Last Updated: 2026-03-29
 - 상태는 색 + 텍스트 + 배지 조합으로 표현한다
 
 ### Matching
-- 승인/거절/진행 단계가 최상단에서 먼저 보이도록
-- 점수는 숫자만이 아니라 근거와 상태 흐름도 함께 보여준다
+- 순서:
+  - `Matching Manager`
+  - `Pending Match Requests`
+  - `User Suggested Matches`
+  - `Matching Insights`
+- 요청 카드는 양측 미니 프로필, 점수, 상태, 취미 근거를 한 카드 안에서 읽을 수 있어야 한다
+- 인사이트는 `점수 분해`, `타임라인`, `피드백 요약`이 한 흐름으로 이어져야 한다
+- 승인/거절/연락처 공유 액션은 현재 상태에 따라 한 번에 이해되도록 바뀌어야 한다
 
 ### My
 - 순서:
@@ -212,3 +218,11 @@ Last Updated: 2026-03-29
 4. D4 Network
 5. D5 Matching
 6. D6 Integration hardening
+
+## 12. Rebuild Status
+- `D1` 완료: 공용 픽셀 프리미티브
+- `D2` 완료: My
+- `D3` 완료: Home
+- `D4` 완료: Network
+- `D5` 완료: Matching
+- 현재 포커스: `D6 Integration hardening`

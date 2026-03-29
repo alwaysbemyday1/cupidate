@@ -34,8 +34,8 @@ describe("App navigation tabs", () => {
     fireEvent.press(screen.getByTestId("tab-matching"));
 
     await waitFor(() => {
-      expect(screen.getByText("Recommendation Board")).toBeTruthy();
-      expect(screen.getByText("Match Request History")).toBeTruthy();
+      expect(screen.getByText("Pending Match Requests")).toBeTruthy();
+      expect(screen.getByText("Matching Insights")).toBeTruthy();
     });
 
     fireEvent.press(screen.getByTestId("tab-my"));

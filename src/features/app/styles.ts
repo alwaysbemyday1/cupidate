@@ -642,6 +642,261 @@ export const styles = StyleSheet.create({
   networkSearchResults: {
     gap: s.xs
   },
+  matchingPanelCard: {},
+  matchingPanelContent: {
+    backgroundColor: c.surface,
+    padding: s.sm,
+    gap: s.sm
+  },
+  matchingRequestCard: {},
+  matchingRequestContent: {
+    backgroundColor: c.surfaceAlt,
+    padding: s.sm,
+    gap: s.sm
+  },
+  matchingCardTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: s.xs
+  },
+  matchingMiniProfile: {
+    flex: 1,
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surface,
+    padding: s.xs,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: s.xs
+  },
+  matchingMiniAvatar: {
+    width: 34,
+    height: 34,
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.blueDark,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  matchingMiniInfo: {
+    flex: 1,
+    gap: 2
+  },
+  matchingMiniName: {
+    color: c.ink
+  },
+  matchingMiniMeta: {
+    color: c.inkMuted
+  },
+  matchingCardMetaBlock: {
+    gap: s.xxs
+  },
+  matchingMetaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: s.xs
+  },
+  matchingScoreChip: {
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.blueDark,
+    paddingHorizontal: s.xs,
+    paddingVertical: 6
+  },
+  matchingScoreText: {
+    color: c.inkInverse
+  },
+  matchingStatusChip: {
+    borderWidth: b.normal,
+    borderColor: c.border,
+    paddingHorizontal: s.xs,
+    paddingVertical: 6
+  },
+  matchingStatusNeutral: {
+    backgroundColor: c.surfaceRaised
+  },
+  matchingStatusRequested: {
+    backgroundColor: c.warning
+  },
+  matchingStatusAccepted: {
+    backgroundColor: c.success
+  },
+  matchingStatusRejected: {
+    backgroundColor: c.danger
+  },
+  matchingStatusCompleted: {
+    backgroundColor: c.gold
+  },
+  matchingStatusText: {
+    color: c.ink
+  },
+  matchingSuggestionRow: {
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surfaceAlt,
+    padding: s.sm,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: s.sm
+  },
+  matchingSuggestionInfo: {
+    flex: 1,
+    gap: 2
+  },
+  matchingSuggestionActions: {
+    alignItems: "flex-end"
+  },
+  matchingInsightCard: {},
+  matchingInsightContent: {
+    backgroundColor: c.surface,
+    padding: s.md,
+    gap: s.sm
+  },
+  matchingInsightHeader: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    gap: s.xs
+  },
+  matchingInsightProfileCard: {
+    width: 68,
+    alignItems: "center",
+    gap: s.xs
+  },
+  matchingInsightAvatar: {
+    width: 44,
+    height: 44,
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surfaceAlt,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  matchingBreakdownChart: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    gap: 6,
+    minHeight: 138,
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surfaceAlt,
+    paddingHorizontal: s.xs,
+    paddingVertical: s.sm
+  },
+  matchingBreakdownItem: {
+    flex: 1,
+    alignItems: "center",
+    gap: 4
+  },
+  matchingBreakdownTrack: {
+    width: "100%",
+    minHeight: 80,
+    justifyContent: "flex-end",
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surface
+  },
+  matchingBreakdownFill: {
+    width: "100%"
+  },
+  matchingBreakdownValue: {
+    color: c.ink
+  },
+  matchingBreakdownLabel: {
+    color: c.inkMuted,
+    textAlign: "center"
+  },
+  matchingInsightScoreRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexWrap: "wrap",
+    gap: s.xs
+  },
+  matchingTimelineRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: s.xs
+  },
+  matchingTimelineStep: {
+    flex: 1,
+    alignItems: "center",
+    gap: s.xxs,
+    position: "relative"
+  },
+  matchingTimelineMarker: {
+    width: 36,
+    height: 36,
+    borderWidth: b.normal,
+    borderColor: c.border,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  matchingTimelineMarkerWait: {
+    backgroundColor: c.surfaceAlt
+  },
+  matchingTimelineMarkerLive: {
+    backgroundColor: c.warning
+  },
+  matchingTimelineMarkerDone: {
+    backgroundColor: c.success
+  },
+  matchingTimelineMarkerText: {
+    color: c.ink
+  },
+  matchingTimelineLabel: {
+    color: c.ink,
+    textAlign: "center"
+  },
+  matchingTimelineState: {
+    color: c.inkMuted
+  },
+  matchingTimelineConnector: {
+    position: "absolute",
+    top: 16,
+    left: "68%",
+    width: "64%",
+    height: 6,
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surfaceAlt
+  },
+  matchingTimelineConnectorDone: {
+    backgroundColor: c.success
+  },
+  matchingFeedbackList: {
+    gap: s.xs
+  },
+  matchingFeedbackItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: s.xs,
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surfaceAlt,
+    padding: s.xs
+  },
+  matchingFeedbackAvatar: {
+    width: 34,
+    height: 34,
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.pink,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  matchingFeedbackBody: {
+    flex: 1,
+    gap: 2
+  },
+  matchingFeedbackName: {
+    color: c.inkMuted
+  },
 
   settingRow: {
     flexDirection: "row",
