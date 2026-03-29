@@ -4,10 +4,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PixelText } from "./PixelText";
 import { designTokens } from "../theme/tokens";
 
+type PixelTabIconKind = "home" | "network" | "match" | "my";
+
 type PixelTabBarItem<T extends string> = {
   key: T;
   label: string;
-  iconLabel: string;
+  iconLabel: PixelTabIconKind;
   accentColor: string;
 };
 
@@ -17,15 +19,120 @@ type PixelTabBarProps<T extends string> = {
   onSelect: (key: T) => void;
 };
 
+function PixelGlyph({ kind, color }: { kind: PixelTabIconKind; color: string }) {
+  const pixelsByKind: Record<PixelTabIconKind, Array<[number, number]>> = {
+    home: [
+      [2, 1],
+      [3, 0],
+      [4, 1],
+      [1, 2],
+      [2, 2],
+      [3, 2],
+      [4, 2],
+      [5, 2],
+      [1, 3],
+      [5, 3],
+      [1, 4],
+      [2, 4],
+      [4, 4],
+      [5, 4],
+      [1, 5],
+      [2, 5],
+      [4, 5],
+      [5, 5]
+    ],
+    network: [
+      [1, 1],
+      [2, 1],
+      [4, 1],
+      [5, 1],
+      [2, 2],
+      [3, 2],
+      [4, 2],
+      [1, 3],
+      [2, 3],
+      [4, 3],
+      [5, 3],
+      [2, 4],
+      [3, 4],
+      [4, 4],
+      [1, 5],
+      [2, 5],
+      [4, 5],
+      [5, 5]
+    ],
+    match: [
+      [1, 1],
+      [2, 1],
+      [4, 1],
+      [5, 1],
+      [0, 2],
+      [1, 2],
+      [2, 2],
+      [3, 2],
+      [4, 2],
+      [5, 2],
+      [6, 2],
+      [1, 3],
+      [2, 3],
+      [3, 3],
+      [4, 3],
+      [5, 3],
+      [2, 4],
+      [3, 4],
+      [4, 4],
+      [3, 5]
+    ],
+    my: [
+      [3, 0],
+      [2, 1],
+      [3, 1],
+      [4, 1],
+      [2, 2],
+      [3, 2],
+      [4, 2],
+      [2, 3],
+      [3, 3],
+      [4, 3],
+      [1, 4],
+      [2, 4],
+      [3, 4],
+      [4, 4],
+      [5, 4],
+      [1, 5],
+      [5, 5]
+    ]
+  };
+
+  return (
+    <View style={localStyles.glyphCanvas}>
+      {pixelsByKind[kind].map(([x, y], index) => (
+        <View
+          key={`${kind}-${index}`}
+          style={[
+            localStyles.glyphPixel,
+            {
+              left: x * 2,
+              top: y * 2,
+              backgroundColor: color
+            }
+          ]}
+        />
+      ))}
+    </View>
+  );
+}
+
 export function PixelTabBar<T extends string>({ activeKey, items, onSelect }: PixelTabBarProps<T>) {
   const insets = useSafeAreaInsets();
 
   return (
     <View pointerEvents="box-none" style={localStyles.mount}>
-      <View style={[localStyles.frame, { paddingBottom: Math.max(insets.bottom, designTokens.spacing.xs) }]}>
+      <View style={[localStyles.frame, { paddingBottom: Math.max(insets.bottom, designTokens.spacing.xxs) }]}>
         <View style={localStyles.row}>
           {items.map((item, index) => {
             const active = item.key === activeKey;
+            const iconColor = active ? designTokens.color.inkInverse : designTokens.color.surfaceRaised;
 
             return (
               <Pressable
@@ -57,9 +164,7 @@ export function PixelTabBar<T extends string>({ activeKey, items, onSelect }: Pi
                         active ? { backgroundColor: item.accentColor } : localStyles.iconChipInactive
                       ]}
                     >
-                      <PixelText variant="caption" color={designTokens.color.inkInverse}>
-                        {item.iconLabel}
-                      </PixelText>
+                      <PixelGlyph kind={item.iconLabel} color={iconColor} />
                     </View>
                     <PixelText
                       variant="caption"
@@ -84,21 +189,22 @@ const localStyles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
-    bottom: 0
+    bottom: 0,
+    backgroundColor: designTokens.color.surfaceRaised
   },
   frame: {
     backgroundColor: designTokens.color.surfaceRaised,
     borderTopWidth: designTokens.border.heavy,
     borderColor: designTokens.color.border,
-    paddingTop: designTokens.spacing.xs,
-    paddingHorizontal: designTokens.spacing.xs
+    paddingTop: designTokens.spacing.xxs,
+    paddingHorizontal: designTokens.spacing.xxs
   },
   row: {
     flexDirection: "row"
   },
   cellPressable: {
     flex: 1,
-    minHeight: designTokens.size.tabBarHeight - 12
+    minHeight: designTokens.size.tabBarHeight - 8
   },
   cellPressableBorder: {
     borderLeftWidth: designTokens.border.thin,
@@ -108,10 +214,10 @@ const localStyles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: 6,
+    gap: 4,
     paddingHorizontal: 4,
-    paddingTop: 8,
-    paddingBottom: 6
+    paddingTop: 6,
+    paddingBottom: 4
   },
   cellFaceActive: {
     backgroundColor: designTokens.color.surface
@@ -125,16 +231,14 @@ const localStyles = StyleSheet.create({
   activeStrip: {
     position: "absolute",
     top: 0,
-    left: 10,
-    right: 10,
-    height: 4,
+    left: 8,
+    right: 8,
+    height: 3,
     opacity: 0
   },
   iconChip: {
-    minWidth: 28,
-    minHeight: 24,
-    paddingHorizontal: 6,
-    paddingVertical: 3,
+    width: 24,
+    height: 22,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: designTokens.border.normal,
@@ -145,5 +249,15 @@ const localStyles = StyleSheet.create({
   },
   cellLabel: {
     textAlign: "center"
+  },
+  glyphCanvas: {
+    width: 14,
+    height: 12,
+    position: "relative"
+  },
+  glyphPixel: {
+    position: "absolute",
+    width: 2,
+    height: 2
   }
 });

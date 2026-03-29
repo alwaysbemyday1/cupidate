@@ -21,7 +21,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: c.background,
     paddingHorizontal: s.md,
-    paddingTop: s.md
+    paddingTop: s.sm
   },
   screenBody: {
     flex: 1,
@@ -40,13 +40,13 @@ export const styles = StyleSheet.create({
   },
 
   headerFrame: {
-    marginBottom: s.md
+    marginBottom: s.sm
   },
   headerContent: {
     minHeight: z.headerHeight,
     backgroundColor: c.backgroundAlt,
     paddingHorizontal: s.md,
-    paddingVertical: s.sm,
+    paddingVertical: s.xs,
     justifyContent: "center"
   },
   headerRow: {
@@ -58,19 +58,12 @@ export const styles = StyleSheet.create({
   title: {
     color: c.inkInverse
   },
-  titleAccent: {
-    color: c.gold
-  },
-  subtitle: {
-    color: c.surfaceAlt,
-    marginTop: 2
-  },
   statusBadge: {
     borderWidth: b.normal,
     borderColor: c.border,
     backgroundColor: c.surface,
     paddingHorizontal: s.xs,
-    paddingVertical: 4
+    paddingVertical: 3
   },
   statusText: {
     color: c.ink

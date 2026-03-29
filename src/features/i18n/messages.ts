@@ -2,8 +2,6 @@ import type { Locale } from "./types";
 
 export const messages: Record<Locale, Record<string, string>> = {
   en: {
-    "app.header.subtitle": "PIXEL MATCH NETWORK",
-    "app.status.online": "ONLINE",
     "app.status.locked": "LOCKED",
     "app.tabs.home": "HOME",
     "app.tabs.matching": "MATCH",
@@ -70,8 +68,8 @@ export const messages: Record<Locale, Record<string, string>> = {
     "network.badge.wait": "WAIT",
     "network.badge.reject": "NO",
     "network.segment.board": "Board",
-    "network.segment.cupidates": "My Cupidates ({count})",
-    "network.segment.cupids": "Connected Cupids ({count})",
+    "network.segment.cupidates": "My Cupidates",
+    "network.segment.cupids": "My Cupids",
     "network.subsegment.cupidateList": "Cupidate List",
     "network.subsegment.cupidateRegister": "Register Cupidate",
     "network.subsegment.cupidList": "Cupid List",
@@ -169,7 +167,6 @@ export const messages: Record<Locale, Record<string, string>> = {
     "network.validation.heightRange": "Height must be within 120-230 cm.",
     "network.validation.preferredHeightRange": "Preferred height range must be within 120-230 cm.",
 
-    "matching.sections.manager": "Cupidate: Matching Manager",
     "matching.sections.pending": "Pending Match Requests",
     "matching.sections.suggestions": "User Suggested Matches",
     "matching.sections.insights": "Matching Insights",
@@ -301,8 +298,6 @@ export const messages: Record<Locale, Record<string, string>> = {
     "auth.success.signUpVerify": "Account created. Verify email, then sign in."
   },
   ko: {
-    "app.header.subtitle": "픽셀 매치 네트워크",
-    "app.status.online": "온라인",
     "app.status.locked": "잠금",
     "app.tabs.home": "홈",
     "app.tabs.matching": "매칭",
@@ -369,8 +364,8 @@ export const messages: Record<Locale, Record<string, string>> = {
     "network.badge.wait": "대기",
     "network.badge.reject": "거절",
     "network.segment.board": "보드",
-    "network.segment.cupidates": "내 큐피데이트 ({count})",
-    "network.segment.cupids": "연결된 큐피드 ({count})",
+    "network.segment.cupidates": "내 큐피데이트",
+    "network.segment.cupids": "내 큐피드",
     "network.subsegment.cupidateList": "목록 보기",
     "network.subsegment.cupidateRegister": "큐피데이트 등록",
     "network.subsegment.cupidList": "연결 목록",
@@ -468,7 +463,6 @@ export const messages: Record<Locale, Record<string, string>> = {
     "network.validation.heightRange": "키는 120cm부터 230cm 사이여야 합니다.",
     "network.validation.preferredHeightRange": "선호 키 범위는 120cm부터 230cm 사이여야 합니다.",
 
-    "matching.sections.manager": "Cupidate: Matching Manager",
     "matching.sections.pending": "대기 중인 매칭 요청",
     "matching.sections.suggestions": "사용자 제안 매칭",
     "matching.sections.insights": "매칭 인사이트",

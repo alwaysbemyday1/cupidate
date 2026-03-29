@@ -35,7 +35,7 @@ describe("App i18n flow", () => {
 
     await waitFor(() => {
       expect(screen.getByText(messages.ko["my.sections.profileOverview"])).toBeTruthy();
-      expect(screen.getByText(`Cupidate: ${messages.ko["app.views.my"]}`)).toBeTruthy();
+      expect(screen.getByTestId("app-header-title")).toHaveTextContent(messages.ko["app.views.my"]);
     });
     await waitFor(() => {
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(LOCALE_STORAGE_KEY, "ko");
@@ -46,14 +46,14 @@ describe("App i18n flow", () => {
     await waitFor(() => {
       expect(screen.getByText(messages.ko["home.sections.alarmFeed"])).toBeTruthy();
       expect(screen.getByText(messages.ko["home.sections.quickActions"])).toBeTruthy();
-      expect(screen.getByText(`Cupidate: ${messages.ko["app.views.home"]}`)).toBeTruthy();
+      expect(screen.getByTestId("app-header-title")).toHaveTextContent(messages.ko["app.views.home"]);
     });
 
     rendered.unmount();
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText(`Cupidate: ${messages.ko["app.views.home"]}`)).toBeTruthy();
+      expect(screen.getByTestId("app-header-title")).toHaveTextContent(messages.ko["app.views.home"]);
       expect(screen.getByText(messages.ko["home.sections.alarmFeed"])).toBeTruthy();
     });
   });

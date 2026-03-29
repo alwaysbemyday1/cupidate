@@ -682,3 +682,41 @@ Notes:
   - board for overview
   - list for review
   - dedicated register/search subviews for data entry
+
+### Task 2026-03-29-12 - Slim Dock + Segmented Network Tabs + Supabase Fake Data
+Status: Completed
+
+Changes:
+- Reordered the main bottom navigation to:
+  - Home
+  - Network
+  - Match
+  - My
+- Slimmed the dock height and replaced letter-based icon chips with built-in pixel glyph icons.
+- Simplified the app header so the rebuilt shell now shows:
+  - current page title
+  - optional locked chip only when auth-gated
+- Added a reusable segmented-tab component:
+  - `src/features/app/components/PixelSegmentTabs.tsx`
+- Replaced Network segment controls with tab-like segmented rails instead of button rows:
+  - top level: `Board / My Cupidates / My Cupids`
+  - subviews: `Cupidate List / Register Cupidate`, `Cupid List / Register Cupid`
+- Improved Network flow by returning to the cupid list subview after a successful connection request.
+- Added and applied a Supabase policy migration so authenticated users can search other cupids by nickname:
+  - `supabase/migrations/20260329173000_cupidate_cupids_directory_select.sql`
+- Rewrote `supabase/seed.sql` into an idempotent POC seed.
+- Applied equivalent seed data to the live `fuzuoehehnbcngvwoypd` dev project:
+  - 3 auth users / 3 cupids
+  - 4 cupidates
+  - 4 preference rows
+  - 1 accepted connection
+  - 2 match candidates
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand` passed.
+- Supabase row-count verification confirmed the seeded records.
+
+Notes:
+- No separate icon asset handoff is required yet; the current dock icons are code-drawn pixel glyphs.
+- If we later want more characterful branded icons, a custom sprite sheet would be the next upgrade.

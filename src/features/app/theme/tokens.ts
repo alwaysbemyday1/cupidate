@@ -54,9 +54,9 @@ export const designTokens = {
     metric: 24
   },
   size: {
-    headerHeight: 56,
-    tabBarHeight: 76,
-    tabBarInset: 8,
+    headerHeight: 48,
+    tabBarHeight: 62,
+    tabBarInset: 4,
     pixelShadow: 4,
     buttonHeight: 42,
     buttonHeightSmall: 34,

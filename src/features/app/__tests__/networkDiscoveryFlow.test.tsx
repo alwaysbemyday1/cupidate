@@ -82,13 +82,8 @@ describe("Network discovery flow", () => {
     fireEvent.press(screen.getByText("Add Connection Request"));
 
     await waitFor(() => {
-      expect(screen.queryByDisplayValue("buddy")).toBeNull();
-      expect(screen.getByText("Connected Cupids (1)")).toBeTruthy();
-    });
-
-    fireEvent.press(screen.getByTestId("network-subsegment-cupids-list"));
-
-    await waitFor(() => {
+      expect(screen.getByText("Connected Cupid Roster")).toBeTruthy();
+      expect(screen.getByText("network_buddy")).toBeTruthy();
       expect(screen.getByText("pending")).toBeTruthy();
     });
   });

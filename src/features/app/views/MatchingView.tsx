@@ -304,10 +304,6 @@ export function MatchingView({
       ) : null}
 
       <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
-        {t("matching.sections.manager")}
-      </PixelText>
-
-      <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
         {t("matching.sections.pending")}
       </PixelText>
       {activeRequestCards.length === 0 ? (

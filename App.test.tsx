@@ -21,8 +21,7 @@ describe("App", () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText("Cupidate: Home")).toBeTruthy();
-      expect(screen.getByText("PIXEL MATCH NETWORK")).toBeTruthy();
+      expect(screen.getByTestId("app-header-title")).toHaveTextContent("Home");
     });
   });
 

@@ -43,19 +43,21 @@ function CupidateHeader({ activeView, locked }: { activeView: AppView; locked?: 
       contentStyle={styles.headerContent}
     >
       <View style={styles.headerRow}>
-        <View style={{ flex: 1 }}>
-          <PixelText variant="screenTitle" style={styles.title} color={designTokens.color.inkInverse}>
-            {`Cupidate: ${t(titleKeyForView(activeView))}`}
-          </PixelText>
-          <PixelText variant="caption" style={styles.subtitle}>
-            {t("app.header.subtitle")}
-          </PixelText>
-        </View>
-        <View style={styles.statusBadge}>
-          <PixelText variant="caption" style={styles.statusText}>
-            {locked ? t("app.status.locked") : t("app.status.online")}
-          </PixelText>
-        </View>
+        <PixelText
+          testID="app-header-title"
+          variant="screenTitle"
+          style={styles.title}
+          color={designTokens.color.inkInverse}
+        >
+          {t(titleKeyForView(activeView))}
+        </PixelText>
+        {locked ? (
+          <View style={styles.statusBadge}>
+            <PixelText variant="caption" style={styles.statusText}>
+              {t("app.status.locked")}
+            </PixelText>
+          </View>
+        ) : null}
       </View>
     </PixelBox>
   );
@@ -68,12 +70,19 @@ function CupidateAppShell() {
   });
   const { t } = useI18n();
 
-  const tabItems = useMemo<Array<{ key: AppView; label: string; iconLabel: string; accentColor: string }>>(
+  const tabItems = useMemo<
+    Array<{
+      key: AppView;
+      label: string;
+      iconLabel: "home" | "network" | "match" | "my";
+      accentColor: string;
+    }>
+  >(
     () => [
-      { key: "home", label: t("app.tabs.home"), iconLabel: "HM", accentColor: designTokens.color.gold },
-      { key: "matching", label: t("app.tabs.matching"), iconLabel: "MT", accentColor: designTokens.color.pink },
-      { key: "network", label: t("app.tabs.network"), iconLabel: "NW", accentColor: designTokens.color.blue },
-      { key: "my", label: t("app.tabs.my"), iconLabel: "MY", accentColor: designTokens.color.gold }
+      { key: "home", label: t("app.tabs.home"), iconLabel: "home", accentColor: designTokens.color.gold },
+      { key: "network", label: t("app.tabs.network"), iconLabel: "network", accentColor: designTokens.color.blue },
+      { key: "matching", label: t("app.tabs.matching"), iconLabel: "match", accentColor: designTokens.color.pink },
+      { key: "my", label: t("app.tabs.my"), iconLabel: "my", accentColor: designTokens.color.gold }
     ],
     [t]
   );

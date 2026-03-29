@@ -51,12 +51,13 @@ Completed Work
 - [x] Matching view prototype rebuild + score insight redesign (Task 2026-03-29-07)
 - [x] Locale persistence with device storage (Task 2026-03-29-08A)
 - [x] Dock tab-bar refinement + network subview split + contrast cleanup (Task 2026-03-29-11)
+- [x] Slim dock nav + segmented network tabs + Supabase fake data seed (Task 2026-03-29-12)
 
 Next Tasks (Rebuild Track)
  - Task 2026-03-29-08B: My preference persistence expansion
  - Task 2026-03-29-09: Network action hardening (edit/block/unblock flows)
  - Task 2026-03-29-10: Matching action hardening + completed-state persistence QA
- - Task 2026-03-29-12: Device QA pass on the dock/tab contrast and network registration subviews
+ - Task 2026-03-29-13: Device QA pass on the slim dock, segmented network tabs, and seeded Supabase flow
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:
@@ -355,3 +356,18 @@ Task 2026-03-29-11 (Completed)
 - Synced the updated structure back into:
   - `docs/agent/design_system.md`
   - `docs/agent/views/network.md`
+
+Task 2026-03-29-12 (Completed)
+- Swapped the bottom tab order so `Network` now appears before `Matching`.
+- Slimmed the bottom dock height and replaced text chips with built-in pixel-style icons.
+- Simplified the app header to keep only the current view title plus a locked chip when needed.
+- Replaced Network segment/sub-segment button rows with tab-like segmented rails.
+- Improved Network interaction flow:
+  - connection request success now returns the user to the cupid list view
+- Added a Supabase policy migration so authenticated users can search the cupid directory:
+  - `supabase/migrations/20260329173000_cupidate_cupids_directory_select.sql`
+- Rewrote `supabase/seed.sql` into an idempotent POC seed and applied equivalent fake data to the live dev project:
+  - 3 cupids
+  - 4 cupidates
+  - 1 accepted connection
+  - 2 match candidates

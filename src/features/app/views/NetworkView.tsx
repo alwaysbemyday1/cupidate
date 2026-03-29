@@ -4,6 +4,7 @@ import { ScrollView, TextInput, View, useWindowDimensions } from "react-native";
 import { useI18n } from "../../i18n/context";
 import { PixelBox } from "../components/PixelBox";
 import { PixelButton } from "../components/PixelButton";
+import { PixelSegmentTabs } from "../components/PixelSegmentTabs";
 import { PixelText } from "../components/PixelText";
 import { StateCard } from "../components/StateCard";
 import type {
@@ -310,6 +311,11 @@ export function NetworkView({
     !isSearchingCupids &&
     connectionSearchResults.length === 0;
 
+  async function handleAddConnection() {
+    await onAddConnection();
+    setCupidSubview("list");
+  }
+
   function boardBadgeStyle(tone: Exclude<BoardTone, "neutral">) {
     if (tone === "matched") {
       return styles.networkNodeBadgeMatched;
@@ -400,29 +406,15 @@ export function NetworkView({
         />
       ) : null}
 
-      <View style={styles.networkSegmentRow}>
-        <PixelButton
-          label={t("network.segment.board")}
-          variant="secondary"
-          active={networkSegment === "board"}
-          testID="network-segment-board"
-          onPress={() => onChangeNetworkSegment("board")}
-        />
-        <PixelButton
-          label={t("network.segment.cupidates", { count: myCupidates.length })}
-          variant="primary"
-          active={networkSegment === "cupidates"}
-          testID="network-segment-cupidates"
-          onPress={() => onChangeNetworkSegment("cupidates")}
-        />
-        <PixelButton
-          label={t("network.segment.cupids", { count: connections.length })}
-          variant="secondary"
-          active={networkSegment === "cupids"}
-          testID="network-segment-cupids"
-          onPress={() => onChangeNetworkSegment("cupids")}
-        />
-      </View>
+      <PixelSegmentTabs
+        activeKey={networkSegment}
+        items={[
+          { key: "board", label: t("network.segment.board"), testID: "network-segment-board" },
+          { key: "cupidates", label: t("network.segment.cupidates"), testID: "network-segment-cupidates" },
+          { key: "cupids", label: t("network.segment.cupids"), testID: "network-segment-cupids" }
+        ]}
+        onSelect={onChangeNetworkSegment}
+      />
 
       {networkSegment === "board" ? (
         <View style={[styles.networkHeroRow, isWideHero ? styles.networkHeroRowWide : null]}>
@@ -552,22 +544,19 @@ export function NetworkView({
           <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
             {t("network.sections.cupidatesHub")}
           </PixelText>
-          <View style={styles.buttonRow}>
-            <PixelButton
-              label={t("network.subsegment.cupidateList")}
-              variant="secondary"
-              active={cupidateSubview === "list"}
-              testID="network-subsegment-cupidates-list"
-              onPress={() => setCupidateSubview("list")}
-            />
-            <PixelButton
-              label={t("network.subsegment.cupidateRegister")}
-              variant="primary"
-              active={cupidateSubview === "register"}
-              testID="network-subsegment-cupidates-register"
-              onPress={() => setCupidateSubview("register")}
-            />
-          </View>
+          <PixelSegmentTabs
+            compact
+            activeKey={cupidateSubview}
+            items={[
+              { key: "list", label: t("network.subsegment.cupidateList"), testID: "network-subsegment-cupidates-list" },
+              {
+                key: "register",
+                label: t("network.subsegment.cupidateRegister"),
+                testID: "network-subsegment-cupidates-register"
+              }
+            ]}
+            onSelect={setCupidateSubview}
+          />
           {cupidateSubview === "list" ? (
             <>
               <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
@@ -971,22 +960,15 @@ export function NetworkView({
           <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
             {t("network.sections.cupidsHub")}
           </PixelText>
-          <View style={styles.buttonRow}>
-            <PixelButton
-              label={t("network.subsegment.cupidList")}
-              variant="secondary"
-              active={cupidSubview === "list"}
-              testID="network-subsegment-cupids-list"
-              onPress={() => setCupidSubview("list")}
-            />
-            <PixelButton
-              label={t("network.subsegment.cupidRegister")}
-              variant="primary"
-              active={cupidSubview === "register"}
-              testID="network-subsegment-cupids-register"
-              onPress={() => setCupidSubview("register")}
-            />
-          </View>
+          <PixelSegmentTabs
+            compact
+            activeKey={cupidSubview}
+            items={[
+              { key: "list", label: t("network.subsegment.cupidList"), testID: "network-subsegment-cupids-list" },
+              { key: "register", label: t("network.subsegment.cupidRegister"), testID: "network-subsegment-cupids-register" }
+            ]}
+            onSelect={setCupidSubview}
+          />
 
           {cupidSubview === "list" ? (
             <>
@@ -1106,7 +1088,7 @@ export function NetworkView({
                 variant="primary"
                 disabled={!selectedConnectionCupidId || !!isMutatingNetwork}
                 onPress={() => {
-                  void onAddConnection();
+                  void handleAddConnection();
                 }}
               />
             </View>
