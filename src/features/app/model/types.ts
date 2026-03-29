@@ -88,6 +88,7 @@ export type CupidateProfileSummary = {
   gender: string;
   bio: string;
   isActive: boolean;
+  profileVisibility: CupidateRecord["profileVisibility"];
   region: CupidateRecord["region"];
   jobTitle: CupidateRecord["jobTitle"];
   heightCm: CupidateRecord["heightCm"];
@@ -119,6 +120,7 @@ export type CupidateProfileDraft = {
   gender: string;
   bio: string;
   isActive: boolean;
+  profileVisibility: CupidateRecord["profileVisibility"];
   region?: CupidateRecord["region"];
   jobTitle?: CupidateRecord["jobTitle"];
   heightCm?: CupidateRecord["heightCm"];

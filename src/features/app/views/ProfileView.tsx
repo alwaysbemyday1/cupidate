@@ -31,6 +31,7 @@ type CupidateEditState = {
   birthYearInput: string;
   gender: string;
   bio: string;
+  profileVisibility: "private" | "basic" | "public";
   locationInput: string;
   jobTitleInput: string;
   heightInput: string;
@@ -164,6 +165,13 @@ function relationKey(relationship: CupidProfileSummary["relationship"]) {
   return `profile.relationship.${relationship}`;
 }
 
+function visibilityText(
+  visibility: "private" | "basic" | "public",
+  t: ReturnType<typeof useI18n>["t"]
+) {
+  return t(`network.option.visibility.${visibility}`);
+}
+
 function renderMetaLine(label: string, value: string) {
   return (
     <View style={styles.profileSheetMetaRow}>
@@ -224,6 +232,7 @@ function buildEditState(profile: CupidateProfileSummary): CupidateEditState {
     birthYearInput: profile.birthYear ? String(profile.birthYear) : "",
     gender: profile.gender,
     bio: profile.bio,
+    profileVisibility: profile.profileVisibility ?? "basic",
     locationInput: profile.region ?? profile.preferences.location ?? profile.preferences.region ?? "",
     jobTitleInput: profile.jobTitle ?? profile.preferences.jobTitle ?? "",
     heightInput: profile.heightCm ? String(profile.heightCm) : profile.preferences.heightCm ? String(profile.preferences.heightCm) : "",
@@ -377,6 +386,14 @@ function CupidateProfilePanel({
     editState.preferredHeightMinInput,
     editState.preferredHeightMaxInput
   );
+  const canViewBasicDetails = profile.canEdit || profile.profileVisibility !== "private";
+  const canViewFullDetails = profile.canEdit || profile.profileVisibility === "public";
+  const visibilityDescriptionKey =
+    profile.profileVisibility === "private"
+      ? "profile.visibility.privateDescription"
+      : profile.profileVisibility === "basic"
+        ? "profile.visibility.basicDescription"
+        : "profile.visibility.publicDescription";
 
   function toggleMustHaveCondition(key: PreferenceConditionKey) {
     setEditState((current) => {
@@ -416,6 +433,7 @@ function CupidateProfilePanel({
       gender: editState.gender,
       bio: editState.bio,
       isActive: editState.isActive,
+      profileVisibility: editState.profileVisibility,
       region: location || null,
       jobTitle: editState.jobTitleInput.trim() || null,
       heightCm: heightCm ?? null,
@@ -466,74 +484,124 @@ function CupidateProfilePanel({
             <PixelText variant="body" style={styles.textBody}>
               {t("profile.cupidate.owner", { owner: profile.ownerNickname })}
             </PixelText>
-            <View style={styles.profileSheetStatusChip}>
-              <PixelText variant="caption" style={styles.networkStatusText}>
-                {editState.isActive ? t("profile.cupidate.active") : t("profile.cupidate.inactive")}
-              </PixelText>
+            <View style={styles.buttonRow}>
+              <View style={styles.profileSheetStatusChip}>
+                <PixelText variant="caption" style={styles.networkStatusText}>
+                  {editState.isActive ? t("profile.cupidate.active") : t("profile.cupidate.inactive")}
+                </PixelText>
+              </View>
+              <View style={styles.profileSheetStatusChip}>
+                <PixelText variant="caption" style={styles.networkStatusText}>
+                  {visibilityText(editState.profileVisibility, t)}
+                </PixelText>
+              </View>
             </View>
           </View>
         </View>
 
         <View style={styles.profileSheetMetaList}>
-          {renderMetaLine(t("profile.meta.age"), ageLabel(profile.birthYear))}
-          {renderMetaLine(t("profile.meta.gender"), genderText(profile.gender, t))}
-          {renderMetaLine(t("profile.meta.region"), profile.region ?? profile.preferences.location ?? profile.preferences.region ?? "-")}
-          {renderMetaLine(t("profile.meta.job"), profile.jobTitle ?? profile.preferences.jobTitle ?? "-")}
+          {renderMetaLine(t("profile.meta.visibility"), visibilityText(editState.profileVisibility, t))}
+          {canViewBasicDetails ? (
+            <>
+              {renderMetaLine(t("profile.meta.age"), ageLabel(profile.birthYear))}
+              {renderMetaLine(t("profile.meta.gender"), genderText(profile.gender, t))}
+              {renderMetaLine(
+                t("profile.meta.region"),
+                profile.region ?? profile.preferences.location ?? profile.preferences.region ?? "-"
+              )}
+              {renderMetaLine(t("profile.meta.job"), profile.jobTitle ?? profile.preferences.jobTitle ?? "-")}
+              {canViewFullDetails
+                ? renderMetaLine(
+                    t("profile.meta.height"),
+                    profile.heightCm ?? profile.preferences.heightCm
+                      ? `${profile.heightCm ?? profile.preferences.heightCm} cm`
+                      : "-"
+                  )
+                : null}
+            </>
+          ) : null}
+        </View>
+      </PixelBox>
+
+      {!canViewBasicDetails ? (
+        <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
+          <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+            {t("profile.visibility.privateTitle")}
+          </PixelText>
+          <PixelText variant="body" style={styles.textBody}>
+            {t(visibilityDescriptionKey)}
+          </PixelText>
+        </PixelBox>
+      ) : null}
+
+      {!profile.canEdit && profile.profileVisibility === "basic" ? (
+        <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
+          <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+            {t("profile.visibility.basicTitle")}
+          </PixelText>
+          <PixelText variant="body" style={styles.textBody}>
+            {t("profile.visibility.basicDescription")}
+          </PixelText>
+        </PixelBox>
+      ) : null}
+
+      {canViewFullDetails ? (
+        <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
+          <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+            {t("profile.sections.publicProfile")}
+          </PixelText>
+          <PixelText variant="caption" style={styles.profileMetaText}>
+            {t("profile.cupidate.snapshotHint")}
+          </PixelText>
+          <PixelText variant="body" style={styles.textBody}>
+            {editState.bio || t("profile.cupidate.noBio")}
+          </PixelText>
+          <View style={styles.profileDivider} />
+          {renderMetaLine(t("profile.meta.hobbies"), hobbies)}
+          {renderMetaLine(t("profile.meta.lifestyle"), lifestyleLabel)}
+        </PixelBox>
+      ) : null}
+
+      {canViewFullDetails ? (
+        <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
+          <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+            {t("profile.sections.preferences")}
+          </PixelText>
+          <PixelText variant="caption" style={styles.profileMetaText}>
+            {t("profile.visibility.publicDescription")}
+          </PixelText>
           {renderMetaLine(
-            t("profile.meta.height"),
-            profile.heightCm ?? profile.preferences.heightCm ? `${profile.heightCm ?? profile.preferences.heightCm} cm` : "-"
+            t("profile.meta.preferredAge"),
+            preferredAgeRange ? `${preferredAgeRange[0]} - ${preferredAgeRange[1]}` : "-"
           )}
-        </View>
-      </PixelBox>
-
-      <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
-        <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
-          {t("profile.sections.publicProfile")}
-        </PixelText>
-        <PixelText variant="caption" style={styles.profileMetaText}>
-          {t("profile.cupidate.snapshotHint")}
-        </PixelText>
-        <PixelText variant="body" style={styles.textBody}>
-          {editState.bio || t("profile.cupidate.noBio")}
-        </PixelText>
-        <View style={styles.profileDivider} />
-        {renderMetaLine(t("profile.meta.hobbies"), hobbies)}
-        {renderMetaLine(t("profile.meta.lifestyle"), lifestyleLabel)}
-      </PixelBox>
-
-      <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
-        <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
-          {t("profile.sections.preferences")}
-        </PixelText>
-        {renderMetaLine(
-          t("profile.meta.preferredAge"),
-          preferredAgeRange ? `${preferredAgeRange[0]} - ${preferredAgeRange[1]}` : "-"
-        )}
-        {renderMetaLine(t("profile.meta.preferredGender"), preferredGenderLabel)}
-        {renderMetaLine(t("profile.meta.preferredRegions"), regions)}
-        {renderMetaLine(t("profile.meta.preferredJobs"), jobGroups)}
-        {renderMetaLine(t("profile.meta.preferredLifestyle"), preferredLifestyleLabel)}
-        {renderMetaLine(
-          t("profile.meta.preferredHeight"),
-          preferredHeightRange ? `${preferredHeightRange[0]} - ${preferredHeightRange[1]} cm` : "-"
-        )}
-        {renderMetaLine(t("profile.meta.mustHave"), mustHaveLabels)}
-      </PixelBox>
-
-      <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
-        <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
-          {t("profile.sections.activity")}
-        </PixelText>
-        <View style={styles.summaryGrid}>
-          {renderStatPill(t("profile.stats.requests"), profile.stats.totalRequests)}
-          {renderStatPill(t("profile.stats.ongoing"), profile.stats.ongoingMatches)}
-          {renderStatPill(t("profile.stats.completed"), profile.stats.completedMatches)}
-          {renderStatPill(
-            t("profile.stats.editable"),
-            profile.canEdit ? t("profile.cupidate.editableYes") : t("profile.cupidate.editableNo")
+          {renderMetaLine(t("profile.meta.preferredGender"), preferredGenderLabel)}
+          {renderMetaLine(t("profile.meta.preferredRegions"), regions)}
+          {renderMetaLine(t("profile.meta.preferredJobs"), jobGroups)}
+          {renderMetaLine(t("profile.meta.preferredLifestyle"), preferredLifestyleLabel)}
+          {renderMetaLine(
+            t("profile.meta.preferredHeight"),
+            preferredHeightRange ? `${preferredHeightRange[0]} - ${preferredHeightRange[1]} cm` : "-"
           )}
-        </View>
-      </PixelBox>
+          {renderMetaLine(t("profile.meta.mustHave"), mustHaveLabels)}
+        </PixelBox>
+      ) : null}
+
+      {profile.canEdit ? (
+        <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
+          <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+            {t("profile.sections.activity")}
+          </PixelText>
+          <View style={styles.summaryGrid}>
+            {renderStatPill(t("profile.stats.requests"), profile.stats.totalRequests)}
+            {renderStatPill(t("profile.stats.ongoing"), profile.stats.ongoingMatches)}
+            {renderStatPill(t("profile.stats.completed"), profile.stats.completedMatches)}
+            {renderStatPill(
+              t("profile.stats.editable"),
+              profile.canEdit ? t("profile.cupidate.editableYes") : t("profile.cupidate.editableNo")
+            )}
+          </View>
+        </PixelBox>
+      ) : null}
 
       {profile.canEdit ? (
         <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
@@ -603,6 +671,33 @@ function CupidateProfilePanel({
               label={t("network.option.gender.other")}
               active={editState.gender === "other"}
               onPress={() => setEditState((current) => ({ ...current, gender: "other" }))}
+            />
+          </View>
+
+          <PixelText variant="label" style={styles.fieldLabel}>
+            {t("network.fields.profileVisibility")}
+          </PixelText>
+          <PixelText variant="caption" style={styles.profileMetaText}>
+            {t("network.fields.profileVisibilityHint")}
+          </PixelText>
+          <View style={styles.buttonRow}>
+            <PixelButton
+              label={t("network.option.visibility.private")}
+              variant={editState.profileVisibility === "private" ? "primary" : "secondary"}
+              active={editState.profileVisibility === "private"}
+              onPress={() => setEditState((current) => ({ ...current, profileVisibility: "private" }))}
+            />
+            <PixelButton
+              label={t("network.option.visibility.basic")}
+              variant={editState.profileVisibility === "basic" ? "primary" : "secondary"}
+              active={editState.profileVisibility === "basic"}
+              onPress={() => setEditState((current) => ({ ...current, profileVisibility: "basic" }))}
+            />
+            <PixelButton
+              label={t("network.option.visibility.public")}
+              variant={editState.profileVisibility === "public" ? "primary" : "secondary"}
+              active={editState.profileVisibility === "public"}
+              onPress={() => setEditState((current) => ({ ...current, profileVisibility: "public" }))}
             />
           </View>
 

@@ -61,6 +61,7 @@ export type Database = {
           gender: string | null;
           bio: string | null;
           is_active: boolean;
+          profile_visibility: "private" | "basic" | "public";
           region: string | null;
           job_title: string | null;
           height_cm: number | null;
@@ -77,6 +78,7 @@ export type Database = {
           gender?: string | null;
           bio?: string | null;
           is_active?: boolean;
+          profile_visibility?: "private" | "basic" | "public";
           region?: string | null;
           job_title?: string | null;
           height_cm?: number | null;
@@ -93,6 +95,7 @@ export type Database = {
           gender?: string | null;
           bio?: string | null;
           is_active?: boolean;
+          profile_visibility?: "private" | "basic" | "public";
           region?: string | null;
           job_title?: string | null;
           height_cm?: number | null;

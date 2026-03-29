@@ -207,6 +207,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
   const [birthYearInput, setBirthYearInput] = useState("");
   const [gender, setGender] = useState("");
   const [bio, setBio] = useState("");
+  const [profileVisibility, setProfileVisibility] = useState<"private" | "basic" | "public">("basic");
   const [hobbiesInput, setHobbiesInput] = useState("");
   const [locationInput, setLocationInput] = useState("seoul");
   const [jobTitleInput, setJobTitleInput] = useState("");
@@ -272,6 +273,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
         gender: item.gender ?? "unknown",
         bio: item.bio ?? "",
         isActive: item.isActive,
+        profileVisibility: item.profileVisibility,
         region: item.region,
         jobTitle: item.jobTitle,
         heightCm: item.heightCm,
@@ -483,6 +485,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       gender: cupidate.gender,
       bio: cupidate.bio,
       isActive: cupidate.isActive,
+      profileVisibility: cupidate.profileVisibility,
       region: cupidate.region,
       jobTitle: cupidate.jobTitle,
       heightCm: cupidate.heightCm,
@@ -615,6 +618,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       gender,
       bio: bio.trim(),
       isActive: false,
+      profileVisibility,
       region,
       jobTitle: jobTitleInput.trim() || null,
       heightCm: parsedHeight ?? null,
@@ -637,6 +641,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     setBirthYearInput("");
     setGender("");
     setBio("");
+    setProfileVisibility("basic");
     setHobbiesInput("");
     setLocationInput("seoul");
     setJobTitleInput("");
@@ -766,6 +771,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       gender: draft.gender,
       bio: draft.bio.trim(),
       isActive: draft.isActive,
+      profileVisibility: draft.profileVisibility,
       region: draft.region,
       jobTitle: draft.jobTitle,
       heightCm: draft.heightCm,
@@ -878,6 +884,8 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     setGender,
     bio,
     setBio,
+    profileVisibility,
+    setProfileVisibility,
       hobbiesInput,
       setHobbiesInput,
       locationInput,

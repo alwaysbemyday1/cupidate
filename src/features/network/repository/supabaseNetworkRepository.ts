@@ -27,6 +27,7 @@ type CupidateRow = {
   gender: string | null;
   bio: string | null;
   is_active: boolean;
+  profile_visibility: NetworkCupidate["profileVisibility"];
   region: string | null;
   job_title: string | null;
   height_cm: number | null;
@@ -128,6 +129,7 @@ function mapCupidateRow(
     gender: row.gender,
     bio: row.bio,
     isActive: row.is_active,
+    profileVisibility: row.profile_visibility ?? "basic",
     region: structured.region,
     jobTitle: structured.jobTitle,
     heightCm: structured.heightCm,
@@ -317,6 +319,7 @@ export class SupabaseNetworkRepository implements NetworkRepository {
         gender: input.gender ?? null,
         bio: input.bio ?? "",
         is_active: input.isActive ?? false,
+        profile_visibility: input.profileVisibility ?? "basic",
         region: preferencePayload.structured.region,
         job_title: preferencePayload.structured.jobTitle,
         height_cm: preferencePayload.structured.heightCm,
@@ -370,6 +373,7 @@ export class SupabaseNetworkRepository implements NetworkRepository {
 
     const preferencePayload = buildPreferenceRowPayload(input.cupidateId, mergedInput);
     const updatePayload: Record<string, string | number | boolean | null> = {
+      profile_visibility: input.profileVisibility ?? current.profileVisibility,
       region: preferencePayload.structured.region,
       job_title: preferencePayload.structured.jobTitle,
       height_cm: preferencePayload.structured.heightCm,
@@ -395,6 +399,10 @@ export class SupabaseNetworkRepository implements NetworkRepository {
 
     if (input.isActive !== undefined) {
       updatePayload.is_active = input.isActive;
+    }
+
+    if (input.profileVisibility !== undefined) {
+      updatePayload.profile_visibility = input.profileVisibility;
     }
 
     const { data: cupidateRow, error: cupidateError } = await this.client

@@ -4,6 +4,7 @@ import type {
   GenderPreference,
   PreferenceConditionKey,
   PreferenceData,
+  ProfileVisibility,
   SmokingHabit,
   SmokingPreference
 } from "../../../domain/matching/types";
@@ -28,6 +29,7 @@ export type NetworkCupidate = {
   gender: string | null;
   bio: string | null;
   isActive: boolean;
+  profileVisibility: ProfileVisibility;
   region: string | null;
   jobTitle: string | null;
   heightCm: number | null;
@@ -65,6 +67,7 @@ export type CreateCupidateInput = {
   gender?: string | null;
   bio?: string | null;
   isActive?: boolean;
+  profileVisibility?: ProfileVisibility;
   region?: string | null;
   jobTitle?: string | null;
   heightCm?: number | null;
@@ -88,6 +91,7 @@ export type UpdateCupidateInput = {
   gender?: string | null;
   bio?: string | null;
   isActive?: boolean;
+  profileVisibility?: ProfileVisibility;
   region?: string | null;
   jobTitle?: string | null;
   heightCm?: number | null;

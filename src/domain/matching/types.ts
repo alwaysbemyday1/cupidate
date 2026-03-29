@@ -3,6 +3,7 @@ export type DrinkingHabit = "never" | "social" | "often";
 export type SmokingPreference = "none_only" | "ok" | "any";
 export type DrinkingPreference = "never" | "social" | "often" | "any";
 export type GenderPreference = "female" | "male" | "other";
+export type ProfileVisibility = "private" | "basic" | "public";
 export type PreferenceConditionKey =
   | "age_range"
   | "shared_hobbies"
@@ -68,6 +69,7 @@ export type CupidateProfile = {
   ownerCupidId: string;
   birthYear: number | null;
   gender?: string | null;
+  profileVisibility?: ProfileVisibility;
   region?: string | null;
   jobTitle?: string | null;
   heightCm?: number | null;

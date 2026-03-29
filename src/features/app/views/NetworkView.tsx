@@ -43,6 +43,8 @@ type NetworkViewProps = {
   onChangeBirthYearInput: (value: string) => void;
   gender: string;
   onChangeGender: (value: string) => void;
+  profileVisibility: "private" | "basic" | "public";
+  onChangeProfileVisibility: (value: "private" | "basic" | "public") => void;
   hobbiesInput: string;
   onChangeHobbiesInput: (value: string) => void;
   locationInput: string;
@@ -223,6 +225,8 @@ export function NetworkView({
   onChangeBirthYearInput,
   gender,
   onChangeGender,
+  profileVisibility,
+  onChangeProfileVisibility,
   hobbiesInput,
   onChangeHobbiesInput,
   locationInput,
@@ -766,6 +770,33 @@ export function NetworkView({
                 {t(errors.gender)}
               </PixelText>
             ) : null}
+
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.profileVisibility")}
+            </PixelText>
+            <PixelText variant="caption" style={styles.fieldHint}>
+              {t("network.fields.profileVisibilityHint")}
+            </PixelText>
+            <View style={styles.buttonRow}>
+              <PixelButton
+                label={t("network.option.visibility.private")}
+                variant={profileVisibility === "private" ? "primary" : "secondary"}
+                active={profileVisibility === "private"}
+                onPress={() => onChangeProfileVisibility("private")}
+              />
+              <PixelButton
+                label={t("network.option.visibility.basic")}
+                variant={profileVisibility === "basic" ? "primary" : "secondary"}
+                active={profileVisibility === "basic"}
+                onPress={() => onChangeProfileVisibility("basic")}
+              />
+              <PixelButton
+                label={t("network.option.visibility.public")}
+                variant={profileVisibility === "public" ? "primary" : "secondary"}
+                active={profileVisibility === "public"}
+                onPress={() => onChangeProfileVisibility("public")}
+              />
+            </View>
 
             <View style={styles.buttonRow}>
               <View style={styles.halfInput}>

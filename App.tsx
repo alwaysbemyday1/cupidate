@@ -150,6 +150,8 @@ function CupidateAppShell() {
                 onChangeBirthYearInput={state.setBirthYearInput}
                 gender={state.gender}
                 onChangeGender={state.setGender}
+                profileVisibility={state.profileVisibility}
+                onChangeProfileVisibility={state.setProfileVisibility}
                 hobbiesInput={state.hobbiesInput}
                 onChangeHobbiesInput={state.setHobbiesInput}
                 locationInput={state.locationInput}
@@ -207,6 +209,7 @@ function CupidateAppShell() {
               <MatchingView
                 recommendations={state.recommendations}
                 cupidates={state.cupidates}
+                currentCupidId={state.myCupidId}
                 requestByPair={state.requestByPair}
                 requests={state.requests}
                 onSendRequest={state.onSendRequest}

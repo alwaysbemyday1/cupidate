@@ -29,6 +29,7 @@ describe("Profile overlay flow", () => {
             gender: "female",
             bio: "coffee lover",
             isActive: true,
+            profileVisibility: "public",
             region: "seoul",
             jobTitle: "Brand Strategist",
             heightCm: 164,
@@ -58,6 +59,7 @@ describe("Profile overlay flow", () => {
             gender: "male",
             bio: "music and travel",
             isActive: true,
+            profileVisibility: "basic",
             region: "seoul",
             jobTitle: "Engineer",
             heightCm: 180,
@@ -75,6 +77,36 @@ describe("Profile overlay flow", () => {
               ageRange: [24, 35],
               hobbies: ["coffee", "music"],
               location: "seoul"
+            },
+            createdAt: "2026-03-28T00:00:00.000Z",
+            updatedAt: "2026-03-28T00:00:00.000Z"
+          },
+          {
+            id: "peer-2",
+            ownerCupidId: "local-cupid-a",
+            displayName: "Sora",
+            birthYear: 1995,
+            gender: "female",
+            bio: "quiet reader",
+            isActive: true,
+            profileVisibility: "private",
+            region: "incheon",
+            jobTitle: "Analyst",
+            heightCm: 167,
+            smokingHabit: "none",
+            drinkingHabit: "social",
+            preferredAgeRange: [27, 35],
+            preferredRegions: ["seoul"],
+            preferredJobGroups: ["strategy"],
+            preferredSmoking: "none_only",
+            preferredDrinking: "social",
+            preferredGenders: ["male"],
+            preferredHeightRange: [172, 185],
+            mustHaveConditionKeys: ["preferred_regions"],
+            preferences: {
+              ageRange: [27, 35],
+              hobbies: ["reading", "movie"],
+              location: "incheon"
             },
             createdAt: "2026-03-28T00:00:00.000Z",
             updatedAt: "2026-03-28T00:00:00.000Z"
@@ -140,6 +172,39 @@ describe("Profile overlay flow", () => {
     });
   });
 
+  it("gates non-owner cupidate detail by visibility scope", async () => {
+    render(<App />);
+
+    fireEvent.press(screen.getByTestId("tab-matching"));
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId("profile-open-cupidate-peer-1").length).toBeGreaterThan(0);
+    });
+
+    fireEvent.press(screen.getAllByTestId("profile-open-cupidate-peer-1")[0]);
+
+    await waitFor(() => {
+      expect(screen.getByText("This cupidate shares only basic profile information. Detailed lifestyle notes and preference weights stay private.")).toBeTruthy();
+      expect(screen.queryByText("Public Snapshot")).toBeNull();
+      expect(screen.queryByText("Dating Preferences")).toBeNull();
+      expect(screen.queryByText("Height")).toBeNull();
+    });
+
+    fireEvent.press(screen.getByTestId("profile-sheet-close"));
+
+    await waitFor(() => {
+      expect(screen.queryByText("Basic Only")).toBeNull();
+    });
+
+    fireEvent.press(screen.getAllByTestId("profile-open-cupidate-peer-2")[0]);
+
+    await waitFor(() => {
+      expect(screen.getByText("Private Cupidate Profile")).toBeTruthy();
+      expect(screen.getByText("This cupidate keeps the dating profile private. Other cupids can only confirm that the profile exists.")).toBeTruthy();
+      expect(screen.queryByText("Dating Preferences")).toBeNull();
+    });
+  });
+
   it("opens cupid profile from network and shows matchmaking stats", async () => {
     render(<App />);
 
@@ -179,6 +244,7 @@ describe("Profile overlay flow", () => {
     fireEvent.changeText(screen.getByTestId("profile-edit-region"), "busan");
     fireEvent.changeText(screen.getByTestId("profile-edit-job-title"), "Product Designer");
     fireEvent.changeText(screen.getByTestId("profile-edit-preferred-job-groups"), "finance, strategy");
+    fireEvent.press(screen.getByText("Private"));
 
     fireEvent.press(screen.getByTestId("profile-sheet-save"));
     fireEvent.press(screen.getByTestId("profile-sheet-close"));
@@ -189,6 +255,7 @@ describe("Profile overlay flow", () => {
       expect(screen.getByDisplayValue("busan")).toBeTruthy();
       expect(screen.getByDisplayValue("Product Designer")).toBeTruthy();
       expect(screen.getByDisplayValue("finance, strategy")).toBeTruthy();
+      expect(screen.getAllByText("Private").length).toBeGreaterThan(0);
     });
   });
 

@@ -15,6 +15,7 @@ import { designTokens } from "../theme/tokens";
 type MatchingViewProps = {
   recommendations: RecommendationItem[];
   cupidates: CupidateRecord[];
+  currentCupidId: string;
   requestByPair: Map<string, MatchRequest>;
   requests: MatchRequest[];
   onSendRequest: (sourceCupidateId: string, targetCupidateId: string) => void | Promise<void>;
@@ -70,13 +71,25 @@ function buildAvatarSeed(label: string) {
   return Array.from(trimmed.replace(/\s+/g, "")).slice(0, 2).join("").toUpperCase();
 }
 
-function buildCupidateSubtitle(cupidate?: CupidateRecord) {
+function buildCupidateSubtitle(cupidate: CupidateRecord | undefined, currentCupidId: string) {
   if (!cupidate) {
+    return undefined;
+  }
+
+  if (cupidate.ownerCupidId !== currentCupidId && cupidate.profileVisibility === "private") {
     return undefined;
   }
 
   const parts = [cupidate.region, cupidate.jobTitle].filter(Boolean);
   return parts.length > 0 ? parts.join(" / ") : undefined;
+}
+
+function canRevealDetailedMatchingContext(cupidate: CupidateRecord | undefined, currentCupidId: string) {
+  if (!cupidate) {
+    return false;
+  }
+
+  return cupidate.ownerCupidId === currentCupidId || cupidate.profileVisibility === "public";
 }
 
 function formatDateLabel(value: string) {
@@ -127,6 +140,7 @@ function timelineIndex(status?: MatchRequestStatus) {
 export function MatchingView({
   recommendations,
   cupidates,
+  currentCupidId,
   requestByPair,
   requests,
   onSendRequest,
@@ -200,6 +214,11 @@ export function MatchingView({
   );
 
   const focusCard = activeRequestCards[0] ?? requestCards[0] ?? suggestionCards[0] ?? null;
+  const focusSourceCupidate = focusCard ? cupidateMap.get(focusCard.sourceCupidateId) : undefined;
+  const focusTargetCupidate = focusCard ? cupidateMap.get(focusCard.targetCupidateId) : undefined;
+  const canRevealFocusDetails =
+    canRevealDetailedMatchingContext(focusSourceCupidate, currentCupidId) &&
+    canRevealDetailedMatchingContext(focusTargetCupidate, currentCupidId);
 
   const focusBreakdown = useMemo(
     () =>
@@ -217,7 +236,7 @@ export function MatchingView({
 
     const items: string[] = [];
 
-    if (focusCard.matchedHobbies.length > 0) {
+    if (canRevealFocusDetails && focusCard.matchedHobbies.length > 0) {
       items.push(
         t("matching.feedback.hobbies", {
           value: focusCard.matchedHobbies.join(", ")
@@ -225,7 +244,7 @@ export function MatchingView({
       );
     }
 
-    if (focusCard.priorityMatches.length > 0) {
+    if (canRevealFocusDetails && focusCard.priorityMatches.length > 0) {
       items.push(
         t("matching.feedback.priority", {
           value: focusCard.priorityMatches.map((key) => t(`network.option.mustHave.${key}`)).join(", ")
@@ -257,7 +276,7 @@ export function MatchingView({
     }
 
     return items.slice(0, 3);
-  }, [focusBreakdown, focusCard, t]);
+    }, [canRevealFocusDetails, focusBreakdown, focusCard, t]);
 
   function statusChipStyle(status?: MatchRequestStatus) {
     if (status === "completed") {
@@ -345,7 +364,7 @@ export function MatchingView({
                 {renderMiniProfile(
                   item.sourceCupidateId,
                   item.sourceName,
-                  buildCupidateSubtitle(cupidateMap.get(item.sourceCupidateId))
+                  buildCupidateSubtitle(cupidateMap.get(item.sourceCupidateId), currentCupidId)
                 )}
                 <PixelText variant="screenTitle" style={styles.recommendationHeart}>
                   {"<3"}
@@ -353,7 +372,7 @@ export function MatchingView({
                 {renderMiniProfile(
                   item.targetCupidateId,
                   item.targetName,
-                  buildCupidateSubtitle(cupidateMap.get(item.targetCupidateId))
+                  buildCupidateSubtitle(cupidateMap.get(item.targetCupidateId), currentCupidId)
                 )}
               </View>
 
@@ -379,11 +398,16 @@ export function MatchingView({
                 <PixelText variant="caption" style={styles.listMeta}>
                   {t("matching.card.status", { value: t(statusDisplayKey(item.request?.status ?? "none")) })}
                 </PixelText>
-                <PixelText variant="caption" style={styles.listMeta}>
-                  {t("matching.card.sharedHobbies", {
-                    value: item.matchedHobbies.length > 0 ? item.matchedHobbies.join(", ") : "-"
-                  })}
-                </PixelText>
+                  <PixelText variant="caption" style={styles.listMeta}>
+                    {t("matching.card.sharedHobbies", {
+                      value:
+                        canRevealDetailedMatchingContext(cupidateMap.get(item.sourceCupidateId), currentCupidId) &&
+                        canRevealDetailedMatchingContext(cupidateMap.get(item.targetCupidateId), currentCupidId) &&
+                        item.matchedHobbies.length > 0
+                          ? item.matchedHobbies.join(", ")
+                          : "-"
+                    })}
+                  </PixelText>
               </View>
 
               <View style={styles.buttonRow}>
@@ -437,7 +461,7 @@ export function MatchingView({
                 {renderMiniProfile(
                   item.sourceCupidateId,
                   item.sourceName,
-                  buildCupidateSubtitle(cupidateMap.get(item.sourceCupidateId))
+                  buildCupidateSubtitle(cupidateMap.get(item.sourceCupidateId), currentCupidId)
                 )}
                 <PixelText variant="screenTitle" style={styles.recommendationHeart}>
                   {"<3"}
@@ -445,7 +469,7 @@ export function MatchingView({
                 {renderMiniProfile(
                   item.targetCupidateId,
                   item.targetName,
-                  buildCupidateSubtitle(cupidateMap.get(item.targetCupidateId))
+                  buildCupidateSubtitle(cupidateMap.get(item.targetCupidateId), currentCupidId)
                 )}
               </View>
               <View style={styles.matchingSuggestionFooter}>

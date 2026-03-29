@@ -9,6 +9,7 @@ describe("InMemoryNetworkRepository", () => {
       birthYear: 1998,
       gender: "female",
       bio: "coffee and books",
+      profileVisibility: "public",
       region: "seoul",
       jobTitle: "Product Designer",
       heightCm: 164,
@@ -20,6 +21,7 @@ describe("InMemoryNetworkRepository", () => {
       preferredSmoking: "none_only",
       preferredDrinking: "social",
       preferredGenders: ["male"],
+      mustHaveConditionKeys: ["preferred_regions", "preferred_job_groups"],
       preferences: {
         hobbies: ["coffee", "travel"],
         mbti: "INFJ"
@@ -31,9 +33,11 @@ describe("InMemoryNetworkRepository", () => {
     expect(cupidates).toHaveLength(1);
     expect(cupidates[0].displayName).toBe("Mina");
     expect(cupidates[0].isActive).toBe(false);
+    expect(cupidates[0].profileVisibility).toBe("public");
     expect(cupidates[0].region).toBe("seoul");
     expect(cupidates[0].jobTitle).toBe("Product Designer");
     expect(cupidates[0].preferredJobGroups).toEqual(["engineer", "pm"]);
+    expect(cupidates[0].mustHaveConditionKeys).toEqual(["preferred_regions", "preferred_job_groups"]);
     expect(cupidates[0].preferences.mbti).toBe("INFJ");
     expect(cupidates[0].preferences.hobbies).toEqual(["coffee", "travel"]);
   });
@@ -55,6 +59,7 @@ describe("InMemoryNetworkRepository", () => {
       cupidateId: created.id,
       displayName: "Mina Kim",
       isActive: true,
+      profileVisibility: "private",
       preferences: {
         location: "busan"
       }
@@ -62,6 +67,7 @@ describe("InMemoryNetworkRepository", () => {
 
     expect(updated.displayName).toBe("Mina Kim");
     expect(updated.isActive).toBe(true);
+    expect(updated.profileVisibility).toBe("private");
     expect(updated.region).toBe("busan");
     expect(updated.preferences.region).toBe("busan");
   });
