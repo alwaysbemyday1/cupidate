@@ -48,8 +48,8 @@ describe("App navigation tabs", () => {
     fireEvent.press(screen.getByTestId("tab-home"));
 
     await waitFor(() => {
-      expect(screen.getByText("Quick Actions")).toBeTruthy();
-      expect(screen.getByText("Today's Rec's")).toBeTruthy();
+      expect(screen.getByText("Jump In")).toBeTruthy();
+      expect(screen.getByText("Today's Matches")).toBeTruthy();
     });
   });
 });

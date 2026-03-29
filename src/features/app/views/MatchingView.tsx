@@ -75,7 +75,7 @@ function buildCupidateSubtitle(cupidate?: CupidateRecord) {
   }
 
   const parts = [cupidate.region, cupidate.jobTitle].filter(Boolean);
-  return parts.length > 0 ? parts.join(" · ") : undefined;
+  return parts.length > 0 ? parts.join(" / ") : undefined;
 }
 
 function formatDateLabel(value: string) {
@@ -89,10 +89,6 @@ function formatDateLabel(value: string) {
     2,
     "0"
   )}`;
-}
-
-function statusKey(status: MatchRequestStatus | "none") {
-  return `matching.status.${status}`;
 }
 
 function statusDisplayKey(status: MatchRequestStatus | "none") {
@@ -341,7 +337,7 @@ export function MatchingView({
                   buildCupidateSubtitle(cupidateMap.get(item.sourceCupidateId))
                 )}
                 <PixelText variant="screenTitle" style={styles.recommendationHeart}>
-                  ♥
+                  {"<3"}
                 </PixelText>
                 {renderMiniProfile(
                   item.targetCupidateId,
@@ -370,7 +366,7 @@ export function MatchingView({
                   </View>
                 </View>
                 <PixelText variant="caption" style={styles.listMeta}>
-                  {t("matching.card.status", { value: t(statusKey(item.request?.status ?? "none")) })}
+                  {t("matching.card.status", { value: t(statusDisplayKey(item.request?.status ?? "none")) })}
                 </PixelText>
                 <PixelText variant="caption" style={styles.listMeta}>
                   {t("matching.card.sharedHobbies", {
@@ -437,7 +433,7 @@ export function MatchingView({
                   {t("matching.card.score", { rate: item.matchScore })}
                 </PixelText>
                 <PixelText variant="caption" style={styles.listMeta}>
-                  {t("matching.card.status", { value: t(statusKey("none")) })}
+                  {t("matching.card.status", { value: t(statusDisplayKey("none")) })}
                 </PixelText>
               </View>
 
@@ -533,7 +529,7 @@ export function MatchingView({
             </PixelText>
           </View>
           <PixelText variant="caption" style={styles.listMeta}>
-            {t("matching.card.status", { value: t(statusKey(focusCard.request?.status ?? "none")) })}
+            {t("matching.card.status", { value: t(statusDisplayKey(focusCard.request?.status ?? "none")) })}
           </PixelText>
 
           <View style={styles.profileDivider} />

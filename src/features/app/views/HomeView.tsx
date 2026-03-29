@@ -150,7 +150,7 @@ export function HomeView({
                       </PixelText>
                     </View>
                     <PixelText variant="screenTitle" style={styles.recommendationHeart}>
-                      VS
+                      {"<3"}
                     </PixelText>
                     <View style={styles.recommendationMiniCard}>
                       <PixelText variant="body" style={styles.recommendationMiniName}>
@@ -218,6 +218,7 @@ export function HomeView({
       </PixelText>
       <View style={styles.buttonRow}>
         <PixelButton label={t("home.actions.addNetwork")} variant="secondary" onPress={onGoNetwork} />
+        <PixelButton label={t("home.actions.reviewMatches")} variant="primary" onPress={onGoMatching} />
         <PixelButton label={t("home.actions.updateProfile")} variant="primary" onPress={onGoMy} />
       </View>
     </ScrollView>

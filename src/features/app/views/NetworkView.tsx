@@ -195,7 +195,7 @@ function ageLabel(birthYear: number | null | undefined) {
 }
 
 function joinMeta(parts: Array<string | undefined | null>) {
-  return parts.filter(Boolean).join(" · ");
+  return parts.filter(Boolean).join(" / ");
 }
 
 export function NetworkView({
@@ -278,7 +278,10 @@ export function NetworkView({
       myCupidates.map((item) => ({
         id: item.cupidateId,
         name: item.displayName,
-        subtitle: `${ageLabel(item.birthYear)} · ${item.region ?? item.preferences.location ?? item.preferences.region ?? "--"}`,
+        subtitle: joinMeta([
+          ageLabel(item.birthYear),
+          item.region ?? item.preferences.location ?? item.preferences.region ?? "--"
+        ]),
         tone: resolveCupidateTone(item.cupidateId, requests),
         role: "cupidate"
       })),
@@ -605,9 +608,11 @@ export function NetworkView({
                           {item.displayName}
                         </PixelText>
                         <PixelText variant="caption" style={styles.networkRosterMeta}>
-                          {`${t(genderKey(item.gender))} · ${ageLabel(item.birthYear)} · ${
+                          {joinMeta([
+                            t(genderKey(item.gender)),
+                            ageLabel(item.birthYear),
                             item.region ?? item.preferences.location ?? item.preferences.region ?? "--"
-                          }`}
+                          ])}
                         </PixelText>
                         <PixelText variant="caption" style={styles.networkRosterMeta}>
                           {item.jobTitle ?? item.preferences.jobTitle ?? t("network.meta.awaitingProfile")}
@@ -1146,3 +1151,4 @@ export function NetworkView({
     </ScrollView>
   );
 }
+

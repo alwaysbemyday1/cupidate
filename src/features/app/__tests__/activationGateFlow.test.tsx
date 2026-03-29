@@ -104,7 +104,7 @@ describe("Activation gate flow", () => {
     fireEvent.press(screen.getByTestId("tab-matching"));
 
     await waitFor(() => {
-      expect(screen.queryByText("Hana suggested for Joon")).toBeNull();
+      expect(screen.queryByText("Suggested: Hana + Joon")).toBeNull();
     });
 
     fireEvent.press(screen.getByTestId("tab-network"));
@@ -127,7 +127,7 @@ describe("Activation gate flow", () => {
     fireEvent.press(screen.getByTestId("tab-matching"));
 
     await waitFor(() => {
-      expect(screen.getByText("Hana suggested for Joon")).toBeTruthy();
+      expect(screen.getByText("Suggested: Hana + Joon")).toBeTruthy();
     });
   });
 });

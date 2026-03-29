@@ -82,7 +82,7 @@ describe("Network discovery flow", () => {
     fireEvent.press(screen.getByText("Add Connection Request"));
 
     await waitFor(() => {
-      expect(screen.getByText("Connected Cupid Roster")).toBeTruthy();
+      expect(screen.getByText("Connected Cupids")).toBeTruthy();
       expect(screen.getByText("network_buddy")).toBeTruthy();
       expect(screen.getByText("pending")).toBeTruthy();
     });
