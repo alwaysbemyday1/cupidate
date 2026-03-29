@@ -720,3 +720,57 @@ Verification:
 Notes:
 - No separate icon asset handoff is required yet; the current dock icons are code-drawn pixel glyphs.
 - If we later want more characterful branded icons, a custom sprite sheet would be the next upgrade.
+
+### Task 2026-03-29-14 - Cupid/Cupidate Profile Overlay
+Status: Completed
+
+Changes:
+- Added a reusable profile overlay view:
+  - `src/features/app/views/ProfileView.tsx`
+- Added app-state profile selection flow:
+  - cupid profile summary
+  - cupidate profile summary
+  - open/close handlers in `useCupidateAppState`
+- Wired Network and Matching entities so pressing cupid / cupidate items opens the profile overlay.
+- Expanded local state types so cupidates now carry activation state into the UI model.
+- Added UI test coverage:
+  - `src/features/app/__tests__/profileOverlayFlow.test.tsx`
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand` passed.
+
+Notes:
+- This first cut focused on making profile entry possible from the active screens before changing the activation business rules.
+
+### Task 2026-03-29-15 - Cupidate Activation Gate + Profile Management
+Status: Completed
+
+Changes:
+- Added editable owner controls inside the cupidate profile overlay:
+  - activation / pause toggle
+  - core profile field editing
+  - core preference field editing
+- Extended Network repository contract with cupidate update support:
+  - `updateCupidate`
+- Added update mutation hook and app-state save path for cupidate profile management.
+- Changed new cupidate creation default to `inactive` in both in-memory and Supabase repository paths.
+- Updated matching recommendation generation so only active cupidates are considered.
+- Added Supabase migration:
+  - `supabase/migrations/20260329193000_cupidate_activation_gate.sql`
+  - changes:
+    - `cupidates.is_active` default -> `false`
+    - match-candidate trigger now rejects inactive cupidate pairs
+    - added `(owner_cupid_id, is_active)` index
+- Updated `supabase/seed.sql` and reseeded the live dev project with one inactive cupidate (`Hana`) for activation QA.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand` passed.
+- Supabase migration applied successfully to `fuzuoehehnbcngvwoypd`.
+- Seed verification confirmed:
+  - `Mina`, `Dohun`, `Yuna`, `Jin` active
+  - `Hana` inactive
+
+Notes:
+- The current POC now matches the product rule that every user can be a cupid, but only activated cupidates participate in matching visibility and scoring.

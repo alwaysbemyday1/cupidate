@@ -5,6 +5,7 @@ Last Updated: 2026-03-29
 ## 1. Screen Purpose
 - Manage the relationship graph between my cupidates and connected cupids.
 - Keep the overview board separate from registration/detail management.
+- Allow entry into profile detail for both cupid and cupidate entities.
 - Make it clear where the user should go for:
   - board overview
   - cupidate list
@@ -53,6 +54,11 @@ Last Updated: 2026-03-29
   - age/gender/region summary
   - job title or fallback meta
   - current match status badge
+- row press opens `Cupidate Profile View`
+- if the owner opens the profile, they can:
+  - activate/deactivate the cupidate
+  - edit core public profile fields
+  - edit core matching preference fields
 
 ### 4.2 Register Cupidate Subview
 - dedicated registration view for cupidate creation
@@ -76,6 +82,8 @@ Last Updated: 2026-03-29
   - preferred drinking
 - save CTA must still allow submission-driven validation feedback
 - save CTA should be disabled only while the mutation is actively running
+- newly created cupidates should default to `inactive`
+- user should be guided to open the profile detail and activate when ready
 
 ## 5. Connected Cupids Segment
 ### 5.1 Cupid List Subview
@@ -85,6 +93,8 @@ Last Updated: 2026-03-29
   - cupid id
   - region or fallback meta
   - connection status badge
+- row press opens `Cupid Profile View`
+- cupid profile should show accumulated introduction / completion stats
 
 ### 5.2 Register Cupid Subview
 - dedicated registration/search view for finding another cupid by nickname
@@ -114,9 +124,11 @@ Queries:
 - `network_my_cupidates`
 - `network_connected_cupids`
 - `network_connection_requests`
+- `profile_detail_summary`
 
 Mutations:
 - `create_cupidate`
+- `update_cupidate`
 - `request_cupid_connection`
 - `update_connection_status`
 

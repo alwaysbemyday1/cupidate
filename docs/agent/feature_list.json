@@ -16,11 +16,13 @@
   "domain_rules": {
     "roles": {
       "cupid": "Network orchestrator who manages acquaintances and sends/receives introductions",
-      "cupidate": "Person profile managed by a Cupid and evaluated by matching logic"
+      "cupidate": "Person profile managed by a Cupid and evaluated by matching logic",
+      "active_cupidate": "Cupidate profile that is activated for public dating visibility and matching"
     },
     "matching_constraints": [
       "Direct cupidate-to-cupidate search is not the primary flow",
-      "High-confidence recommendations require accepted network connection between cupids"
+      "High-confidence recommendations require accepted network connection between cupids",
+      "Inactive cupidates must not appear in matching recommendations"
     ],
     "security": [
       "Supabase RLS as the baseline for all access paths",
@@ -51,7 +53,8 @@
       "core_features": [
         "Cupidate registration and list",
         "Connected cupid request/list/status",
-        "Network scope management"
+        "Network scope management",
+        "Cupid/Cupidate profile detail entry"
       ],
       "spec_path": "docs/agent/views/network.md"
     },
@@ -63,7 +66,8 @@
         "Recommendation cards with score/reasons",
         "Request/accept/reject flow",
         "Contact-shared completion",
-        "Matching history"
+        "Matching history",
+        "Active-cupidate-only candidate pool"
       ],
       "spec_path": "docs/agent/views/matching.md"
     },
@@ -118,7 +122,8 @@
         "UI interaction tests",
         "Error/loading UX hardening",
         "Supabase auth-flow alignment",
-        "Prototype-based pixel UI rebuilding"
+        "Prototype-based pixel UI rebuilding",
+        "Profile overlay and cupidate activation flow"
       ]
     },
     {

@@ -4,6 +4,7 @@ Last Updated: 2026-03-29
 
 ## 1. 화면 목적
 - 내 프로필/계정정보/매칭 선호도를 한 화면군에서 관리하는 설정 허브.
+- 장기적으로는 `내 cupidate 활성화 상태`를 가장 명확하게 확인하는 허브가 되어야 한다.
 
 ## 2. 핵심 구성
 1) 상단 헤더
@@ -59,10 +60,13 @@ Queries:
 - `my_profile`
 - `my_preferences`
 - `my_account_summary`
+- `my_cupidate_activation_state`
 
 Mutations:
 - `update_profile`
 - `update_preferences`
+- `activate_my_cupidate`
+- `deactivate_my_cupidate`
 - `change_password`
 - `deactivate_account`
 
@@ -76,3 +80,4 @@ Mutations:
 - 저장 성공 시 홈/매칭 점수에 반영
 - 영/한 언어 전환이 즉시 반영
 - 모바일 스크롤과 하단 탭바 충돌 없음
+- 내 cupidate 활성화 여부를 혼동하지 않게 표현

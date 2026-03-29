@@ -52,12 +52,14 @@ Completed Work
 - [x] Locale persistence with device storage (Task 2026-03-29-08A)
 - [x] Dock tab-bar refinement + network subview split + contrast cleanup (Task 2026-03-29-11)
 - [x] Slim dock nav + segmented network tabs + Supabase fake data seed (Task 2026-03-29-12)
+- [x] Cupid/Cupidate profile overlay flow from Network and Matching (Task 2026-03-29-14)
+- [x] Cupidate activation-gated matching flow + Supabase migration (Task 2026-03-29-15)
 
 Next Tasks (Rebuild Track)
  - Task 2026-03-29-08B: My preference persistence expansion
- - Task 2026-03-29-09: Network action hardening (edit/block/unblock flows)
+ - Task 2026-03-29-09: Network action hardening (block/unblock, incoming connection handling)
  - Task 2026-03-29-10: Matching action hardening + completed-state persistence QA
- - Task 2026-03-29-13: Device QA pass on the slim dock, segmented network tabs, and seeded Supabase flow
+ - Task 2026-03-29-13: Device QA pass on the slim dock, segmented network tabs, profile overlay, and activation flow
 
 Task 2026-03-28-01 (Completed)
 - Refactored monolithic App.tsx into feature modules:

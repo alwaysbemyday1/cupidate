@@ -5,6 +5,7 @@ Last Updated: 2026-03-29
 ## 1. 화면 목적
 - 매칭 요청의 승인/거절/연락처 공유와 매칭률 근거 확인을 한 곳에서 처리하는 의사결정 화면.
 - 사용자는 이 화면에서 현재 대기 중인 요청을 즉시 처리하고, 추천 후보를 요청으로 전환하고, 점수 근거와 진행 단계를 함께 확인해야 한다.
+- 사용자는 매칭 중 보이는 cupidate를 눌러 공개 프로필을 확인할 수 있어야 한다.
 
 ## 2. 핵심 구성
 1) 상단 헤더
@@ -25,6 +26,7 @@ Last Updated: 2026-03-29
   - 매칭률
   - 현재 상태 (`Awaiting Approval`, `Reviewing`, `Contacts Shared` 등)
   - 공유 취미 또는 핵심 근거
+- 양측 미니 프로필 press 시 `Cupidate Profile View` 오픈
 - 상태별 액션:
   - `requested` -> `승인`, `거절`
   - `accepted` -> `연락처 공유 완료`
@@ -38,6 +40,7 @@ Last Updated: 2026-03-29
   - 기본 상태 (`New Suggestion`)
 - 액션:
   - `매칭 요청`
+- 추천 대상은 `active cupidate`만 포함한다.
 
 5) Matching Insights 섹션
 - 점수 분해 차트(카테고리별)
@@ -52,7 +55,8 @@ Last Updated: 2026-03-29
   - `Hobbies`
   - `Lifestyle`
   - `Location`
-  - `Profile`
+- `Profile`
+- 인사이트 헤더에 보이는 양측 프로필도 press 대상이어야 한다.
 
 6) 하단 탭바
 - Match 활성 상태
@@ -71,6 +75,7 @@ Queries:
 - `matching_requests_inbox`
 - `matching_history_summary`
 - `matching_score_breakdown`
+- `matching_profile_snapshot`
 
 Mutations:
 - `send_matching_request`
@@ -92,3 +97,4 @@ Mutations:
 - 매칭률 분해 근거가 사용자에게 읽히는 형태로 표시
 - 진행 상태 타임라인이 실제 데이터와 일치
 - 영/한 전환 시 Matching 전체 정적 카피가 함께 전환
+- inactive cupidate는 추천/요청 생성 경로에 나타나지 않음

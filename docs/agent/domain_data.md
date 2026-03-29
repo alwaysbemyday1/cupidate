@@ -6,13 +6,25 @@ Last Updated: 2026-03-29
 Roles:
 - `Cupid`: 지인 네트워크를 관리하고 소개를 주선하는 사용자
 - `Cupidate`: Cupid가 관리하는 소개 대상 프로필
+- `Active Cupidate`: 소개팅 프로필/선호도를 공개하고 매칭 계산 및 탐색에 포함되는 cupidate
 
 Core constraints:
+- 모든 유저는 `cupid` 역할을 가진다.
+- 모든 `cupid`가 `active cupidate`인 것은 아니다.
+- `inactive cupidate`는 네트워크에는 보일 수 있지만 매칭 후보 계산에는 포함되지 않는다.
 - 직접적인 cupidate-to-cupidate 검색은 기본 플로우가 아님
 - 연결 승인된 cupid 네트워크 범위 안에서 추천/매칭 수행
 - Supabase RLS 기반 접근 제어 필수
 
 ## 2) Profile Input Schema
+Profile ownership:
+- `cupid`는 여러 cupidate 프로필을 관리할 수 있다.
+- 각 cupidate는 `isActive` 상태를 가진다.
+- `isActive = true` 인 경우에만:
+  - Matching 추천 대상에 포함
+  - 검색 가능한 dating profile로 취급
+  - 프로필/선호도 기반 점수 계산 대상으로 사용
+
 ### Required basic fields
 - `displayName`
 - `birthYear`
@@ -89,9 +101,15 @@ Location:
 - `upsertCurrentCupidNickname`
 - `listCupidates`
 - `createCupidate`
+- `updateCupidate`
 - `listConnections`
 - `createConnection`
 - `updateConnectionStatus`
+
+### Profile access rule
+- `Cupid profile`: 해당 cupid가 관리 중인 cupidate 수, active cupidate 수, 주선 수, 진행/완료 통계 노출
+- `Cupidate profile`: 공개 가능한 소개팅 프로필 요약 + 선호도 요약 노출
+- owner가 보는 cupidate profile에서는 활성화 토글과 핵심 프로필/선호도 수정 가능
 
 ### Matching entity
 - `MatchingCandidate`
@@ -124,3 +142,9 @@ Matching:
 - 핵심 생활정보(흡연/음주/종교) 최소 입력
 - 취미 태그 3개 이상
 - 선호도 필수 조건(연령/지역/흡연/성별) 입력
+
+## 10) Activation Rule
+- database default: new cupidates start as `inactive`
+- frontend default: registration creates an inactive cupidate first
+- activation happens from the cupidate profile management view
+- Supabase trigger must reject match candidate creation if either cupidate is inactive
