@@ -619,6 +619,10 @@ export const styles = StyleSheet.create({
     paddingHorizontal: s.xs,
     paddingVertical: 6
   },
+  networkStatusColumn: {
+    alignItems: "flex-end",
+    gap: s.xxs
+  },
   networkStatusNeutral: {
     backgroundColor: c.blueDark
   },
@@ -737,6 +741,14 @@ export const styles = StyleSheet.create({
     borderColor: c.border,
     backgroundColor: c.surfaceAlt,
     padding: s.sm,
+    gap: s.sm
+  },
+  matchingSuggestionProfiles: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: s.xs
+  },
+  matchingSuggestionFooter: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",

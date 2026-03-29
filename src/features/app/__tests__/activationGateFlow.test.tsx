@@ -101,17 +101,28 @@ describe("Activation gate flow", () => {
   it("keeps inactive cupidates out of matching until activated from profile management", async () => {
     render(<App />);
 
+    await waitFor(() => {
+      expect(screen.getByText("ACTIVATE A CUPIDATE")).toBeTruthy();
+    });
+
     fireEvent.press(screen.getByTestId("tab-matching"));
 
     await waitFor(() => {
       expect(screen.queryByText("Suggested: Hana + Joon")).toBeNull();
     });
 
-    fireEvent.press(screen.getByTestId("tab-network"));
+    fireEvent.press(screen.getByTestId("tab-home"));
+
+    await waitFor(() => {
+      expect(screen.getAllByText("Manage Network").length).toBeGreaterThan(0);
+    });
+
+    fireEvent.press(screen.getAllByText("Manage Network")[0]);
     fireEvent.press(screen.getByTestId("network-segment-cupidates"));
 
     await waitFor(() => {
       expect(screen.getByTestId("profile-open-cupidate-mine-hana")).toBeTruthy();
+      expect(screen.getByText("Inactive")).toBeTruthy();
     });
 
     fireEvent.press(screen.getByTestId("profile-open-cupidate-mine-hana"));

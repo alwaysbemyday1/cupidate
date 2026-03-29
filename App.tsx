@@ -121,6 +121,8 @@ function CupidateAppShell() {
             {state.activeView === "home" && (
               <HomeView
                 homeSummary={state.homeSummary}
+                activeCupidateCount={state.activeMyCupidates.length}
+                inactiveCupidateCount={state.inactiveMyCupidates.length}
                 notifications={state.notifications}
                 recommendations={state.recommendations}
                 cupidates={state.cupidates}
@@ -226,8 +228,11 @@ function CupidateAppShell() {
                 notificationEnabled={state.notificationEnabled}
                 onChangeNotificationEnabled={state.setNotificationEnabled}
                 connectionCount={state.connections.length}
-                cupidateCount={state.cupidates.length}
+                cupidateCount={state.myCupidates.length}
+                activeCupidateCount={state.activeMyCupidates.length}
+                inactiveCupidateCount={state.inactiveMyCupidates.length}
                 requestCount={state.requests.length}
+                onGoNetwork={() => state.setActiveView("network")}
                 currentCupidId={state.myCupidId}
                 accountEmail={authGate.session?.user?.email ?? null}
                 joinedAt={authGate.session?.user?.created_at ?? null}

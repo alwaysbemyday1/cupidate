@@ -422,27 +422,44 @@ export function MatchingView({
         <PixelBox style={styles.matchingPanelCard} contentStyle={styles.matchingPanelContent}>
           {suggestionCards.slice(0, 4).map((item) => (
             <View key={item.key} style={styles.matchingSuggestionRow}>
-              <View style={styles.matchingSuggestionInfo}>
-                <PixelText variant="body" style={styles.listName}>
-                  {t("matching.card.suggestionTitle", {
-                    source: item.sourceName,
-                    target: item.targetName
-                  })}
+              <View style={styles.matchingSuggestionProfiles}>
+                {renderMiniProfile(
+                  item.sourceCupidateId,
+                  item.sourceName,
+                  buildCupidateSubtitle(cupidateMap.get(item.sourceCupidateId))
+                )}
+                <PixelText variant="screenTitle" style={styles.recommendationHeart}>
+                  {"<3"}
                 </PixelText>
-                <PixelText variant="caption" style={styles.listMeta}>
-                  {t("matching.card.score", { rate: item.matchScore })}
-                </PixelText>
-                <PixelText variant="caption" style={styles.listMeta}>
-                  {t("matching.card.status", { value: t(statusDisplayKey("none")) })}
-                </PixelText>
+                {renderMiniProfile(
+                  item.targetCupidateId,
+                  item.targetName,
+                  buildCupidateSubtitle(cupidateMap.get(item.targetCupidateId))
+                )}
               </View>
+              <View style={styles.matchingSuggestionFooter}>
+                <View style={styles.matchingSuggestionInfo}>
+                  <PixelText variant="body" style={styles.listName}>
+                    {t("matching.card.suggestionTitle", {
+                      source: item.sourceName,
+                      target: item.targetName
+                    })}
+                  </PixelText>
+                  <PixelText variant="caption" style={styles.listMeta}>
+                    {t("matching.card.score", { rate: item.matchScore })}
+                  </PixelText>
+                  <PixelText variant="caption" style={styles.listMeta}>
+                    {t("matching.card.status", { value: t(statusDisplayKey("none")) })}
+                  </PixelText>
+                </View>
 
-              <View style={styles.matchingSuggestionActions}>
-                <PixelButton
-                  label={isMutatingMatching ? t("matching.actions.processing") : t("matching.actions.request")}
-                  variant="primary"
-                  onPress={() => onSendRequest(item.sourceCupidateId, item.targetCupidateId)}
-                />
+                <View style={styles.matchingSuggestionActions}>
+                  <PixelButton
+                    label={isMutatingMatching ? t("matching.actions.processing") : t("matching.actions.request")}
+                    variant="primary"
+                    onPress={() => onSendRequest(item.sourceCupidateId, item.targetCupidateId)}
+                  />
+                </View>
               </View>
             </View>
           ))}

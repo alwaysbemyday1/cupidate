@@ -330,6 +330,11 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     [myCupidates]
   );
 
+  const inactiveMyCupidates = useMemo(
+    () => myCupidates.filter((item) => !item.isActive),
+    [myCupidates]
+  );
+
   const activeConnectedCupidates = useMemo(
     () => connectedCupidates.filter((item) => item.isActive),
     [connectedCupidates]
@@ -913,6 +918,9 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     myCupidId,
     recommendations,
     requestByPair,
+    myCupidates,
+    activeMyCupidates,
+    inactiveMyCupidates,
     notifications,
     homeSummary,
     isHomeLoading:

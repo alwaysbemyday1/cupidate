@@ -173,6 +173,10 @@ function cupidateStatusKey(tone: BoardTone) {
   return `network.cupidate.status.${tone}`;
 }
 
+function cupidateActivationKey(isActive: boolean) {
+  return isActive ? "network.cupidate.activation.active" : "network.cupidate.activation.inactive";
+}
+
 function genderKey(gender: string) {
   switch (gender) {
     case "male":
@@ -618,10 +622,22 @@ export function NetworkView({
                           {item.jobTitle ?? item.preferences.jobTitle ?? t("network.meta.awaitingProfile")}
                         </PixelText>
                       </View>
-                      <View style={[styles.networkStatusChip, rosterStatusStyle(tone)]}>
-                        <PixelText variant="caption" style={styles.networkStatusText}>
-                          {t(cupidateStatusKey(tone))}
-                        </PixelText>
+                      <View style={styles.networkStatusColumn}>
+                        <View
+                          style={[
+                            styles.networkStatusChip,
+                            item.isActive ? styles.networkStatusMatched : styles.networkStatusNeutral
+                          ]}
+                        >
+                          <PixelText variant="caption" style={styles.networkStatusText}>
+                            {t(cupidateActivationKey(item.isActive))}
+                          </PixelText>
+                        </View>
+                        <View style={[styles.networkStatusChip, rosterStatusStyle(tone)]}>
+                          <PixelText variant="caption" style={styles.networkStatusText}>
+                            {t(cupidateStatusKey(tone))}
+                          </PixelText>
+                        </View>
                       </View>
                     </View>
                   </View>

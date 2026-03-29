@@ -10,6 +10,8 @@ import { useI18n } from "../../i18n/context";
 
 type HomeViewProps = {
   homeSummary: HomeSummary;
+  activeCupidateCount: number;
+  inactiveCupidateCount: number;
   notifications: HomeNotification[];
   recommendations: RecommendationItem[];
   cupidates: CupidateRecord[];
@@ -51,6 +53,8 @@ function notificationBadgeKey(status: HomeNotification["status"]) {
 
 export function HomeView({
   homeSummary,
+  activeCupidateCount,
+  inactiveCupidateCount,
   notifications,
   recommendations,
   cupidates,
@@ -64,6 +68,25 @@ export function HomeView({
   const { t } = useI18n();
   const cupidateMap = new Map(cupidates.map((item) => [item.cupidateId, item]));
   const topRecommendations = recommendations.slice(0, 2);
+  const readinessState =
+    homeSummary.myCupidates === 0
+      ? {
+          title: t("home.readiness.noCupidatesTitle"),
+          description: t("home.readiness.noCupidatesDescription")
+        }
+      : activeCupidateCount === 0
+        ? {
+            title: t("home.readiness.noActiveTitle"),
+            description: t("home.readiness.noActiveDescription", {
+              count: inactiveCupidateCount
+            })
+          }
+        : homeSummary.connectedCupids === 0
+          ? {
+              title: t("home.readiness.noConnectionsTitle"),
+              description: t("home.readiness.noConnectionsDescription")
+            }
+          : null;
 
   return (
     <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
@@ -212,6 +235,21 @@ export function HomeView({
           </View>
         </View>
       </PixelBox>
+
+      {readinessState ? (
+        <>
+          <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
+            {t("home.sections.readiness")}
+          </PixelText>
+          <StateCard
+            tone="empty"
+            title={readinessState.title}
+            description={readinessState.description}
+            actionLabel={t("home.actions.addNetwork")}
+            onAction={onGoNetwork}
+          />
+        </>
+      ) : null}
 
       <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
         {t("home.sections.quickActions")}

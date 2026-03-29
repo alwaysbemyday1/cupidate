@@ -126,10 +126,10 @@ describe("Profile overlay flow", () => {
     fireEvent.press(screen.getByTestId("tab-matching"));
 
     await waitFor(() => {
-      expect(screen.getByTestId("profile-open-cupidate-mine-1")).toBeTruthy();
+      expect(screen.getAllByTestId("profile-open-cupidate-mine-1").length).toBeGreaterThan(0);
     });
 
-    fireEvent.press(screen.getByTestId("profile-open-cupidate-mine-1"));
+    fireEvent.press(screen.getAllByTestId("profile-open-cupidate-mine-1")[0]);
 
     await waitFor(() => {
       expect(screen.getByTestId("profile-sheet-title")).toHaveTextContent("Cupidate Profile");

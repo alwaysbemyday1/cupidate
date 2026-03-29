@@ -20,7 +20,10 @@ type MyViewProps = {
   onChangeNotificationEnabled: (value: boolean) => void;
   connectionCount: number;
   cupidateCount: number;
+  activeCupidateCount: number;
+  inactiveCupidateCount: number;
   requestCount: number;
+  onGoNetwork: () => void;
   currentCupidId: string;
   accountEmail?: string | null;
   joinedAt?: string | null;
@@ -67,7 +70,10 @@ export function MyView({
   onChangeNotificationEnabled,
   connectionCount,
   cupidateCount,
+  activeCupidateCount,
+  inactiveCupidateCount,
   requestCount,
+  onGoNetwork,
   currentCupidId,
   accountEmail,
   joinedAt,
@@ -224,6 +230,37 @@ export function MyView({
       </PixelBox>
 
       <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
+        {t("my.sections.readiness")}
+      </PixelText>
+      {cupidateCount === 0 ? (
+        <StateCard
+          tone="empty"
+          title={t("my.readiness.emptyTitle")}
+          description={t("my.readiness.emptyDescription")}
+          actionLabel={t("my.buttons.openNetwork")}
+          onAction={onGoNetwork}
+        />
+      ) : (
+        <PixelBox style={styles.listCard} contentStyle={styles.listCardContent}>
+          <PixelText variant="body" style={styles.textBody}>
+            {t("my.readiness.hint", {
+              active: activeCupidateCount,
+              inactive: inactiveCupidateCount
+            })}
+          </PixelText>
+          <View style={styles.summaryGrid}>
+            <SummaryCard label={t("my.readiness.active")} value={activeCupidateCount} />
+            <SummaryCard label={t("my.readiness.inactive")} value={inactiveCupidateCount} />
+          </View>
+          {inactiveCupidateCount > 0 ? (
+            <View style={styles.stateCardActionRow}>
+              <PixelButton label={t("my.buttons.openNetwork")} variant="secondary" onPress={onGoNetwork} />
+            </View>
+          ) : null}
+        </PixelBox>
+      )}
+
+      <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
         {t("my.sections.summary")}
       </PixelText>
       {connectionCount === 0 && cupidateCount === 0 && requestCount === 0 ? (
@@ -231,12 +268,12 @@ export function MyView({
       ) : (
         <View style={styles.summaryGrid}>
           <SummaryCard label={t("my.summary.connections")} value={connectionCount} />
-          <SummaryCard label={t("my.summary.cupidates")} value={cupidateCount} />
           <SummaryCard label={t("my.summary.requests")} value={requestCount} />
           <SummaryCard
             label={t("my.summary.visibility")}
             value={privacyNetworkOnly ? t("my.summary.visibilityNetwork") : t("my.summary.visibilityPrivate")}
           />
+          <SummaryCard label={t("my.summary.notifications")} value={notificationLabel} />
         </View>
       )}
     </ScrollView>

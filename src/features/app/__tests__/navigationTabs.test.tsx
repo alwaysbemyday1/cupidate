@@ -42,6 +42,7 @@ describe("App navigation tabs", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Nickname")).toBeTruthy();
+      expect(screen.getByText("Cupidate Readiness")).toBeTruthy();
       expect(screen.getByText("Account Summary")).toBeTruthy();
     });
 
