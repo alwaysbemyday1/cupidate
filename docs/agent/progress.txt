@@ -63,6 +63,7 @@ Completed Work
 - [x] Network IA simplification to cupid-first flow (Task 2026-03-30-07)
 - [x] Cupid profile linkage + inbound connection inbox handling (Task 2026-03-30-08)
 - [x] Single self-profile enforcement in repository/Supabase seed/schema (Task 2026-03-30-09)
+- [x] Profile view QA hardening for inactive/visibility gating (Task 2026-03-31-01)
 
 Next Tasks (Rebuild Track)
  - Task 2026-03-30-03: Device QA pass on Home readiness -> Network -> activation -> Matching flow

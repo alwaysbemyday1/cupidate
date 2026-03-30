@@ -346,8 +346,6 @@ function CupidProfilePanel({
           {t("profile.cupid.summary")}
         </PixelText>
         <View style={styles.summaryGrid}>
-          {renderStatPill(t("profile.stats.managedCupidates"), profile.stats.cupidateCount)}
-          {renderStatPill(t("profile.stats.activeCupidates"), profile.stats.activeCupidateCount)}
           {renderStatPill(t("profile.stats.matchmakingRequests"), profile.stats.introductions)}
           {renderStatPill(t("profile.stats.ongoing"), profile.stats.ongoingMatches)}
           {renderStatPill(t("profile.stats.romanceConversions"), profile.stats.completedMatches)}
@@ -417,14 +415,23 @@ function CupidateProfilePanel({
     editState.preferredHeightMinInput,
     editState.preferredHeightMaxInput
   );
-  const canViewBasicDetails = profile.canEdit || profile.profileVisibility !== "private";
-  const canViewFullDetails = profile.canEdit || profile.profileVisibility === "public";
+  const isRemoteInactive = !profile.canEdit && !profile.isActive;
+  const canViewBasicDetails = profile.canEdit || (!isRemoteInactive && profile.profileVisibility !== "private");
+  const canViewFullDetails = profile.canEdit || (!isRemoteInactive && profile.profileVisibility === "public");
   const visibilityDescriptionKey =
-    profile.profileVisibility === "private"
+    isRemoteInactive
+      ? "profile.visibility.inactiveDescription"
+      : profile.profileVisibility === "private"
       ? "profile.visibility.privateDescription"
       : profile.profileVisibility === "basic"
         ? "profile.visibility.basicDescription"
         : "profile.visibility.publicDescription";
+  const visibilityTitleKey =
+    isRemoteInactive
+      ? "profile.visibility.inactiveTitle"
+      : profile.profileVisibility === "private"
+        ? "profile.visibility.privateTitle"
+        : "profile.visibility.basicTitle";
 
   function toggleMustHaveCondition(key: PreferenceConditionKey) {
     setEditState((current) => {
@@ -531,7 +538,6 @@ function CupidateProfilePanel({
         </View>
 
         <View style={styles.profileSheetMetaList}>
-          {renderMetaLine(t("profile.meta.visibility"), visibilityText(editState.profileVisibility, t))}
           {canViewBasicDetails ? (
             <>
               {renderMetaLine(t("profile.meta.age"), ageLabel(profile.birthYear))}
@@ -554,10 +560,10 @@ function CupidateProfilePanel({
         </View>
       </PixelBox>
 
-      {!canViewBasicDetails ? (
+      {!canViewBasicDetails || isRemoteInactive ? (
         <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
           <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
-            {t("profile.visibility.privateTitle")}
+            {t(visibilityTitleKey)}
           </PixelText>
           <PixelText variant="body" style={styles.textBody}>
             {t(visibilityDescriptionKey)}
@@ -565,7 +571,7 @@ function CupidateProfilePanel({
         </PixelBox>
       ) : null}
 
-      {!profile.canEdit && profile.profileVisibility === "basic" ? (
+      {!profile.canEdit && !isRemoteInactive && profile.profileVisibility === "basic" ? (
         <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
           <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
             {t("profile.visibility.basicTitle")}
@@ -626,10 +632,6 @@ function CupidateProfilePanel({
             {renderStatPill(t("profile.stats.requests"), profile.stats.totalRequests)}
             {renderStatPill(t("profile.stats.ongoing"), profile.stats.ongoingMatches)}
             {renderStatPill(t("profile.stats.completed"), profile.stats.completedMatches)}
-            {renderStatPill(
-              t("profile.stats.editable"),
-              profile.canEdit ? t("profile.cupidate.editableYes") : t("profile.cupidate.editableNo")
-            )}
           </View>
         </PixelBox>
       ) : null}

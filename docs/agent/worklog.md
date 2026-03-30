@@ -1,5 +1,30 @@
 # Agent Worklog
 
+## 2026-03-31
+
+### Task 2026-03-31-01 - Profile View QA Hardening
+Status: Completed
+
+Changes:
+- Removed redundant cupid summary stats that no longer make sense after the single self-profile rule:
+  - removed `Managed`
+  - removed `Active`
+- Removed duplicate visibility metadata from the cupidate header/meta stack.
+- Tightened inactive cupidate gating:
+  - non-owner viewers now see an inactive-status notice only
+  - detailed public snapshot and preference summary stay hidden until the cupidate is active again
+- Removed the redundant owner-only `Access` pill from cupidate activity.
+- Added direct component tests for:
+  - inactive remote cupidate visibility gating
+  - cupid summary focus on matchmaking outcomes
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand src/features/app/views/__tests__/ProfileView.test.tsx src/features/app/__tests__/profileOverlayFlow.test.tsx` passed.
+
+Notes:
+- This pass was aimed at making the profile sheet trustworthy: the UI now matches both profile visibility and cupidate activation state.
+
 ## 2026-03-30
 
 ### Task 2026-03-30-07 - Network IA Simplification to Cupid-First Flow

@@ -385,8 +385,10 @@ const enMessages: Record<string, string> = {
     "profile.manage.activationHint": "Turn this on when the dating profile is ready to be matched.",
     "profile.visibility.privateTitle": "Private Cupidate Profile",
     "profile.visibility.basicTitle": "Basic Profile Only",
+    "profile.visibility.inactiveTitle": "Inactive Dating Profile",
     "profile.visibility.privateDescription": "This cupidate keeps the dating profile private. Other cupids can only confirm that the profile exists.",
     "profile.visibility.basicDescription": "This cupidate shares only basic profile information. Detailed lifestyle notes and preference weights stay private.",
+    "profile.visibility.inactiveDescription": "This cupidate profile is currently paused and does not reveal dating details until it is activated again.",
     "profile.visibility.publicDescription": "This cupidate shares the matching snapshot and preference summary with other connected cupids.",
 
     "auth.title": "Access Terminal",
@@ -802,8 +804,10 @@ const koMessages: Record<string, string> = {
   "profile.manage.activationHint": "소개팅 프로필이 준비되면 켜서 매칭에 노출하세요.",
   "profile.visibility.privateTitle": "비공개 큐피데이트 프로필",
   "profile.visibility.basicTitle": "기본 정보만 공개",
+  "profile.visibility.inactiveTitle": "비활성 소개팅 프로필",
   "profile.visibility.privateDescription": "이 큐피데이트는 소개팅 프로필을 비공개로 유지하고 있어요. 다른 큐피드는 프로필이 존재한다는 사실만 확인할 수 있어요.",
   "profile.visibility.basicDescription": "이 큐피데이트는 기본 정보만 공개하고 있어요. 생활 정보와 상세 선호도는 비공개예요.",
+  "profile.visibility.inactiveDescription": "이 큐피데이트 프로필은 현재 일시중지 상태라서, 다시 활성화되기 전까지 상세 소개팅 정보가 공개되지 않아요.",
   "profile.visibility.publicDescription": "이 큐피데이트는 소개팅 프로필 요약과 선호도 요약을 연결된 큐피드에게 공개하고 있어요.",
 
   "auth.title": "접속 터미널",

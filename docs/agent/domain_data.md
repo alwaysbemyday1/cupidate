@@ -183,6 +183,8 @@ Location:
   - `private`: 비소유자는 비공개 안내만 본다
   - `basic`: 비소유자는 이름/상태/기본 메타까지만 본다
   - `public`: 비소유자는 공개 소개팅 프로필 요약 + 공개 선호도 요약을 본다
+- activation gating:
+  - `inactive`: 비소유자는 활성화 상태만 확인할 수 있고, 공개범위가 `public/basic` 이어도 상세 소개팅 정보는 열람하지 못한다
 - Matching/Network에서 remote profile을 열었을 때 상세 사유나 취미, 선호 요약은 visibility rule을 통과한 범위 안에서만 노출한다
 
 ### Matching entity
