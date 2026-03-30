@@ -35,6 +35,7 @@ type NetworkViewProps = {
   selectedConnectionCupidId: string | null;
   onSelectConnectionCupid: (cupidId: string) => void;
   onAddConnection: () => void | Promise<void>;
+  onRespondToConnection: (connectionId: string, action: "accept" | "decline") => void | Promise<void>;
   onOpenCupidProfile: (cupidId: string) => void;
   onOpenCupidateProfile: (cupidateId: string) => void;
   isNetworkLoading?: boolean;
@@ -142,6 +143,7 @@ export function NetworkView({
   selectedConnectionCupidId,
   onSelectConnectionCupid,
   onAddConnection,
+  onRespondToConnection,
   onOpenCupidProfile,
   onOpenCupidateProfile,
   isNetworkLoading,
@@ -271,10 +273,28 @@ export function NetworkView({
                                 {t(datingStatusKey(item.datingProfileStatus))}
                               </PixelText>
                             </View>
+                            </View>
                           </View>
+                          {item.status === "pending" && item.direction === "inbound" ? (
+                            <View style={styles.buttonRow}>
+                              <PixelButton
+                                label={t("network.actions.acceptConnection")}
+                                variant="success"
+                                onPress={() => {
+                                  void onRespondToConnection(item.connectionId, "accept");
+                                }}
+                              />
+                              <PixelButton
+                                label={t("network.actions.declineConnection")}
+                                variant="danger"
+                                onPress={() => {
+                                  void onRespondToConnection(item.connectionId, "decline");
+                                }}
+                              />
+                            </View>
+                          ) : null}
                         </View>
-                      </View>
-                    </Pressable>
+                      </Pressable>
                   ))}
                 </PixelBox>
               )}

@@ -15,6 +15,7 @@ import {
   useCupidatesQuery,
   useCurrentCupidQuery,
   useSearchCupidsQuery,
+  useUpdateConnectionStatusMutation,
   useUpdateCupidateMutation,
   useUpsertCurrentCupidNicknameMutation
 } from "../../network/hooks/useNetworkData";
@@ -251,6 +252,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
   const createCupidateMutation = useCreateCupidateMutation();
   const updateCupidateMutation = useUpdateCupidateMutation();
   const createConnectionMutation = useCreateConnectionMutation();
+  const updateConnectionStatusMutation = useUpdateConnectionStatusMutation();
   const upsertNicknameMutation = useUpsertCurrentCupidNicknameMutation();
 
   const requestMatchMutation = useRequestMatchMutation();
@@ -764,6 +766,17 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     setSelectedConnectionCupidId(null);
   };
 
+  const onRespondToConnection = async (connectionId: string, action: "accept" | "decline") => {
+    if (!isDataAccessEnabled) {
+      return;
+    }
+
+    await updateConnectionStatusMutation.mutateAsync({
+      connectionId,
+      status: action === "accept" ? "accepted" : "blocked"
+    });
+  };
+
   const onSaveNickname = async () => {
     if (!isDataAccessEnabled) {
       return;
@@ -1051,6 +1064,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     onRegisterCupidate,
     onSaveCupidateProfile,
     onAddConnection,
+    onRespondToConnection,
     onSaveNickname,
     onSendRequest,
     onUpdateRequestStatus,

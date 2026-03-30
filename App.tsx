@@ -149,6 +149,7 @@ function CupidateAppShell() {
                 selectedConnectionCupidId={state.selectedConnectionCupidId}
                 onSelectConnectionCupid={state.setSelectedConnectionCupidId}
                 onAddConnection={state.onAddConnection}
+                onRespondToConnection={state.onRespondToConnection}
                 onOpenCupidProfile={state.onOpenCupidProfile}
                 onOpenCupidateProfile={state.onOpenCupidateProfile}
                 isNetworkLoading={state.isNetworkLoading}
