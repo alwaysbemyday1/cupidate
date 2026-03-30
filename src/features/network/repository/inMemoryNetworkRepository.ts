@@ -132,6 +132,15 @@ export class InMemoryNetworkRepository implements NetworkRepository {
   }
 
   async createCupidate(input: CreateCupidateInput): Promise<NetworkCupidate> {
+    const existing = this.cupidates.find((item) => item.ownerCupidId === this.currentCupid.id);
+
+    if (existing) {
+      return this.updateCupidate({
+        cupidateId: existing.id,
+        ...input
+      });
+    }
+
     const next = hydrateCupidate(input, this.currentCupid.id);
     this.cupidates = [next, ...this.cupidates];
     return next;

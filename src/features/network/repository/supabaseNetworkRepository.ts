@@ -308,6 +308,26 @@ export class SupabaseNetworkRepository implements NetworkRepository {
 
   async createCupidate(input: CreateCupidateInput): Promise<NetworkCupidate> {
     const userId = await getRequiredUserId(this.client);
+    const { data: existingRows, error: existingError } = await this.client
+      .from("cupidates")
+      .select("id")
+      .eq("owner_cupid_id", userId)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .returns<Array<{ id: string }>>();
+
+    if (existingError) {
+      throw existingError;
+    }
+
+    const existingCupidateId = existingRows?.[0]?.id;
+    if (existingCupidateId) {
+      return this.updateCupidate({
+        cupidateId: existingCupidateId,
+        ...input
+      });
+    }
+
     const preferencePayload = buildPreferenceRowPayload("", input);
 
     const { data: cupidateRow, error: cupidateError } = await this.client

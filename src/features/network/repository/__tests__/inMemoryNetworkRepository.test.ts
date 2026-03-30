@@ -72,6 +72,32 @@ describe("InMemoryNetworkRepository", () => {
     expect(updated.preferences.region).toBe("busan");
   });
 
+  it("treats cupidate creation as a single self-profile upsert", async () => {
+    const repository = new InMemoryNetworkRepository();
+
+    const first = await repository.createCupidate({
+      displayName: "Mina",
+      birthYear: 1998,
+      gender: "female",
+      bio: "first profile"
+    });
+
+    const second = await repository.createCupidate({
+      displayName: "Mina Updated",
+      birthYear: 1997,
+      gender: "female",
+      bio: "updated profile",
+      isActive: true
+    });
+
+    const cupidates = await repository.listCupidates();
+
+    expect(cupidates).toHaveLength(1);
+    expect(second.id).toBe(first.id);
+    expect(cupidates[0].displayName).toBe("Mina Updated");
+    expect(cupidates[0].isActive).toBe(true);
+  });
+
   it("creates outbound connection with counterpart metadata", async () => {
     const repository = new InMemoryNetworkRepository();
 
