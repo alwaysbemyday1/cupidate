@@ -64,6 +64,7 @@ Completed Work
 - [x] Cupid profile linkage + inbound connection inbox handling (Task 2026-03-30-08)
 - [x] Single self-profile enforcement in repository/Supabase seed/schema (Task 2026-03-30-09)
 - [x] Profile view QA hardening for inactive/visibility gating (Task 2026-03-31-01)
+- [x] Matching tab QA hardening for concise cards and visibility-safe insights (Task 2026-03-31-02)
 
 Next Tasks (Rebuild Track)
  - Task 2026-03-30-03: Device QA pass on Home readiness -> Network -> activation -> Matching flow

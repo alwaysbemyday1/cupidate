@@ -76,7 +76,7 @@ function buildCupidateSubtitle(cupidate: CupidateRecord | undefined, currentCupi
     return undefined;
   }
 
-  if (cupidate.ownerCupidId !== currentCupidId && cupidate.profileVisibility === "private") {
+  if (cupidate.ownerCupidId !== currentCupidId && (!cupidate.isActive || cupidate.profileVisibility === "private")) {
     return undefined;
   }
 
@@ -86,6 +86,10 @@ function buildCupidateSubtitle(cupidate: CupidateRecord | undefined, currentCupi
 
 function canRevealDetailedMatchingContext(cupidate: CupidateRecord | undefined, currentCupidId: string) {
   if (!cupidate) {
+    return false;
+  }
+
+  if (cupidate.ownerCupidId !== currentCupidId && !cupidate.isActive) {
     return false;
   }
 
@@ -135,6 +139,30 @@ function timelineIndex(status?: MatchRequestStatus) {
   }
 
   return -1;
+}
+
+function buildReasonLine(
+  item: MatchingCardItem,
+  canReveal: boolean,
+  t: ReturnType<typeof useI18n>["t"]
+) {
+  if (!canReveal) {
+    return null;
+  }
+
+  if (item.priorityMatches.length > 0) {
+    return t("matching.feedback.priority", {
+      value: item.priorityMatches.map((key) => t(`network.option.mustHave.${key}`)).join(", ")
+    });
+  }
+
+  if (item.matchedHobbies.length > 0) {
+    return t("matching.feedback.hobbies", {
+      value: item.matchedHobbies.join(", ")
+    });
+  }
+
+  return null;
 }
 
 export function MatchingView({
@@ -213,7 +241,7 @@ export function MatchingView({
     [requestCards]
   );
 
-  const focusCard = activeRequestCards[0] ?? requestCards[0] ?? suggestionCards[0] ?? null;
+  const focusCard = activeRequestCards[0] ?? suggestionCards[0] ?? requestCards[0] ?? null;
   const focusSourceCupidate = focusCard ? cupidateMap.get(focusCard.sourceCupidateId) : undefined;
   const focusTargetCupidate = focusCard ? cupidateMap.get(focusCard.targetCupidateId) : undefined;
   const canRevealFocusDetails =
@@ -353,13 +381,19 @@ export function MatchingView({
         />
       ) : (
         <PixelBox style={styles.matchingPanelCard} contentStyle={styles.matchingPanelContent}>
-          {activeRequestCards.map((item) => (
-            <PixelBox
-              key={item.key}
-              style={styles.matchingRequestCard}
-              contentStyle={styles.matchingRequestContent}
-              backgroundColor={designTokens.color.surface}
-            >
+          {activeRequestCards.map((item) => {
+            const canRevealCardDetails =
+              canRevealDetailedMatchingContext(cupidateMap.get(item.sourceCupidateId), currentCupidId) &&
+              canRevealDetailedMatchingContext(cupidateMap.get(item.targetCupidateId), currentCupidId);
+            const reasonLine = buildReasonLine(item, canRevealCardDetails, t);
+
+            return (
+              <PixelBox
+                key={item.key}
+                style={styles.matchingRequestCard}
+                contentStyle={styles.matchingRequestContent}
+                backgroundColor={designTokens.color.surface}
+              >
               <View style={styles.matchingCardTopRow}>
                 {renderMiniProfile(
                   item.sourceCupidateId,
@@ -377,12 +411,6 @@ export function MatchingView({
               </View>
 
               <View style={styles.matchingCardMetaBlock}>
-                <PixelText variant="body" style={styles.listName}>
-                  {t("matching.card.requestTitle", {
-                    source: item.sourceName,
-                    target: item.targetName
-                  })}
-                </PixelText>
                 <View style={styles.matchingMetaRow}>
                   <View style={styles.matchingScoreChip}>
                     <PixelText variant="caption" style={styles.matchingScoreText}>
@@ -395,52 +423,57 @@ export function MatchingView({
                     </PixelText>
                   </View>
                 </View>
-                <PixelText variant="caption" style={styles.listMeta}>
-                  {t("matching.card.status", { value: t(statusDisplayKey(item.request?.status ?? "none")) })}
-                </PixelText>
-                  <PixelText variant="caption" style={styles.listMeta}>
-                    {t("matching.card.sharedHobbies", {
-                      value:
-                        canRevealDetailedMatchingContext(cupidateMap.get(item.sourceCupidateId), currentCupidId) &&
-                        canRevealDetailedMatchingContext(cupidateMap.get(item.targetCupidateId), currentCupidId) &&
-                        item.matchedHobbies.length > 0
-                          ? item.matchedHobbies.join(", ")
-                          : "-"
-                    })}
+                {reasonLine ? (
+                  <PixelText variant="caption" style={styles.matchingReasonText}>
+                    {reasonLine}
                   </PixelText>
+                ) : null}
               </View>
 
-              <View style={styles.buttonRow}>
+              <View style={styles.matchingActionRow}>
                 {item.request?.status === "requested" ? (
                   <>
-                    <PixelButton
-                      label={t("matching.actions.approve")}
+                    <View style={styles.matchingActionCell}>
+                      <PixelButton
+                        label={t("matching.actions.approve")}
                       variant="success"
+                      disabled={isMutatingMatching}
                       onPress={() =>
                         onUpdateRequestStatus(item.sourceCupidateId, item.targetCupidateId, "accepted")
                       }
-                    />
-                    <PixelButton
-                      label={t("matching.actions.reject")}
+                      />
+                    </View>
+                    <View style={styles.matchingActionCell}>
+                      <PixelButton
+                        label={t("matching.actions.reject")}
                       variant="danger"
+                      disabled={isMutatingMatching}
                       onPress={() =>
                         onUpdateRequestStatus(item.sourceCupidateId, item.targetCupidateId, "rejected")
                       }
-                    />
+                      />
+                    </View>
                   </>
                 ) : (
-                  <PixelButton
-                    label={item.request?.status === "completed" ? t("matching.actions.completed") : t("matching.actions.share")}
-                    variant={item.request?.status === "completed" ? "neutral" : "primary"}
-                    disabled={item.request?.status === "completed"}
-                    onPress={() =>
-                      onUpdateRequestStatus(item.sourceCupidateId, item.targetCupidateId, "completed")
-                    }
-                  />
+                  <View style={styles.matchingActionCell}>
+                    <PixelButton
+                      label={
+                        item.request?.status === "completed"
+                          ? t("matching.actions.completed")
+                          : t("matching.actions.share")
+                      }
+                      variant={item.request?.status === "completed" ? "neutral" : "primary"}
+                      disabled={item.request?.status === "completed" || isMutatingMatching}
+                      onPress={() =>
+                        onUpdateRequestStatus(item.sourceCupidateId, item.targetCupidateId, "completed")
+                      }
+                    />
+                  </View>
                 )}
               </View>
             </PixelBox>
-          ))}
+            );
+          })}
         </PixelBox>
       )}
 
@@ -455,7 +488,13 @@ export function MatchingView({
         />
       ) : (
         <PixelBox style={styles.matchingPanelCard} contentStyle={styles.matchingPanelContent}>
-          {suggestionCards.slice(0, 4).map((item) => (
+          {suggestionCards.slice(0, 4).map((item) => {
+            const canRevealCardDetails =
+              canRevealDetailedMatchingContext(cupidateMap.get(item.sourceCupidateId), currentCupidId) &&
+              canRevealDetailedMatchingContext(cupidateMap.get(item.targetCupidateId), currentCupidId);
+            const reasonLine = buildReasonLine(item, canRevealCardDetails, t);
+
+            return (
             <View key={item.key} style={styles.matchingSuggestionRow}>
               <View style={styles.matchingSuggestionProfiles}>
                 {renderMiniProfile(
@@ -473,31 +512,38 @@ export function MatchingView({
                 )}
               </View>
               <View style={styles.matchingSuggestionFooter}>
-                <View style={styles.matchingSuggestionInfo}>
-                  <PixelText variant="body" style={styles.listName}>
-                    {t("matching.card.suggestionTitle", {
-                      source: item.sourceName,
-                      target: item.targetName
-                    })}
-                  </PixelText>
-                  <PixelText variant="caption" style={styles.listMeta}>
-                    {t("matching.card.score", { rate: item.matchScore })}
-                  </PixelText>
-                  <PixelText variant="caption" style={styles.listMeta}>
-                    {t("matching.card.status", { value: t(statusDisplayKey("none")) })}
-                  </PixelText>
+                <View style={styles.matchingMetaRow}>
+                  <View style={styles.matchingScoreChip}>
+                    <PixelText variant="caption" style={styles.matchingScoreText}>
+                      {t("matching.card.score", { rate: item.matchScore })}
+                    </PixelText>
+                  </View>
+                  <View style={[styles.matchingStatusChip, statusChipStyle(undefined)]}>
+                    <PixelText variant="caption" style={styles.matchingStatusText}>
+                      {t(statusDisplayKey("none"))}
+                    </PixelText>
+                  </View>
                 </View>
+                {reasonLine ? (
+                  <PixelText variant="caption" style={styles.matchingReasonText}>
+                    {reasonLine}
+                  </PixelText>
+                ) : null}
 
                 <View style={styles.matchingSuggestionActions}>
-                  <PixelButton
-                    label={isMutatingMatching ? t("matching.actions.processing") : t("matching.actions.request")}
-                    variant="primary"
-                    onPress={() => onSendRequest(item.sourceCupidateId, item.targetCupidateId)}
-                  />
+                  <View style={styles.matchingActionCell}>
+                    <PixelButton
+                      label={isMutatingMatching ? t("matching.actions.processing") : t("matching.actions.request")}
+                      variant="primary"
+                      disabled={isMutatingMatching}
+                      onPress={() => onSendRequest(item.sourceCupidateId, item.targetCupidateId)}
+                    />
+                  </View>
                 </View>
               </View>
             </View>
-          ))}
+            );
+          })}
         </PixelBox>
       )}
 
@@ -521,68 +567,78 @@ export function MatchingView({
               onPress={() => onOpenCupidateProfile(focusCard.sourceCupidateId)}
               testID={`profile-open-cupidate-${focusCard.sourceCupidateId}`}
             >
-            <View style={styles.matchingInsightProfileCard}>
-              <View style={styles.matchingInsightAvatar}>
-                <PixelText variant="body" style={styles.networkAvatarText}>
-                  {buildAvatarSeed(focusCard.sourceName)}
+              <View style={styles.matchingInsightProfileCard}>
+                <View style={styles.matchingInsightAvatar}>
+                  <PixelText variant="body" style={styles.networkAvatarText}>
+                    {buildAvatarSeed(focusCard.sourceName)}
+                  </PixelText>
+                </View>
+                <PixelText variant="body" style={styles.matchingMiniName}>
+                  {focusCard.sourceName}
                 </PixelText>
               </View>
-              <PixelText variant="body" style={styles.matchingMiniName}>
-                {focusCard.sourceName}
-              </PixelText>
-            </View>
             </Pressable>
 
-            <View style={styles.matchingBreakdownChart}>
-              {focusBreakdown.map((item) => {
-                const barHeight = Math.max(8, Math.round((item.value / item.max) * 72));
+            {canRevealFocusDetails ? (
+              <View style={styles.matchingBreakdownChart}>
+                {focusBreakdown.map((item) => {
+                  const barHeight = Math.max(8, Math.round((item.value / item.max) * 72));
 
-                return (
-                  <View key={item.key} style={styles.matchingBreakdownItem}>
-                    <View style={styles.matchingBreakdownTrack}>
-                      <View style={[styles.matchingBreakdownFill, { height: barHeight, backgroundColor: item.color }]} />
+                  return (
+                    <View key={item.key} style={styles.matchingBreakdownItem}>
+                      <View style={styles.matchingBreakdownTrack}>
+                        <View style={[styles.matchingBreakdownFill, { height: barHeight, backgroundColor: item.color }]} />
+                      </View>
+                      <PixelText variant="caption" style={styles.matchingBreakdownValue}>
+                        {Math.round(item.value)}
+                      </PixelText>
+                      <PixelText variant="caption" style={styles.matchingBreakdownLabel}>
+                        {t(`matching.breakdown.${item.key}`)}
+                      </PixelText>
                     </View>
-                    <PixelText variant="caption" style={styles.matchingBreakdownValue}>
-                      {Math.round(item.value)}
-                    </PixelText>
-                    <PixelText variant="caption" style={styles.matchingBreakdownLabel}>
-                      {t(`matching.breakdown.${item.key}`)}
-                    </PixelText>
-                  </View>
-                );
-              })}
-            </View>
+                  );
+                })}
+              </View>
+            ) : (
+              <View style={styles.matchingLimitedInsightBox}>
+                <PixelText variant="body" style={styles.textBody}>
+                  {t("matching.visibility.description")}
+                </PixelText>
+              </View>
+            )}
 
             <Pressable
               onPress={() => onOpenCupidateProfile(focusCard.targetCupidateId)}
               testID={`profile-open-cupidate-${focusCard.targetCupidateId}`}
             >
-            <View style={styles.matchingInsightProfileCard}>
-              <View style={styles.matchingInsightAvatar}>
-                <PixelText variant="body" style={styles.networkAvatarText}>
-                  {buildAvatarSeed(focusCard.targetName)}
+              <View style={styles.matchingInsightProfileCard}>
+                <View style={styles.matchingInsightAvatar}>
+                  <PixelText variant="body" style={styles.networkAvatarText}>
+                    {buildAvatarSeed(focusCard.targetName)}
+                  </PixelText>
+                </View>
+                <PixelText variant="body" style={styles.matchingMiniName}>
+                  {focusCard.targetName}
                 </PixelText>
               </View>
-              <PixelText variant="body" style={styles.matchingMiniName}>
-                {focusCard.targetName}
-              </PixelText>
-            </View>
             </Pressable>
           </View>
 
-          <View style={styles.matchingInsightScoreRow}>
+          <View style={styles.matchingInsightMetaRow}>
             <View style={styles.matchingScoreChip}>
               <PixelText variant="caption" style={styles.matchingScoreText}>
                 {t("matching.card.score", { rate: focusCard.matchScore })}
+              </PixelText>
+            </View>
+            <View style={[styles.matchingStatusChip, statusChipStyle(focusCard.request?.status)]}>
+              <PixelText variant="caption" style={styles.matchingStatusText}>
+                {t(statusDisplayKey(focusCard.request?.status ?? "none"))}
               </PixelText>
             </View>
             <PixelText variant="caption" style={styles.listMeta}>
               {t("matching.card.created", { value: formatDateLabel(focusCard.createdAt) })}
             </PixelText>
           </View>
-          <PixelText variant="caption" style={styles.listMeta}>
-            {t("matching.card.status", { value: t(statusDisplayKey(focusCard.request?.status ?? "none")) })}
-          </PixelText>
 
           <View style={styles.profileDivider} />
 
@@ -633,34 +689,27 @@ export function MatchingView({
             })}
           </View>
 
-          <View style={styles.profileDivider} />
+          {canRevealFocusDetails ? (
+            <>
+              <View style={styles.profileDivider} />
 
-          <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
-            {t("matching.sections.feedback")}
-          </PixelText>
-          <View style={styles.matchingFeedbackList}>
-            {feedbackItems.map((item, index) => {
-              const ownerName = index % 2 === 0 ? focusCard.sourceName : focusCard.targetName;
-
-              return (
-                <View key={`${ownerName}-${index}`} style={styles.matchingFeedbackItem}>
-                  <View style={styles.matchingFeedbackAvatar}>
-                    <PixelText variant="caption" style={styles.networkAvatarText}>
-                      {buildAvatarSeed(ownerName)}
-                    </PixelText>
-                  </View>
-                  <View style={styles.matchingFeedbackBody}>
-                    <PixelText variant="caption" style={styles.matchingFeedbackName}>
-                      {ownerName}
-                    </PixelText>
-                    <PixelText variant="body" style={styles.textBody}>
-                      {item}
-                    </PixelText>
-                  </View>
-                </View>
-              );
-            })}
-          </View>
+              <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+                {t("matching.sections.feedback")}
+              </PixelText>
+              <View style={styles.matchingFeedbackList}>
+                {feedbackItems.map((item, index) => {
+                  return (
+                    <View key={`feedback-${index}`} style={styles.matchingFeedbackItem}>
+                      <View style={styles.matchingFeedbackBullet} />
+                      <PixelText variant="body" style={styles.matchingFeedbackText}>
+                        {item}
+                      </PixelText>
+                    </View>
+                  );
+                })}
+              </View>
+            </>
+          ) : null}
         </PixelBox>
       )}
     </ScrollView>

@@ -668,6 +668,9 @@ export const styles = StyleSheet.create({
   matchingCardMetaBlock: {
     gap: s.xxs
   },
+  matchingReasonText: {
+    color: c.inkMuted
+  },
   matchingMetaRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -721,17 +724,10 @@ export const styles = StyleSheet.create({
     gap: s.xs
   },
   matchingSuggestionFooter: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
     gap: s.sm
   },
-  matchingSuggestionInfo: {
-    flex: 1,
-    gap: 2
-  },
   matchingSuggestionActions: {
-    alignItems: "flex-end"
+    width: "100%"
   },
   matchingInsightCard: {},
   matchingInsightContent: {
@@ -741,7 +737,7 @@ export const styles = StyleSheet.create({
   },
   matchingInsightHeader: {
     flexDirection: "row",
-    alignItems: "flex-end",
+    alignItems: "center",
     justifyContent: "space-between",
     gap: s.xs
   },
@@ -772,6 +768,16 @@ export const styles = StyleSheet.create({
     paddingHorizontal: s.xs,
     paddingVertical: s.sm
   },
+  matchingLimitedInsightBox: {
+    flex: 1,
+    minHeight: 138,
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surfaceAlt,
+    paddingHorizontal: s.sm,
+    paddingVertical: s.sm,
+    justifyContent: "center"
+  },
   matchingBreakdownItem: {
     flex: 1,
     alignItems: "center",
@@ -795,12 +801,20 @@ export const styles = StyleSheet.create({
     color: c.inkMuted,
     textAlign: "center"
   },
-  matchingInsightScoreRow: {
+  matchingInsightMetaRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     flexWrap: "wrap",
     gap: s.xs
+  },
+  matchingActionRow: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    gap: s.xs
+  },
+  matchingActionCell: {
+    flex: 1
   },
   matchingTimelineRow: {
     flexDirection: "row",
@@ -866,21 +880,17 @@ export const styles = StyleSheet.create({
     backgroundColor: c.surfaceAlt,
     padding: s.xs
   },
-  matchingFeedbackAvatar: {
-    width: 34,
-    height: 34,
+  matchingFeedbackBullet: {
+    width: 12,
+    height: 12,
     borderWidth: b.normal,
     borderColor: c.border,
     backgroundColor: c.pink,
-    alignItems: "center",
-    justifyContent: "center"
+    marginTop: 4
   },
-  matchingFeedbackBody: {
+  matchingFeedbackText: {
     flex: 1,
-    gap: 2
-  },
-  matchingFeedbackName: {
-    color: c.inkMuted
+    color: c.ink
   },
 
   settingRow: {

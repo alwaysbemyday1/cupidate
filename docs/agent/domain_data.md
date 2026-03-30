@@ -1,6 +1,6 @@
 ﻿# Cupidate Domain & Data Contract
 
-Last Updated: 2026-03-30
+Last Updated: 2026-03-31
 
 ## 1) Domain Overview
 Roles:
@@ -186,6 +186,10 @@ Location:
 - activation gating:
   - `inactive`: 비소유자는 활성화 상태만 확인할 수 있고, 공개범위가 `public/basic` 이어도 상세 소개팅 정보는 열람하지 못한다
 - Matching/Network에서 remote profile을 열었을 때 상세 사유나 취미, 선호 요약은 visibility rule을 통과한 범위 안에서만 노출한다
+- Matching insight rule:
+  - overall match score and lifecycle state can stay visible
+  - detailed breakdown bars, hobby reasons, and must-have explanations are hidden when either side is not fully revealable (`public` + active, or owner)
+  - when detail is hidden, Matching shows a limited-visibility notice instead of repeating fake or inferred detail
 
 ### Matching entity
 - `MatchingCandidate`

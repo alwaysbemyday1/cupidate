@@ -142,7 +142,9 @@ describe("Activation gate flow", () => {
     fireEvent.press(screen.getByTestId("tab-matching"));
 
     await waitFor(() => {
-      expect(screen.getByText("Suggested: Hana + Joon")).toBeTruthy();
+      expect(screen.getByText("Request Match")).toBeTruthy();
+      expect(screen.getAllByText("Hana").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Joon").length).toBeGreaterThan(0);
     });
   });
 });

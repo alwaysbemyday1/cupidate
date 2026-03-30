@@ -25,6 +25,35 @@ Verification:
 Notes:
 - This pass was aimed at making the profile sheet trustworthy: the UI now matches both profile visibility and cupidate activation state.
 
+### Task 2026-03-31-02 - Matching QA Hardening
+Status: Completed
+
+Changes:
+- Simplified request and suggestion cards so they now focus on:
+  - pair row
+  - match score
+  - lifecycle state
+  - one concise reason line
+  - one balanced action row
+- Removed redundant matching copy from the cards:
+  - duplicate pair titles
+  - duplicate status sentences
+  - empty placeholder hobby lines
+- Tightened visibility-safe insight behavior:
+  - active requests are prioritized first
+  - if there is no active request, suggestions are prioritized before old history
+  - detailed breakdown and feedback are hidden when either side is not fully revealable
+- Removed the fake-speaker feedback pattern and replaced it with plain bullet feedback.
+- Disabled matching action buttons during mutation to avoid duplicate taps.
+- Removed stale translation keys tied to the verbose pre-QA card layout.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand` passed.
+
+Notes:
+- This pass was aimed at making Matching easier to scan on-device while keeping the privacy model consistent with Profile and Network.
+
 ## 2026-03-30
 
 ### Task 2026-03-30-07 - Network IA Simplification to Cupid-First Flow

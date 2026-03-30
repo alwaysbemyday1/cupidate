@@ -114,27 +114,35 @@ describe("Matching flow", () => {
     fireEvent.press(screen.getByTestId("tab-matching"));
 
     await waitFor(() => {
-      expect(screen.getByText("Suggested: Mina + Joon")).toBeTruthy();
-      expect(screen.getAllByText("Status: New Suggestion").length).toBeGreaterThan(0);
+      expect(screen.getByText("Request Match")).toBeTruthy();
+      expect(
+        screen.getAllByText(
+          "Detailed scoring is hidden because one of these dating profiles is not fully visible right now."
+        ).length
+      ).toBe(1);
+      expect(screen.queryByText("Feedback Summary")).toBeNull();
+      expect(screen.queryByText("Suggested: Mina + Joon")).toBeNull();
     });
 
     fireEvent.press(screen.getByText("Request Match"));
 
     await waitFor(() => {
-      expect(screen.getByText("Mina & Joon Request")).toBeTruthy();
-      expect(screen.getAllByText("Status: Awaiting Approval").length).toBeGreaterThan(0);
+      expect(screen.getByText("Approve")).toBeTruthy();
+      expect(screen.getByText("Reject")).toBeTruthy();
+      expect(screen.getAllByText("Awaiting Approval").length).toBeGreaterThan(0);
     });
 
     fireEvent.press(screen.getByText("Approve"));
 
     await waitFor(() => {
-      expect(screen.getAllByText("Status: Decision in progress").length).toBeGreaterThan(0);
+      expect(screen.getByText("Mark Contact Shared")).toBeTruthy();
+      expect(screen.getAllByText("Decision in progress").length).toBeGreaterThan(0);
     });
 
     fireEvent.press(screen.getByText("Mark Contact Shared"));
 
     await waitFor(() => {
-      expect(screen.getAllByText("Status: Contact Shared").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Contact Shared").length).toBeGreaterThan(0);
     });
   });
 });
