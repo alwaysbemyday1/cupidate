@@ -4,7 +4,7 @@ export const MY_CUPID_ID = "cupid-me";
 export const CONNECTED_CUPID_ID = "cupid-connected-1";
 
 export type AppView = "home" | "network" | "matching" | "my";
-export type NetworkSegment = "board" | "cupidates" | "cupids";
+export type NetworkSegment = "cupidates" | "cupids";
 export type MatchRequestStatus = "requested" | "accepted" | "rejected" | "completed";
 
 export type CupidateRecord = CupidateProfile & {
@@ -15,10 +15,16 @@ export type CupidateRecord = CupidateProfile & {
 };
 
 export type CupidConnection = {
+  connectionId: string;
   cupidId: string;
   name: string;
   region: string;
   status: "connected" | "pending" | "blocked";
+  direction: "outbound" | "inbound";
+  datingProfileStatus: "active" | "inactive" | "none";
+  activeCupidateId: string | null;
+  activeCupidateVisibility: CupidateRecord["profileVisibility"] | null;
+  activeCupidateName: string | null;
 };
 
 export type MatchRequest = {
@@ -69,6 +75,12 @@ export type CupidProfileSummary = {
   cupidId: string;
   nickname: string;
   relationship: "self" | "connected" | "pending" | "blocked" | "discoverable";
+  datingProfile: {
+    status: "active" | "inactive" | "none";
+    cupidateId: string | null;
+    displayName: string | null;
+    visibility: CupidateRecord["profileVisibility"] | null;
+  };
   stats: {
     cupidateCount: number;
     activeCupidateCount: number;

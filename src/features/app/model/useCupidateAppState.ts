@@ -190,6 +190,14 @@ function mapRelationship(status: CupidConnection["status"] | "self" | undefined)
   return "discoverable";
 }
 
+function pickRepresentativeCupidate(cupidates: CupidateRecord[]) {
+  if (cupidates.length === 0) {
+    return null;
+  }
+
+  return cupidates.find((item) => item.isActive) ?? cupidates[0];
+}
+
 export function pairKey(sourceCupidateId: string, targetCupidateId: string) {
   return `${sourceCupidateId}:${targetCupidateId}`;
 }
@@ -202,7 +210,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
   const isDataAccessEnabled = options?.isDataAccessEnabled ?? true;
   const [activeView, setActiveView] = useState<AppView>("home");
   const [selectedProfileTarget, setSelectedProfileTarget] = useState<SelectedProfileTarget | null>(null);
-  const [networkSegment, setNetworkSegment] = useState<NetworkSegment>("board");
+  const [networkSegment, setNetworkSegment] = useState<NetworkSegment>("cupids");
   const [displayName, setDisplayName] = useState("");
   const [birthYearInput, setBirthYearInput] = useState("");
   const [gender, setGender] = useState("");
@@ -292,32 +300,88 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     [cupidatesQuery.data]
   );
 
-  const connections = useMemo<CupidConnection[]>(
+  const cupidatesByOwnerId = useMemo(() => {
+    const grouped = new Map<string, CupidateRecord[]>();
+
+    cupidates.forEach((item) => {
+      const current = grouped.get(item.ownerCupidId) ?? [];
+      current.push(item);
+      grouped.set(item.ownerCupidId, current);
+    });
+
+    return grouped;
+  }, [cupidates]);
+
+  const representativeCupidateByOwnerId = useMemo(() => {
+    const grouped = new Map<string, CupidateRecord | null>();
+
+    cupidatesByOwnerId.forEach((items, ownerCupidId) => {
+      grouped.set(ownerCupidId, pickRepresentativeCupidate(items));
+    });
+
+    return grouped;
+  }, [cupidatesByOwnerId]);
+
+  const rawConnections = useMemo(
     () =>
       (connectionsQuery.data ?? []).map((item) => ({
+        connectionId: item.id,
         cupidId: item.counterpartCupidId,
         name: item.counterpartNickname ?? item.counterpartCupidId,
         region: "-",
-        status: mapConnectionStatus(item.status)
+        status: mapConnectionStatus(item.status),
+        direction: item.direction
       })),
     [connectionsQuery.data]
   );
 
-  const existingConnectionCupidIds = useMemo(
-    () => new Set(connections.map((item) => item.cupidId)),
-    [connections]
+  const connections = useMemo<CupidConnection[]>(
+    () =>
+      rawConnections.map((item) => {
+        const representativeCupidate = representativeCupidateByOwnerId.get(item.cupidId) ?? null;
+        const activeCupidate = representativeCupidate?.isActive ? representativeCupidate : null;
+
+        return {
+          ...item,
+          datingProfileStatus: activeCupidate ? "active" : representativeCupidate ? "inactive" : "none",
+          activeCupidateId: activeCupidate?.cupidateId ?? null,
+          activeCupidateVisibility: activeCupidate?.profileVisibility ?? null,
+          activeCupidateName: activeCupidate?.displayName ?? null
+        };
+      }),
+    [rawConnections, representativeCupidateByOwnerId]
   );
 
-  const connectionSearchResults = useMemo(
+  const existingConnectionCupidIds = useMemo(() => new Set(connections.map((item) => item.cupidId)), [connections]);
+
+  const connectionSearchResults = useMemo<
+    Array<{
+      cupidId: string;
+      nickname: string;
+      datingProfileStatus: "active" | "inactive" | "none";
+      cupidateId: string | null;
+      cupidateName: string | null;
+      profileVisibility: "private" | "basic" | "public" | null;
+    }>
+  >(
     () =>
       (cupidSearchQuery.data ?? [])
         .filter((item) => item.id !== myCupidId)
         .filter((item) => !existingConnectionCupidIds.has(item.id))
-        .map((item) => ({
-          cupidId: item.id,
-          nickname: item.nickname
-        })),
-    [cupidSearchQuery.data, existingConnectionCupidIds, myCupidId]
+        .map((item) => {
+          const representativeCupidate = representativeCupidateByOwnerId.get(item.id) ?? null;
+          const activeCupidate = representativeCupidate?.isActive ? representativeCupidate : null;
+
+          return {
+            cupidId: item.id,
+            nickname: item.nickname,
+            datingProfileStatus: activeCupidate ? "active" : representativeCupidate ? "inactive" : "none",
+            cupidateId: activeCupidate?.cupidateId ?? null,
+            cupidateName: activeCupidate?.displayName ?? null,
+            profileVisibility: activeCupidate?.profileVisibility ?? representativeCupidate?.profileVisibility ?? null
+          };
+        }),
+    [cupidSearchQuery.data, existingConnectionCupidIds, myCupidId, representativeCupidateByOwnerId]
   );
 
   const myCupidates = useMemo(
@@ -340,9 +404,23 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     [myCupidates]
   );
 
+  const myPrimaryCupidate = useMemo(
+    () => representativeCupidateByOwnerId.get(myCupidId) ?? null,
+    [myCupidId, representativeCupidateByOwnerId]
+  );
+
   const activeConnectedCupidates = useMemo(
     () => connectedCupidates.filter((item) => item.isActive),
     [connectedCupidates]
+  );
+
+  const networkCupidates = useMemo(
+    () =>
+      connections
+        .filter((item) => item.status === "connected")
+        .map((item) => representativeCupidateByOwnerId.get(item.cupidId) ?? null)
+        .filter((item): item is CupidateRecord => !!item && item.isActive),
+    [connections, representativeCupidateByOwnerId]
   );
 
   const recommendations = useMemo(() => {
@@ -445,6 +523,8 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       const cupidId = selectedProfileTarget.cupidId;
       const cupid = cupidById.get(cupidId);
       const ownedCupidates = cupidates.filter((item) => item.ownerCupidId === cupidId);
+      const representativeCupidate = representativeCupidateByOwnerId.get(cupidId) ?? null;
+      const activeCupidate = representativeCupidate?.isActive ? representativeCupidate : null;
       const ownedCupidateIds = new Set(ownedCupidates.map((item) => item.cupidateId));
       const relatedRequests = requests.filter(
         (request) => ownedCupidateIds.has(request.sourceCupidateId) || ownedCupidateIds.has(request.targetCupidateId)
@@ -455,6 +535,12 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
         cupidId,
         nickname: cupid?.nickname ?? cupidId,
         relationship: mapRelationship(cupid?.status),
+        datingProfile: {
+          status: activeCupidate ? "active" : representativeCupidate ? "inactive" : "none",
+          cupidateId: activeCupidate?.cupidateId ?? null,
+          displayName: activeCupidate?.displayName ?? representativeCupidate?.displayName ?? null,
+          visibility: activeCupidate?.profileVisibility ?? representativeCupidate?.profileVisibility ?? null
+        },
         stats: {
           cupidateCount: ownedCupidates.length,
           activeCupidateCount: ownedCupidates.filter((item) => item.isActive).length,
@@ -509,7 +595,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
         completedMatches: relatedRequests.filter((request) => request.status === "completed").length
       }
     };
-  }, [cupidById, cupidates, myCupidId, requests, requestsByCupidateId, selectedProfileTarget]);
+  }, [cupidById, cupidates, myCupidId, representativeCupidateByOwnerId, requests, requestsByCupidateId, selectedProfileTarget]);
 
   const notifications = useMemo<HomeNotification[]>(
     () =>
@@ -937,6 +1023,8 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     recommendations,
     requestByPair,
     myCupidates,
+    myPrimaryCupidate,
+    networkCupidates,
     activeMyCupidates,
     inactiveMyCupidates,
     notifications,

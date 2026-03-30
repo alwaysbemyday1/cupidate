@@ -25,17 +25,16 @@ describe("App", () => {
     });
   });
 
-  it("shows validation message when required fields are missing", async () => {
+  it("shows derived cupidate flow instead of manual cupidate registration", async () => {
     render(<App />);
 
     fireEvent.press(screen.getByTestId("tab-network"));
     fireEvent.press(screen.getByTestId("network-segment-cupidates"));
-    fireEvent.press(screen.getByTestId("network-subsegment-cupidates-register"));
-    fireEvent.press(screen.getByText("Save Cupidate"));
 
     await waitFor(() => {
-      expect(screen.getByText("Name is required.")).toBeTruthy();
-      expect(screen.getByText("Gender is required.")).toBeTruthy();
+      expect(screen.getByText("My Dating Profile")).toBeTruthy();
+      expect(screen.getByText("Active Cupidates in Network")).toBeTruthy();
+      expect(screen.queryByTestId("network-subsegment-cupidates-register")).toBeNull();
     });
   });
 });
