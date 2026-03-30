@@ -393,34 +393,6 @@ export const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: s.xs
   },
-  networkHeroRow: {
-    gap: s.sm
-  },
-  networkHeroRowWide: {
-    flexDirection: "row",
-    alignItems: "flex-start"
-  },
-  networkBoardCard: {
-    flex: 1
-  },
-  networkBoardContent: {
-    backgroundColor: c.surface,
-    padding: s.sm,
-    gap: s.sm
-  },
-  networkBoardHeader: {
-    gap: s.xxs
-  },
-  networkBoardCaption: {
-    color: c.inkMuted
-  },
-  networkBoardCanvas: {
-    borderWidth: b.normal,
-    borderColor: c.border,
-    backgroundColor: c.surfaceRaised,
-    padding: s.sm,
-    gap: s.sm
-  },
   networkMasterBlock: {
     alignItems: "center",
     gap: s.xs
