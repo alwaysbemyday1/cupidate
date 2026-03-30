@@ -1,6 +1,6 @@
 ﻿# Cupidate Design System
 
-Last Updated: 2026-03-29
+Last Updated: 2026-03-30
 
 ## 1. Source of Truth
 - Top-level rulebook: `docs/agent/codexrules.md`
@@ -86,9 +86,9 @@ This rule applies to:
   - four evenly distributed items
 - Tabs:
   - `HOME`
-  - `MATCH`
   - `NETWORK`
-  - `MY INFO`
+  - `MATCH`
+  - `MY`
 - Active tab treatment:
   - colored top strip
   - stronger card face
@@ -220,28 +220,21 @@ Rules:
 ### Network
 Required structure:
 1. primary segment row
-   - `Board`
-   - `My Cupidates`
-   - `Connected Cupids`
-2. `Board` segment
-   - `MASTER CUPID`
-   - relationship board
-   - stat card
-   - legend card
-3. `My Cupidates` segment
-   - dedicated subview toggle:
-     - `Cupidate List`
-     - `Register Cupidate`
-4. `Connected Cupids` segment
+   - `Cupids`
+   - `Cupidates`
+2. `Cupids` segment
    - dedicated subview toggle:
      - `Cupid List`
-     - `Register Cupid`
+     - `Add Cupid`
+3. `Cupidates` segment
+   - `My Dating Profile`
+   - `Active Cupidates in Network`
 
 Redundancy cleanup rule:
-- Board summary information lives only in the board segment.
-- Cupidate registration content lives only in the cupidate register subview.
-- Cupid connection search/request content lives only in the cupid register subview.
-- Do not repeat the same stats or helper copy across all segments.
+- Do not surface a separate board-only segment.
+- Do not surface a separate cupidate-registration flow for remote people.
+- Cupid connection search/request content lives only in the cupid add subview.
+- Do not repeat the same helper copy across all segments.
 
 ### Matching
 Required order:
@@ -291,7 +284,8 @@ Rules:
 - Are there any soft RN shadows left in the core UI?
 - Are page titles using the correct contrast style?
 - Are there duplicate headings or duplicate data blocks inside the same screen?
-- Do the separate `Register Cupidate` and `Register Cupid` subviews feel clearly distinct?
+- Is it obvious that Network adds `cupids`, while `cupidates` appear automatically from active connected profiles?
+- Does the cupid list clearly separate connection state from dating-profile state?
 - Does the UI still match the prototype impression without trying to clone screenshots 1:1?
 
 ## 12. Current Rebuild Status

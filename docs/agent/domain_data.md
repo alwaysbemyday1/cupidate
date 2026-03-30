@@ -10,6 +10,7 @@ Roles:
 
 Core constraints:
 - 모든 유저는 `cupid` 역할을 가진다.
+- 모든 `cupid`는 자신의 `cupidate` self-profile을 최대 1개까지 가진다.
 - 모든 `cupid`가 `active cupidate`인 것은 아니다.
 - `inactive cupidate`는 네트워크에는 보일 수 있지만 매칭 후보 계산에는 포함되지 않는다.
 - 직접적인 cupidate-to-cupidate 검색은 기본 플로우가 아님
@@ -18,7 +19,9 @@ Core constraints:
 
 ## 2) Profile Input Schema
 Profile ownership:
-- `cupid`는 여러 cupidate 프로필을 관리할 수 있다.
+- `cupid`는 기본 사용자 역할이다.
+- `cupidate`는 같은 사용자가 선택적으로 활성화하는 self-profile이다.
+- 한 `cupid`는 자기 자신의 `cupidate` 프로필을 최대 1개까지 가진다.
 - 각 cupidate는 `isActive` 상태를 가진다.
 - 각 cupidate는 소개팅 프로필 공개범위 `profileVisibility` 를 가진다:
   - `private`: 본인(owner)만 상세 열람 가능
@@ -216,14 +219,21 @@ Matching:
 
 ## 10) Activation Rule
 - database default: new cupidates start as `inactive`
-- frontend default: registration creates an inactive cupidate first
+- frontend default: self-profile creation/upsert creates an inactive cupidate first
 - activation happens from the cupidate profile management view
 - Supabase trigger must reject match candidate creation if either cupidate is inactive
+- Network flow never adds cupidates directly for other people:
+  - user adds a `cupid`
+  - if that connected cupid has an active cupidate profile, it appears in Network -> Cupidates automatically
 
 ## 11) Current App Surface Mapping
-- Network register view:
-  - structured profile input: region / job title / height / smoking / drinking / profile visibility
-  - structured preference input: age range / preferred regions / preferred job groups / preferred smoking / preferred drinking / preferred genders / preferred height / must-have conditions
+- Network cupid view:
+  - discover and add `cupid` connections only
+  - inbound pending requests can be accepted/declined from the cupid list
+  - cupid row surfaces connection state + dating-profile state together
+- Network cupidate view:
+  - `My Dating Profile` shows the current user's single self-profile
+  - `Active Cupidates in Network` is derived automatically from connected cupids whose self-profile is active
   - roster rows surface: activation state / visibility / must-have count
 - Matching view:
   - recommendation subtitles use structured public profile info (`region`, `jobTitle`)

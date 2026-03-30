@@ -60,10 +60,13 @@ Completed Work
 - [x] Must-have preference weighting and cap-of-five flow (Task 2026-03-30-04)
 - [x] Cupidate profile visibility gating (`private/basic/public`) (Task 2026-03-30-05)
 - [x] Visibility surface clarification across Network/My/Profile (Task 2026-03-30-06)
+- [x] Network IA simplification to cupid-first flow (Task 2026-03-30-07)
+- [x] Cupid profile linkage + inbound connection inbox handling (Task 2026-03-30-08)
+- [x] Single self-profile enforcement in repository/Supabase seed/schema (Task 2026-03-30-09)
 
 Next Tasks (Rebuild Track)
  - Task 2026-03-30-03: Device QA pass on Home readiness -> Network -> activation -> Matching flow
- - Task 2026-03-29-09: Network action hardening (block/unblock, incoming connection handling)
+ - Task 2026-03-29-09: Network action hardening (block/unblock follow-up)
  - Task 2026-03-29-10: Matching action hardening + completed-state persistence QA
  - Task 2026-03-29-08B: My preference persistence expansion
 

@@ -1,54 +1,39 @@
-﻿# Network View Spec (Prototype Rebuild)
+# Network View Spec (Cupid-First QA Pass)
 
 Last Updated: 2026-03-30
 
 ## 1. Screen Purpose
-- Manage the relationship graph between my cupidates and connected cupids.
-- Keep the overview board separate from registration/detail management.
+- Manage my cupid network first, then surface cupidates that become available through that network.
 - Allow entry into profile detail for both cupid and cupidate entities.
-- Make it clear where the user should go for:
-  - board overview
-  - cupidate list
-  - cupidate registration
-  - connected cupid list
-  - connected cupid registration/search
+- Make it obvious that:
+  - every user is a cupid
+  - not every cupid is an active cupidate
+  - connected cupids with active cupidate profiles appear automatically in the cupidate list
+  - cupidates are not added manually for other people
 
 ## 2. High-Level Layout
 1. app header
 - title: `Cupidate: Network`
 
 2. primary segment row
-- `Board`
-- `My Cupidates`
-- `My Cupids`
+- `Cupids`
+- `Cupidates`
 
 3. segment content
-- `Board` segment:
-  - `MASTER CUPID`
-  - relationship board
-  - match proposal stats
-  - legend
-- `My Cupidates` segment:
-  - sub-toggle: `Cupidate List` / `Register Cupidate`
-- `Connected Cupids` segment:
-  - sub-toggle: `Cupid List` / `Register Cupid`
+- `Cupids` segment:
+  - explanation card for cupid-first flow
+  - sub-toggle: `Cupid List` / `Add Cupid`
+- `Cupidates` segment:
+  - explanation card for automatic cupidate surfacing
+  - `My Dating Profile`
+  - `Active Cupidates in Network`
 
 4. bottom dock tab bar
 - Network tab active
 
-## 3. Board Segment Rules
-- This is the summary/overview mode.
-- It should answer, at a glance:
-  - how many proposals exist
-  - how many cupids are connected
-  - how many introductions succeeded
-  - how many matches are active
-- The board is the only place that should show the large relationship graph.
-- Do not repeat the same stats again inside the list/register segments.
-
-## 4. My Cupidates Segment
-### 4.1 Cupidate List Subview
-- shows registered cupidates owned by the current cupid
+## 3. Cupidates Segment Rules
+### 3.1 My Dating Profile
+- shows the current cupid's single self cupidate profile when it exists
 - each row should include:
   - display name
   - age/gender/region summary
@@ -56,7 +41,6 @@ Last Updated: 2026-03-30
   - activation badge (`Active` / `Inactive`)
   - profile visibility label (`Private` / `Basic` / `Public`)
   - must-have condition count
-  - current match status badge
 - row press opens `Cupidate Profile View`
 - if the owner opens the profile, they can:
   - activate/deactivate the cupidate
@@ -64,49 +48,34 @@ Last Updated: 2026-03-30
   - edit core public profile fields
   - edit core matching preference fields
 
-### 4.2 Register Cupidate Subview
-- dedicated registration view for cupidate creation
-- must collect the profile fields needed for the current POC:
-  - name
-  - birth year
-  - height
-  - gender
-  - region
-  - job title
-  - hobbies
-  - bio / matching notes
-  - smoking habit
-  - drinking habit
-- must collect the preference fields needed for scoring:
-  - preferred age min/max
-  - preferred regions
-  - preferred job groups
-  - preferred gender
-  - preferred height min/max
-  - preferred smoking
-  - preferred drinking
-  - must-have conditions (up to 5)
-- must collect cupidate profile access settings:
-  - profile visibility (`private` / `basic` / `public`)
-- structured fields should be saved into top-level columns first, not only nested json
-- flexible tags like hobbies remain json-backed
-- save CTA must still allow submission-driven validation feedback
-- save CTA should be disabled only while the mutation is actively running
-- newly created cupidates should default to `inactive`
-- user should be guided to open the profile detail and activate when ready
+### 3.2 Active Cupidates in Network
+- shows only cupidates that belong to connected cupids and are currently active
+- inactive or non-existent cupidate profiles do not appear here
+- each row should include:
+  - display name
+  - owner cupid nickname
+  - age/gender/region summary
+  - visibility label
+- row press opens `Cupidate Profile View`
+- visibility rules still apply inside the profile view
 
-## 5. Connected Cupids Segment
-### 5.1 Cupid List Subview
+## 4. Cupids Segment
+### 4.1 Cupid List Subview
 - shows currently connected or pending cupids
 - each row should include:
   - nickname
   - cupid id
-  - region or fallback meta
   - connection status badge
+  - direction label for inbound/outbound pending requests
+  - dating profile status badge (`Active` / `Inactive` / `No Dating Profile`)
 - row press opens `Cupid Profile View`
-- cupid profile should show accumulated introduction / completion stats
+- inbound pending requests must expose in-row `Accept` / `Decline` actions
+- cupid profile should show:
+  - matchmaking stats
+  - current dating profile status
+  - direct entry into linked cupidate profile when active
 
-### 5.2 Register Cupid Subview
+### 4.2 Add Cupid Subview
 - dedicated registration/search view for finding another cupid by nickname
 - should contain:
   - search input
@@ -115,32 +84,32 @@ Last Updated: 2026-03-30
   - send connection request action
 - empty/loading/error states must stay inside this subview only
 
-## 6. Redundancy Cleanup Rules
+## 5. Redundancy Cleanup Rules
 - Remove dead controls that do not change real behavior.
-- Do not show cupidate registration form inside the board view.
-- Do not show cupid connection search inside the cupid list view.
+- Do not surface a separate `Board` view.
+- Do not surface a separate `Register Cupidate` flow for other people.
+- Do not show cupid connection search inside the cupid list subview.
 - Avoid duplicate titles where the selected sub-tab already defines the mode.
 - Keep one clear purpose per subview.
 - Roster rows should explain both:
-  - activation state
-  - request/match state
+  - connection state
+  - dating profile state
 
-## 7. Design Rules
+## 6. Design Rules
 - Use the current `design_system.md` palette and dock navigation rules.
-- Board nodes, roster rows, and forms must all use `PixelBox` language.
+- Roster rows, explanation cards, and forms must all use `PixelBox` language.
 - Text on dark shell background uses light text.
 - Text on beige surfaces uses dark text.
 - Status should be readable by color + label together.
 
-## 8. Data Contract
+## 7. Data Contract
 Queries:
-- `network_my_cupidates`
 - `network_connected_cupids`
 - `network_connection_requests`
+- `network_active_cupidates`
 - `profile_detail_summary`
 
 Mutations:
-- `create_cupidate`
 - `update_cupidate`
 - `request_cupid_connection`
 - `update_connection_status`
@@ -151,32 +120,32 @@ Structured persistence contract:
 - `preferredSmoking`, `preferredDrinking`, `preferredGenders`, `preferredHeightRange`
 - `mustHaveConditionKeys`
 - repository hydrates those back into `preferences` for backward-safe reads
+- repository create path for cupidate is an owner-based upsert, not multi-profile creation
 
-## 9. States
+## 8. States
 - Loading:
-  - board sync card
   - search loading card
 - Empty:
-  - no board nodes
-  - no cupidates
+  - no self cupidate yet
+  - no active cupidates in network
   - no connected cupids
   - no search results
 - Error:
   - retry CTA inside Network only
 
-## 10. i18n
+## 9. i18n
 When locale changes, these must switch together:
 - segment labels
 - subview labels
-- board labels and legend
 - form fields and validation messages
 - search and action labels
 - empty/loading/error copy
 
-## 11. Definition of Done
-- The board feels like an overview screen, not a data-entry page.
-- Cupidate registration is a clearly dedicated subview.
+## 10. Definition of Done
+- It is obvious that `Cupid` is the base relationship object in Network.
+- It is obvious that `Cupidate` is an optional active dating profile, not a second user type to add manually.
+- Connected cupids with active cupidates appear automatically in the cupidate list.
 - Cupid registration/search is a clearly dedicated subview.
 - Redundant blocks are removed.
 - English and Korean both remain readable in the same layout.
-- Users can tell at a glance which cupidates are active, how visible they are, and how many non-negotiable conditions they currently use.
+- Users can tell at a glance which connected cupids are ready for matching and which cupidates are actually available in the network.

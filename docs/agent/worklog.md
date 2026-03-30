@@ -1,5 +1,72 @@
 # Agent Worklog
 
+## 2026-03-30
+
+### Task 2026-03-30-07 - Network IA Simplification to Cupid-First Flow
+Status: Completed
+
+Changes:
+- Removed the `Board` segment from Network and collapsed the screen into two clear domains:
+  - `Cupids`
+  - `Cupidates`
+- Removed direct remote-cupidate registration flow from Network.
+- Reframed the Network mental model around the rule:
+  - every user is a `cupid`
+  - only some users activate a `cupidate` self-profile
+- Rebuilt Network state derivation so:
+  - `My Dating Profile` comes from the current cupid's single self-profile
+  - `Active Cupidates in Network` is derived automatically from connected cupids
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand` passed.
+
+Notes:
+- This was the biggest UX correction in the Network QA pass because it removed the false impression that users manually add both cupids and cupidates as separate people.
+
+### Task 2026-03-30-08 - Cupid Profile Linkage + Connection Inbox Handling
+Status: Completed
+
+Changes:
+- Extended cupid rows so pending inbound requests can be accepted/declined directly from Network.
+- Added cupid profile linkage to active cupidate profiles:
+  - cupid profile now shows dating-profile status
+  - active cupidate can be opened directly from the cupid profile overlay
+- Updated tests for:
+  - inbound request handling
+  - linked cupidate entry from cupid profile
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand` passed.
+
+Notes:
+- This tightened the real user flow: review cupid -> inspect dating-profile readiness -> jump to cupidate profile if available.
+
+### Task 2026-03-30-09 - Single Self-Profile Enforcement
+Status: Completed
+
+Changes:
+- Updated repository create behavior so cupidate creation is treated as a self-profile upsert per owner.
+- Added migration:
+  - `supabase/migrations/20260330160000_cupidate_single_profile_per_cupid.sql`
+- Migration behavior:
+  - canonicalizes duplicate cupidates per owner
+  - preserves the best surviving preference row
+  - remaps valid match candidates
+  - adds a unique constraint on `cupidates.owner_cupid_id`
+- Rewrote `supabase/seed.sql` to the cupid-first model and applied it to the live dev project.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand` passed (`16` suites / `45` tests).
+- Supabase verification confirmed:
+  - no owners with duplicate cupidates
+  - `Dohun`, `Jin`, `Yuna`, `Hana` in the expected final state
+
+Notes:
+- This closed the data-model bug that was making the Network surface feel inconsistent even after UI cleanup.
+
 ## 2026-03-29
 
 ### Task 2026-03-29-16 - Hybrid Cupidate Schema Rollout
