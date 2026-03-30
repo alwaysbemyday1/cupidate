@@ -205,7 +205,7 @@ describe("Profile overlay flow", () => {
     });
   });
 
-  it("opens cupid profile from network and shows matchmaking stats", async () => {
+  it("opens cupid profile from network and links to the active cupidate profile", async () => {
     render(<App />);
 
     fireEvent.press(screen.getByTestId("tab-network"));
@@ -222,6 +222,14 @@ describe("Profile overlay flow", () => {
       expect(screen.getByTestId("profile-sheet-title")).toHaveTextContent("Cupid Profile");
       expect(screen.getByText("Shows how this cupid has guided matches and relationship handoffs across the network.")).toBeTruthy();
       expect(screen.getByText("Romance Conversions")).toBeTruthy();
+      expect(screen.getByText("This cupid is currently open for introductions as Joon.")).toBeTruthy();
+      expect(screen.getByTestId("profile-open-linked-cupidate")).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByTestId("profile-open-linked-cupidate"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("profile-sheet-title")).toHaveTextContent("Cupidate Profile");
     });
   });
 

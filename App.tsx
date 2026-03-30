@@ -209,6 +209,7 @@ function CupidateAppShell() {
         <ProfileView
           profile={state.selectedProfile}
           onClose={state.onCloseProfile}
+          onOpenCupidateProfile={state.onOpenCupidateProfile}
           onSaveCupidateProfile={state.onSaveCupidateProfile}
           isSavingCupidateProfile={state.isMutatingNetwork}
         />

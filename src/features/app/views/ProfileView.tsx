@@ -22,6 +22,7 @@ import { designTokens } from "../theme/tokens";
 type ProfileViewProps = {
   profile: SelectedProfileSummary;
   onClose: () => void;
+  onOpenCupidateProfile?: (cupidateId: string) => void;
   onSaveCupidateProfile?: (draft: CupidateProfileDraft) => void | Promise<void>;
   isSavingCupidateProfile?: boolean;
 };
@@ -172,6 +173,10 @@ function visibilityText(
   return t(`network.option.visibility.${visibility}`);
 }
 
+function cupidDatingStatusKey(status: CupidProfileSummary["datingProfile"]["status"]) {
+  return `profile.cupid.dating.${status}`;
+}
+
 function renderMetaLine(label: string, value: string) {
   return (
     <View style={styles.profileSheetMetaRow}>
@@ -277,10 +282,12 @@ function buildEditState(profile: CupidateProfileSummary): CupidateEditState {
 
 function CupidProfilePanel({
   profile,
-  t
+  t,
+  onOpenCupidateProfile
 }: {
   profile: CupidProfileSummary;
   t: ReturnType<typeof useI18n>["t"];
+  onOpenCupidateProfile?: (cupidateId: string) => void;
 }) {
   return (
     <>
@@ -305,6 +312,30 @@ function CupidProfilePanel({
             </View>
           </View>
         </View>
+      </PixelBox>
+
+      <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
+        <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+          {t("profile.sections.datingProfile")}
+        </PixelText>
+        <PixelText variant="body" style={styles.textBody}>
+          {t(cupidDatingStatusKey(profile.datingProfile.status), {
+            value: profile.datingProfile.displayName ?? profile.nickname
+          })}
+        </PixelText>
+        {profile.datingProfile.visibility ? (
+          renderMetaLine(t("profile.meta.visibility"), visibilityText(profile.datingProfile.visibility, t))
+        ) : null}
+        {profile.datingProfile.status === "active" && profile.datingProfile.cupidateId && onOpenCupidateProfile ? (
+          <View style={styles.buttonRow}>
+            <PixelButton
+              label={t("profile.actions.openCupidate")}
+              variant="primary"
+              testID="profile-open-linked-cupidate"
+              onPress={() => onOpenCupidateProfile(profile.datingProfile.cupidateId!)}
+            />
+          </View>
+        ) : null}
       </PixelBox>
 
       <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
@@ -1032,6 +1063,7 @@ function CupidateProfilePanel({
 export function ProfileView({
   profile,
   onClose,
+  onOpenCupidateProfile,
   onSaveCupidateProfile,
   isSavingCupidateProfile
 }: ProfileViewProps) {
@@ -1060,7 +1092,7 @@ export function ProfileView({
 
           <ScrollView style={styles.profileSheetScroll} contentContainerStyle={styles.profileSheetScrollContent}>
             {profile.kind === "cupid" ? (
-              <CupidProfilePanel profile={profile} t={t} />
+              <CupidProfilePanel profile={profile} t={t} onOpenCupidateProfile={onOpenCupidateProfile} />
             ) : (
               <CupidateProfilePanel
                 profile={profile}
