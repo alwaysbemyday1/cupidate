@@ -212,9 +212,9 @@ function renderStatPill(label: string, value: string | number) {
   );
 }
 
-function renderFactChip(label: string, value: string) {
+function renderFactChip(label: string, value: string, key?: string) {
   return (
-    <View style={styles.profileFactChip}>
+    <View key={key} style={styles.profileFactChip}>
       <PixelText variant="caption" style={styles.profileFactLabel}>
         {label}
       </PixelText>
@@ -740,10 +740,10 @@ function CupidateProfilePanel({
 
             <View style={styles.profileFactGrid}>
               {basicFacts.map((item, index) => (
-                <View key={`${item.label}-${index}`}>{renderFactChip(item.label, item.value)}</View>
+                renderFactChip(item.label, item.value, `${item.label}-${index}`)
               ))}
               {canViewFullDetails ? (
-                <View key="lifestyle-fact">{renderFactChip(t("profile.meta.lifestyle"), lifestyleLabel)}</View>
+                renderFactChip(t("profile.meta.lifestyle"), lifestyleLabel, "lifestyle-fact")
               ) : null}
             </View>
 
@@ -772,7 +772,7 @@ function CupidateProfilePanel({
                 item.label !== t("profile.meta.mustHave")
               )
               .map((item, index) => (
-                <View key={`${item.label}-${index}`}>{renderFactChip(item.label, item.value)}</View>
+                renderFactChip(item.label, item.value, `${item.label}-${index}`)
               ))}
           </View>
 

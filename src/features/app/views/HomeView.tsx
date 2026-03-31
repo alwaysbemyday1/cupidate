@@ -166,11 +166,11 @@ export function HomeView({
                 <PixelBox style={styles.recommendationCard} contentStyle={styles.recommendationCardContent}>
                   <View style={styles.recommendationHeader}>
                     <View style={styles.recommendationMiniCard}>
-                      <PixelText variant="body" style={styles.recommendationMiniName}>
+                      <PixelText variant="body" style={styles.recommendationMiniName} numberOfLines={2}>
                         {source?.displayName ?? item.sourceCupidateId}
                       </PixelText>
                       {buildRecommendationMeta(source) ? (
-                        <PixelText variant="caption" style={styles.listMeta}>
+                        <PixelText variant="caption" style={styles.listMeta} numberOfLines={2}>
                           {buildRecommendationMeta(source)}
                         </PixelText>
                       ) : null}
@@ -179,11 +179,11 @@ export function HomeView({
                       {"<3"}
                     </PixelText>
                     <View style={styles.recommendationMiniCard}>
-                      <PixelText variant="body" style={styles.recommendationMiniName}>
+                      <PixelText variant="body" style={styles.recommendationMiniName} numberOfLines={2}>
                         {target?.displayName ?? item.targetCupidateId}
                       </PixelText>
                       {buildRecommendationMeta(target) ? (
-                        <PixelText variant="caption" style={styles.listMeta}>
+                        <PixelText variant="caption" style={styles.listMeta} numberOfLines={2}>
                           {buildRecommendationMeta(target)}
                         </PixelText>
                       ) : null}

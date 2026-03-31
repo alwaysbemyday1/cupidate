@@ -328,7 +328,11 @@ export function MatchingView({
 
   function renderMiniProfile(cupidateId: string, name: string, subtitle?: string) {
     return (
-      <Pressable onPress={() => onOpenCupidateProfile(cupidateId)} testID={`profile-open-cupidate-${cupidateId}`}>
+      <Pressable
+        onPress={() => onOpenCupidateProfile(cupidateId)}
+        style={styles.matchingMiniProfilePressable}
+        testID={`profile-open-cupidate-${cupidateId}`}
+      >
         <View style={styles.matchingMiniProfile}>
           <View style={styles.matchingMiniAvatar}>
             <PixelText variant="body" style={styles.networkAvatarText}>

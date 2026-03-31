@@ -50,7 +50,9 @@ export function PixelText({
 const localStyles = StyleSheet.create({
   base: {
     color: designTokens.color.ink,
-    fontFamily: designTokens.font.family
+    fontFamily: designTokens.font.family,
+    flexShrink: 1,
+    includeFontPadding: false
   },
   screenTitle: {
     fontSize: designTokens.font.title,

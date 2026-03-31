@@ -172,6 +172,7 @@ export const styles = StyleSheet.create({
   },
   feedBody: {
     flex: 1,
+    minWidth: 0,
     gap: s.xxs
   },
   recommendationRow: {
@@ -180,7 +181,10 @@ export const styles = StyleSheet.create({
     gap: s.xs
   },
   recommendationPressable: {
-    width: "48%"
+    flexGrow: 1,
+    flexBasis: 248,
+    maxWidth: "100%",
+    minWidth: 0
   },
   recommendationCard: {},
   recommendationCardContent: {
@@ -192,12 +196,13 @@ export const styles = StyleSheet.create({
   },
   recommendationHeader: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "stretch",
     justifyContent: "space-between",
     gap: s.xs
   },
   recommendationMiniCard: {
     flex: 1,
+    minWidth: 0,
     borderWidth: b.normal,
     borderColor: c.border,
     backgroundColor: c.surfaceAlt,
@@ -206,7 +211,8 @@ export const styles = StyleSheet.create({
     gap: 2
   },
   recommendationMiniName: {
-    color: c.ink
+    color: c.ink,
+    flexShrink: 1
   },
   recommendationHeart: {
     color: c.pink
@@ -228,7 +234,10 @@ export const styles = StyleSheet.create({
     gap: s.xs
   },
   metricPill: {
-    width: "48%",
+    flexGrow: 1,
+    flexBasis: 140,
+    maxWidth: "100%",
+    minWidth: 0,
     borderWidth: b.normal,
     borderColor: c.border,
     backgroundColor: c.surfaceAlt,
@@ -236,10 +245,12 @@ export const styles = StyleSheet.create({
     gap: 2
   },
   metricValue: {
-    color: c.ink
+    color: c.ink,
+    flexShrink: 1
   },
   metricLabel: {
-    color: c.inkMuted
+    color: c.inkMuted,
+    flexShrink: 1
   },
 
   summaryGrid: {
@@ -248,7 +259,10 @@ export const styles = StyleSheet.create({
     gap: s.xs
   },
   summaryCard: {
-    width: "48%"
+    flexGrow: 1,
+    flexBasis: 140,
+    maxWidth: "100%",
+    minWidth: 0
   },
   summaryCardContent: {
     minHeight: 86,
@@ -257,10 +271,12 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between"
   },
   summaryLabel: {
-    color: c.inkMuted
+    color: c.inkMuted,
+    flexShrink: 1
   },
   summaryValue: {
-    color: c.ink
+    color: c.ink,
+    flexShrink: 1
   },
 
   stateCard: {},
@@ -324,7 +340,10 @@ export const styles = StyleSheet.create({
     fontFamily: f.family
   },
   halfInput: {
-    width: "48%"
+    flexGrow: 1,
+    flexBasis: 140,
+    maxWidth: "100%",
+    minWidth: 136
   },
   multilineInput: {
     minHeight: 92,
@@ -348,10 +367,12 @@ export const styles = StyleSheet.create({
     gap: s.xxs
   },
   listName: {
-    color: c.ink
+    color: c.ink,
+    flexShrink: 1
   },
   listMeta: {
-    color: c.inkMuted
+    color: c.inkMuted,
+    flexShrink: 1
   },
   profileRow: {
     flexDirection: "row",
@@ -372,6 +393,7 @@ export const styles = StyleSheet.create({
   },
   profileInfo: {
     flex: 1,
+    minWidth: 0,
     gap: s.xxs
   },
   profileDivider: {
@@ -407,6 +429,7 @@ export const styles = StyleSheet.create({
   },
   networkMasterInfo: {
     flex: 1,
+    minWidth: 0,
     gap: 2
   },
   networkMasterName: {
@@ -430,12 +453,16 @@ export const styles = StyleSheet.create({
     gap: s.xs
   },
   networkFeaturedNode: {
-    width: "48%"
+    flexGrow: 1,
+    flexBasis: 156,
+    maxWidth: "100%",
+    minWidth: 0
   },
   networkNodeContent: {
     backgroundColor: c.surface,
     minHeight: 116,
     padding: s.xs,
+    minWidth: 0,
     gap: s.xs
   },
   networkNodeHeader: {
@@ -473,10 +500,12 @@ export const styles = StyleSheet.create({
     color: c.ink
   },
   networkNodeName: {
-    color: c.ink
+    color: c.ink,
+    flexShrink: 1
   },
   networkNodeMeta: {
-    color: c.inkMuted
+    color: c.inkMuted,
+    flexShrink: 1
   },
   networkNodeBadge: {
     minWidth: 38,
@@ -514,6 +543,7 @@ export const styles = StyleSheet.create({
     minHeight: 78,
     padding: s.xs,
     gap: s.xs,
+    minWidth: 0,
     alignItems: "center"
   },
   networkSideStack: {
@@ -574,10 +604,12 @@ export const styles = StyleSheet.create({
   },
   networkRosterMain: {
     flex: 1,
+    minWidth: 0,
     gap: 2
   },
   networkRosterMeta: {
-    color: c.inkMuted
+    color: c.inkMuted,
+    flexShrink: 1
   },
   networkStatusChip: {
     borderWidth: b.normal,
@@ -680,11 +712,16 @@ export const styles = StyleSheet.create({
   },
   matchingCardTopRow: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "stretch",
     gap: s.xs
+  },
+  matchingMiniProfilePressable: {
+    flex: 1,
+    minWidth: 0
   },
   matchingMiniProfile: {
     flex: 1,
+    minWidth: 0,
     borderWidth: b.normal,
     borderColor: c.border,
     backgroundColor: c.surface,
@@ -704,13 +741,16 @@ export const styles = StyleSheet.create({
   },
   matchingMiniInfo: {
     flex: 1,
+    minWidth: 0,
     gap: 2
   },
   matchingMiniName: {
-    color: c.ink
+    color: c.ink,
+    flexShrink: 1
   },
   matchingMiniMeta: {
-    color: c.inkMuted
+    color: c.inkMuted,
+    flexShrink: 1
   },
   matchingCardMetaBlock: {
     gap: s.xxs
@@ -768,6 +808,7 @@ export const styles = StyleSheet.create({
   matchingSuggestionProfiles: {
     flexDirection: "row",
     alignItems: "center",
+    minWidth: 0,
     gap: s.xs
   },
   matchingSuggestionFooter: {
@@ -1061,7 +1102,7 @@ export const styles = StyleSheet.create({
   },
   profileSheetHeaderRow: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: s.sm
   },
   profileSheetAvatar: {
@@ -1075,6 +1116,7 @@ export const styles = StyleSheet.create({
   },
   profileSheetHeaderInfo: {
     flex: 1,
+    minWidth: 0,
     gap: s.xxs
   },
   profileSheetStatusChip: {
@@ -1095,7 +1137,8 @@ export const styles = StyleSheet.create({
     color: c.inkMuted
   },
   profileSheetMetaValue: {
-    color: c.ink
+    color: c.ink,
+    flexShrink: 1
   },
   profileCardNotice: {
     gap: s.xs
@@ -1109,7 +1152,10 @@ export const styles = StyleSheet.create({
     gap: s.xs
   },
   profileFactChip: {
-    width: "48%",
+    flexGrow: 1,
+    flexBasis: 140,
+    maxWidth: "100%",
+    minWidth: 0,
     borderWidth: b.normal,
     borderColor: c.border,
     backgroundColor: c.surfaceAlt,
@@ -1120,7 +1166,8 @@ export const styles = StyleSheet.create({
     color: c.inkMuted
   },
   profileFactValue: {
-    color: c.ink
+    color: c.ink,
+    flexShrink: 1
   },
   profileTagGroup: {
     gap: s.xxs
@@ -1141,7 +1188,10 @@ export const styles = StyleSheet.create({
     color: c.ink
   },
   profileSheetStatPill: {
-    width: "48%",
+    flexGrow: 1,
+    flexBasis: 140,
+    maxWidth: "100%",
+    minWidth: 0,
     borderWidth: b.normal,
     borderColor: c.border,
     backgroundColor: c.surfaceAlt,
@@ -1150,9 +1200,11 @@ export const styles = StyleSheet.create({
   },
 
   textBody: {
-    color: c.ink
+    color: c.ink,
+    flexShrink: 1
   },
   textCaption: {
-    color: c.inkMuted
+    color: c.inkMuted,
+    flexShrink: 1
   }
 });
