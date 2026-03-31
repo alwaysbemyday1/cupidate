@@ -1,5 +1,5 @@
 [Cupidate Progress Tracker]
-Last Updated: 2026-03-30
+Last Updated: 2026-04-01
 
 Current Track: Service Build (Post-POC)
 Current Phase: S3 Pixel UI Rebuild (POC QA Hardening)
@@ -68,6 +68,9 @@ Completed Work
 - [x] Home view QA hardening for concise cards and actionable readiness summary (Task 2026-03-31-03)
 - [x] My view QA hardening for clear account/settings/network separation (Task 2026-03-31-04)
 - [x] Network shell QA hardening for compact guides and FAB entry (Task 2026-04-01-01)
+- [x] Compact-screen layout hardening across Home/Matching/Profile (Task 2026-04-01-05)
+- [x] Docked Network FAB polish + cupid ID cleanup (Task 2026-04-01-06)
+- [x] Independent vertical scrolling per cupid profile page (Task 2026-04-01-07)
 
 Next Tasks (Rebuild Track)
  - Task 2026-03-30-03: Device QA pass on Home readiness -> Network -> activation -> Matching flow

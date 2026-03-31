@@ -108,6 +108,62 @@ Notes:
 
 ## 2026-04-01
 
+### Task 2026-04-01-05 - Compact-Screen Layout Hardening
+Status: Completed
+
+Changes:
+- Replaced brittle fixed `48%` card/input widths with responsive flex-basis sizing on shared surfaces.
+- Added compact-screen safety rules in live styles:
+  - more `minWidth: 0` on flex children
+  - text shrink support through `PixelText`
+  - safer matching mini-profile sizing
+- Fixed a profile fact-grid bug where percent-width chips were wrapped in plain views, causing ultra-narrow vertical columns on device.
+- Tightened recommendation and matching card text wrapping so names/meta do not collapse into per-character stacks on narrow phones.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand` passed.
+
+Notes:
+- This was the key device-QA stabilization pass for the broken rectangular alignment seen on smaller Android screens.
+
+### Task 2026-04-01-06 - Docked Network FAB + Cupid ID Cleanup
+Status: Completed
+
+Changes:
+- Repositioned the Network floating action button so it sits docked against the top-right edge of the bottom navigation instead of floating awkwardly above content.
+- Rebuilt the FAB into a stronger elevated round action with hard pixel shadow.
+- Removed visible cupid ID copy from:
+  - cupid rows in Network
+  - cupid discovery search results
+  - cupid profile header
+- Added a short dedicated FAB label while keeping the full action label for accessibility.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand` passed.
+
+Notes:
+- The goal here was to make the FAB feel like a real dock action and reduce profile/list noise that users do not need in the POC.
+
+### Task 2026-04-01-07 - Independent Cupid Pager Scrolling
+Status: Completed
+
+Changes:
+- Removed the single outer vertical scroll dependency for cupid profiles with an active linked cupidate.
+- Rebuilt the cupid profile sheet so each pager page owns its own vertical `ScrollView`:
+  - `Cupid Activity`
+  - `Cupidate Profile`
+- Kept direct cupidate sheets on the simpler single-scroll path.
+- Added component coverage to lock in the new scroll structure.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand` passed.
+
+Notes:
+- This fixes the empty trailing scroll space where the short activity page was inheriting the taller cupidate page height.
+
 ### Task 2026-04-01-01 - Network Shell QA Hardening
 Status: Completed
 

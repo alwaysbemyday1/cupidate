@@ -69,7 +69,6 @@ Last Updated: 2026-04-01
 - shows currently connected or pending cupids
 - each row should include:
   - nickname
-  - cupid id
   - connection status badge
   - direction label for inbound/outbound pending requests
   - dating profile status badge (`Active` / `Inactive` / `No Dating Profile`)
@@ -84,6 +83,7 @@ Last Updated: 2026-04-01
 ### 4.2 Add Cupid Composer
 - opened from a floating action button, not from a sub-tab
 - dedicated registration/search view for finding another cupid
+- floating action button should feel docked to the top-right edge of the bottom navigation, not like a loose content button
 - should contain:
   - a short guidance card that explains:
     - adding a cupid is enough
@@ -111,6 +111,8 @@ Last Updated: 2026-04-01
 - Text on dark shell background uses light text.
 - Text on beige surfaces uses dark text.
 - Status should be readable by color + label together.
+- On compact Android widths, avoid strict `%` width grids that can collapse text into vertical character stacks.
+- Prefer responsive `flexBasis + flexGrow + minWidth: 0` patterns for row cards and profile fact chips.
 
 ## 7. Data Contract
 Queries:

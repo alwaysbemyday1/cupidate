@@ -1,6 +1,6 @@
 ﻿# Cupidate Design System
 
-Last Updated: 2026-03-30
+Last Updated: 2026-04-01
 
 ## 1. Source of Truth
 - Top-level rulebook: `docs/agent/codexrules.md`
@@ -156,10 +156,20 @@ Use the live code palette below unless there is an explicit redesign task.
 - spacing: `4 / 8 / 12 / 16 / 20 / 24 / 32`
 - border: `1 / 2 / 3`
 - pixel shadow offset: `4`
-- header height: `56`
-- tab bar height: `76`
+- header height: `48`
+- tab bar height: `62`
 - button height: `42`
 - avatars: `32 / 48 / 96`
+
+### 7.1 Compact-Screen Guardrails
+- Do not rely on strict `width: "48%"` grids for critical cards or fact chips.
+- Prefer responsive layout rules:
+  - `flexBasis`
+  - `flexGrow`
+  - `maxWidth: "100%"`
+  - `minWidth: 0` on shrinking flex children
+- Any row with text + badges + avatar must explicitly protect the text column with `minWidth: 0`.
+- Avoid wrapping percentage-sized cards inside plain anonymous `View` nodes, because the percentage will then resolve against the wrapper instead of the row container and can produce broken ultra-thin columns.
 
 ## 8. Component Contracts
 ### 8.1 `PixelText`
@@ -200,12 +210,22 @@ Rules:
   - label
 - The whole bar should read as one navigation object, not a loose button pile.
 
-### 8.5 Section Titles
+### 8.5 Network FAB
+- The Network action button is a dock-adjacent FAB, not a normal inline button.
+- It should sit visually attached to the top-right of the bottom dock.
+- Use:
+  - hard pixel shadow
+  - stronger silhouette than surrounding cards
+  - round or rounded-square face
+  - short visible label, full accessibility label
+- The FAB should never float high enough to read like a random content card.
+
+### 8.6 Section Titles
 - `pageSectionTitle`: for section headings placed directly on dark shell background.
 - `surfaceSectionTitle`: for headings inside beige/light cards.
 - Never mix the two incorrectly.
 
-### 8.6 Profile Sheets
+### 8.7 Profile Sheets
 - `Cupidate Profile` should not split `public summary` and `basic profile` into two stacked cards when the profile is public.
 - Use one top card for:
   - avatar
@@ -220,6 +240,8 @@ Rules:
   - `Basics`
   - `About & Lifestyle`
   - `Dating Preferences`
+- If a `Cupid Profile` includes a horizontal pager between `Cupid Activity` and `Cupidate Profile`, each page must own its own vertical scroll.
+- Do not let one profile page inherit the height of the other page's content.
 
 ## 9. Screen Structure Rules
 ### Home
@@ -239,9 +261,8 @@ Required structure:
    - `Cupids`
    - `Cupidates`
 2. `Cupids` segment
-   - dedicated subview toggle:
-     - `Cupid List`
-     - `Add Cupid`
+   - cupid roster directly visible
+   - add-cupid composer opened from a docked FAB
 3. `Cupidates` segment
    - `My Dating Profile`
    - `Active Cupidates in Network`
