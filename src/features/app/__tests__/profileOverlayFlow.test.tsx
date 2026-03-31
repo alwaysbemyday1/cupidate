@@ -215,12 +215,14 @@ describe("Profile overlay flow", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("profile-open-cupid-local-cupid-a")).toBeTruthy();
+      expect(screen.getByTestId("network-add-cupid-fab")).toBeTruthy();
     });
 
     fireEvent.press(screen.getByTestId("profile-open-cupid-local-cupid-a"));
 
     await waitFor(() => {
       expect(screen.getByTestId("profile-sheet-title")).toHaveTextContent("Cupid Profile");
+      expect(screen.queryByTestId("network-add-cupid-fab")).toBeNull();
       expect(screen.getByTestId("profile-segment-activity")).toBeTruthy();
       expect(screen.getByTestId("profile-segment-cupidate")).toBeTruthy();
       expect(screen.getByText("Shows how this cupid has guided matches and relationship handoffs across the network.")).toBeTruthy();

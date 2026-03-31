@@ -155,6 +155,7 @@ function CupidateAppShell() {
                 isNetworkLoading={state.isNetworkLoading}
                 isSearchingCupids={state.isSearchingCupids}
                 isMutatingNetwork={state.isMutatingNetwork}
+                isProfileOverlayVisible={!!state.selectedProfile}
                 networkError={state.networkError}
                 onRetryNetworkError={state.onRetryNetwork}
               />

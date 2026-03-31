@@ -654,19 +654,18 @@ export const styles = StyleSheet.create({
   },
   networkFab: {
     position: "absolute",
-    right: s.md,
     zIndex: 24
   },
   networkFabShadow: {
     backgroundColor: c.shadow,
-    borderRadius: 36,
-    paddingRight: z.pixelShadow,
-    paddingBottom: z.pixelShadow
+    borderRadius: 30,
+    paddingRight: 2,
+    paddingBottom: 2
   },
   networkFabInner: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     borderWidth: b.normal,
     borderColor: c.border,
     backgroundColor: c.pink,
@@ -676,11 +675,13 @@ export const styles = StyleSheet.create({
   },
   networkFabPlus: {
     color: c.inkInverse,
-    lineHeight: 22
+    lineHeight: 18
   },
   networkFabLabel: {
     color: c.inkInverse,
-    textAlign: "center"
+    textAlign: "center",
+    fontSize: 11,
+    lineHeight: 12
   },
   networkComposerOverlay: {
     ...StyleSheet.absoluteFillObject,

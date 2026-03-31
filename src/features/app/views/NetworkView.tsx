@@ -40,6 +40,7 @@ type NetworkViewProps = {
   isNetworkLoading?: boolean;
   isSearchingCupids?: boolean;
   isMutatingNetwork?: boolean;
+  isProfileOverlayVisible?: boolean;
   networkError?: string | null;
   onRetryNetworkError?: () => void | Promise<void>;
 };
@@ -138,6 +139,7 @@ export function NetworkView({
   isNetworkLoading,
   isSearchingCupids,
   isMutatingNetwork,
+  isProfileOverlayVisible,
   networkError,
   onRetryNetworkError
 }: NetworkViewProps) {
@@ -155,6 +157,12 @@ export function NetworkView({
       setIsAddCupidComposerOpen(false);
     }
   }, [networkSegment]);
+
+  useEffect(() => {
+    if (isProfileOverlayVisible) {
+      setIsAddCupidComposerOpen(false);
+    }
+  }, [isProfileOverlayVisible]);
 
   const showSearchEmptyState =
     networkSegment === "cupids" &&
@@ -393,29 +401,32 @@ export function NetworkView({
         ) : null}
       </ScrollView>
 
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={t("network.actions.openAddCupid")}
-        testID="network-add-cupid-fab"
-        style={[
-          styles.networkFab,
-          {
-            bottom: Math.max(insets.bottom, designTokens.size.tabBarInset) + designTokens.spacing.sm
-          }
-        ]}
-        onPress={() => setIsAddCupidComposerOpen(true)}
-      >
-        <View style={styles.networkFabShadow}>
-          <View style={styles.networkFabInner}>
-            <PixelText variant="screenTitle" style={styles.networkFabPlus}>
-              +
-            </PixelText>
-            <PixelText variant="caption" style={styles.networkFabLabel}>
-              {t("network.actions.fabAdd")}
-            </PixelText>
+      {!isProfileOverlayVisible && !isAddCupidComposerOpen ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("network.actions.openAddCupid")}
+          testID="network-add-cupid-fab"
+          style={[
+            styles.networkFab,
+            {
+              right: designTokens.spacing.sm,
+              bottom: Math.max(insets.bottom, 2) + 6
+            }
+          ]}
+          onPress={() => setIsAddCupidComposerOpen(true)}
+        >
+          <View style={styles.networkFabShadow}>
+            <View style={styles.networkFabInner}>
+              <PixelText variant="screenTitle" style={styles.networkFabPlus}>
+                +
+              </PixelText>
+              <PixelText variant="caption" style={styles.networkFabLabel}>
+                {t("network.actions.fabAdd")}
+              </PixelText>
+            </View>
           </View>
-        </View>
-      </Pressable>
+        </Pressable>
+      ) : null}
 
       {isAddCupidComposerOpen ? (
         <View style={styles.networkComposerOverlay} testID="network-add-cupid-sheet">
