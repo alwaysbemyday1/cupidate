@@ -78,7 +78,7 @@ describe("Network discovery flow", () => {
 
     await waitFor(() => {
       expect(screen.getByText("network_buddy")).toBeTruthy();
-      expect(screen.getByText("Cupid ID: local-cupid-a")).toBeTruthy();
+      expect(screen.getByText("No cupidate profile")).toBeTruthy();
     });
 
     fireEvent.press(screen.getByText("Select"));

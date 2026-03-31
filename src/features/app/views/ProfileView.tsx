@@ -349,9 +349,6 @@ function CupidProfileActivityPanel({
             <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
               {profile.nickname}
             </PixelText>
-            <PixelText variant="body" style={styles.textBody}>
-              {t("profile.cupid.id", { id: profile.cupidId })}
-            </PixelText>
             {datingStatusText ? (
               <PixelText variant="caption" style={styles.profileMetaText}>
                 {datingStatusText}

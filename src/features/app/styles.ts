@@ -655,23 +655,32 @@ export const styles = StyleSheet.create({
   networkFab: {
     position: "absolute",
     right: s.md,
-    bottom: z.tabBarHeight + z.tabBarInset + s.md
+    zIndex: 24
+  },
+  networkFabShadow: {
+    backgroundColor: c.shadow,
+    borderRadius: 36,
+    paddingRight: z.pixelShadow,
+    paddingBottom: z.pixelShadow
   },
   networkFabInner: {
-    minWidth: 76,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     borderWidth: b.normal,
     borderColor: c.border,
     backgroundColor: c.pink,
-    paddingHorizontal: s.sm,
-    paddingVertical: s.xs,
     alignItems: "center",
+    justifyContent: "center",
     gap: 2
   },
   networkFabPlus: {
-    color: c.inkInverse
+    color: c.inkInverse,
+    lineHeight: 22
   },
   networkFabLabel: {
-    color: c.inkInverse
+    color: c.inkInverse,
+    textAlign: "center"
   },
   networkComposerOverlay: {
     ...StyleSheet.absoluteFillObject,

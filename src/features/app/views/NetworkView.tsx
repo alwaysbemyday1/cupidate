@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, TextInput, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useI18n } from "../../i18n/context";
 import { PixelBox } from "../components/PixelBox";
@@ -141,6 +142,7 @@ export function NetworkView({
   onRetryNetworkError
 }: NetworkViewProps) {
   const { t } = useI18n();
+  const insets = useSafeAreaInsets();
   const [isAddCupidComposerOpen, setIsAddCupidComposerOpen] = useState(false);
 
   const connectedCupidNameById = useMemo(
@@ -223,9 +225,6 @@ export function NetworkView({
                         <View style={styles.networkRosterMain}>
                           <PixelText variant="body" style={styles.listName}>
                             {item.name}
-                          </PixelText>
-                          <PixelText variant="caption" style={styles.networkRosterMeta}>
-                            {t("network.connection.id", { id: item.cupidId })}
                           </PixelText>
                           <PixelText variant="caption" style={styles.networkRosterMeta}>
                             {t(`network.connection.direction.${item.direction}`)}
@@ -396,17 +395,25 @@ export function NetworkView({
 
       <Pressable
         accessibilityRole="button"
+        accessibilityLabel={t("network.actions.openAddCupid")}
         testID="network-add-cupid-fab"
-        style={styles.networkFab}
+        style={[
+          styles.networkFab,
+          {
+            bottom: Math.max(insets.bottom, designTokens.size.tabBarInset) + designTokens.spacing.sm
+          }
+        ]}
         onPress={() => setIsAddCupidComposerOpen(true)}
       >
-        <View style={styles.networkFabInner}>
-          <PixelText variant="screenTitle" style={styles.networkFabPlus}>
-            +
-          </PixelText>
-          <PixelText variant="caption" style={styles.networkFabLabel}>
-            {t("network.actions.openAddCupid")}
-          </PixelText>
+        <View style={styles.networkFabShadow}>
+          <View style={styles.networkFabInner}>
+            <PixelText variant="screenTitle" style={styles.networkFabPlus}>
+              +
+            </PixelText>
+            <PixelText variant="caption" style={styles.networkFabLabel}>
+              {t("network.actions.fabAdd")}
+            </PixelText>
+          </View>
         </View>
       </Pressable>
 
@@ -479,9 +486,6 @@ export function NetworkView({
                             <View style={styles.networkRosterMain}>
                               <PixelText variant="body" style={styles.listName}>
                                 {item.nickname}
-                              </PixelText>
-                              <PixelText variant="caption" style={styles.networkRosterMeta}>
-                                {t("network.connection.id", { id: item.cupidId })}
                               </PixelText>
                               <PixelText variant="caption" style={styles.networkRosterMeta}>
                                 {item.datingProfileStatus === "active" && item.cupidateName
