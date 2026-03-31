@@ -225,6 +225,19 @@ function renderFactChip(label: string, value: string, key?: string) {
   );
 }
 
+function renderCompactFactPill(label: string, value: string, key?: string) {
+  return (
+    <View key={key} style={styles.profileCompactFactPill}>
+      <PixelText variant="caption" style={styles.profileCompactFactLabel} numberOfLines={1}>
+        {label}
+      </PixelText>
+      <PixelText variant="body" style={styles.profileCompactFactValue} numberOfLines={2}>
+        {value}
+      </PixelText>
+    </View>
+  );
+}
+
 function renderTagChip(value: string, index: number) {
   return (
     <View key={`${value}-${index}`} style={styles.profileTagChip}>
@@ -616,6 +629,20 @@ function CupidateProfilePanel({
       ],
       [jobGroups, mustHaveLabels, preferredAgeRange, preferredGenderLabel, preferredHeightRange, preferredLifestyleLabel, regions, t]
   );
+  const compactTopFacts = useMemo(
+    () => [
+      ...basicFacts,
+      ...(canViewFullDetails
+        ? [
+            {
+              label: t("profile.meta.lifestyle"),
+              value: lifestyleLabel
+            }
+          ]
+        : [])
+    ],
+    [basicFacts, canViewFullDetails, lifestyleLabel, t]
+  );
   const visibilityDescriptionKey =
     isRemoteInactive
       ? "profile.visibility.inactiveDescription"
@@ -720,7 +747,7 @@ function CupidateProfilePanel({
             <PixelText variant="body" style={styles.textBody}>
               {t("profile.cupidate.owner", { owner: profile.ownerNickname })}
             </PixelText>
-            <View style={styles.buttonRow}>
+            <View style={styles.profileSheetHeaderBadges}>
               <View style={styles.profileSheetStatusChip}>
                 <PixelText variant="caption" style={styles.networkStatusText}>
                   {editState.isActive ? t("profile.cupidate.active") : t("profile.cupidate.inactive")}
@@ -764,13 +791,8 @@ function CupidateProfilePanel({
               </PixelText>
             ) : null}
 
-            <View style={styles.profileFactGrid}>
-              {basicFacts.map((item, index) => (
-                renderFactChip(item.label, item.value, `${item.label}-${index}`)
-              ))}
-              {canViewFullDetails ? (
-                renderFactChip(t("profile.meta.lifestyle"), lifestyleLabel, "lifestyle-fact")
-              ) : null}
+            <View style={styles.profileCompactFactWrap}>
+              {compactTopFacts.map((item, index) => renderCompactFactPill(item.label, item.value, `${item.label}-${index}`))}
             </View>
 
             {canViewFullDetails && hobbyTags.length > 0 ? (

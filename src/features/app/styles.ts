@@ -1111,10 +1111,13 @@ export const styles = StyleSheet.create({
   },
   profilePageScrollContent: {
     gap: s.sm,
-    paddingRight: s.xs,
-    paddingBottom: s.md
+    paddingBottom: s.md,
+    alignItems: "stretch"
   },
-  profileSheetCard: {},
+  profileSheetCard: {
+    width: "100%",
+    alignSelf: "stretch"
+  },
   profileSheetCardContent: {
     backgroundColor: c.surface,
     padding: s.md,
@@ -1144,6 +1147,11 @@ export const styles = StyleSheet.create({
     minWidth: 0,
     gap: s.xxs
   },
+  profileSheetHeaderBadges: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: s.xs
+  },
   profileSheetStatusChip: {
     alignSelf: "flex-start",
     borderWidth: b.normal,
@@ -1170,6 +1178,28 @@ export const styles = StyleSheet.create({
   },
   profileSummaryBlock: {
     gap: s.xs
+  },
+  profileCompactFactWrap: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: s.xs
+  },
+  profileCompactFactPill: {
+    maxWidth: "100%",
+    minWidth: 88,
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surfaceAlt,
+    paddingHorizontal: s.sm,
+    paddingVertical: s.xs,
+    gap: 2
+  },
+  profileCompactFactLabel: {
+    color: c.inkMuted
+  },
+  profileCompactFactValue: {
+    color: c.ink,
+    flexShrink: 1
   },
   profileFactGrid: {
     flexDirection: "row",
