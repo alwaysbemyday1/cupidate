@@ -212,6 +212,37 @@ function renderStatPill(label: string, value: string | number) {
   );
 }
 
+function renderFactChip(label: string, value: string) {
+  return (
+    <View style={styles.profileFactChip}>
+      <PixelText variant="caption" style={styles.profileFactLabel}>
+        {label}
+      </PixelText>
+      <PixelText variant="body" style={styles.profileFactValue}>
+        {value}
+      </PixelText>
+    </View>
+  );
+}
+
+function renderTagChip(value: string, index: number) {
+  return (
+    <View key={`${value}-${index}`} style={styles.profileTagChip}>
+      <PixelText variant="caption" style={styles.profileTagText}>
+        {value}
+      </PixelText>
+    </View>
+  );
+}
+
+function formatRangeLabel(range: [number, number] | undefined, suffix = "") {
+  if (!range) {
+    return "-";
+  }
+
+  return `${range[0]} - ${range[1]}${suffix}`;
+}
+
 function parseOptionalNumber(input: string): number | undefined {
   const trimmed = input.trim();
   if (!trimmed) {
@@ -454,14 +485,22 @@ function CupidateProfilePanel({
     setEditState(buildEditState(profile));
   }, [profile]);
 
-  const hobbies = useMemo(() => parseTags(editState.hobbiesInput).join(", ") || "-", [editState.hobbiesInput]);
-  const regions = useMemo(
-    () => parseTags(editState.preferredRegionsInput).join(", ") || "-",
+  const hobbyTags = useMemo(() => parseTags(editState.hobbiesInput), [editState.hobbiesInput]);
+  const preferredRegionTags = useMemo(
+    () => parseTags(editState.preferredRegionsInput),
     [editState.preferredRegionsInput]
   );
-  const jobGroups = useMemo(
-    () => parseTags(editState.preferredJobGroupsInput).join(", ") || "-",
+  const preferredJobGroupTags = useMemo(
+    () => parseTags(editState.preferredJobGroupsInput),
     [editState.preferredJobGroupsInput]
+  );
+  const regions = useMemo(
+    () => preferredRegionTags.join(", ") || "-",
+    [preferredRegionTags]
+  );
+  const jobGroups = useMemo(
+    () => preferredJobGroupTags.join(", ") || "-",
+    [preferredJobGroupTags]
   );
 
   const preferredGenderLabel =
@@ -483,6 +522,10 @@ function CupidateProfilePanel({
       })),
     [t]
   );
+  const mustHaveTagLabels = useMemo(
+    () => (editState.mustHaveConditionKeys ?? []).map((key) => t(`network.option.mustHave.${key}`)),
+    [editState.mustHaveConditionKeys, t]
+  );
   const isMustHaveLimitReached = editState.mustHaveConditionKeys.length >= MAX_MUST_HAVE_CONDITIONS;
   const lifestyleLabel = `${smokingText(profile.smokingHabit ?? profile.preferences.smokingHabit, t)} / ${drinkingText(
     profile.drinkingHabit ?? profile.preferences.drinkingHabit,
@@ -500,6 +543,53 @@ function CupidateProfilePanel({
   const isRemoteInactive = !profile.canEdit && !profile.isActive;
   const canViewBasicDetails = profile.canEdit || (!isRemoteInactive && profile.profileVisibility !== "private");
   const canViewFullDetails = profile.canEdit || (!isRemoteInactive && profile.profileVisibility === "public");
+  const basicFacts = useMemo(
+    () =>
+      [
+        { label: t("profile.meta.age"), value: ageLabel(profile.birthYear) },
+        { label: t("profile.meta.gender"), value: genderText(profile.gender, t) },
+        {
+          label: t("profile.meta.region"),
+          value: profile.region ?? profile.preferences.location ?? profile.preferences.region ?? "-"
+        },
+        { label: t("profile.meta.job"), value: profile.jobTitle ?? profile.preferences.jobTitle ?? "-" },
+        canViewFullDetails
+          ? {
+              label: t("profile.meta.height"),
+              value:
+                profile.heightCm ?? profile.preferences.heightCm
+                  ? `${profile.heightCm ?? profile.preferences.heightCm} cm`
+                  : "-"
+            }
+          : null
+      ].filter(Boolean) as Array<{ label: string; value: string }>,
+    [
+      canViewFullDetails,
+      profile.birthYear,
+      profile.gender,
+      profile.heightCm,
+      profile.jobTitle,
+      profile.preferences.heightCm,
+      profile.preferences.jobTitle,
+      profile.preferences.location,
+      profile.preferences.region,
+      profile.region,
+      t
+    ]
+  );
+  const preferenceFacts = useMemo(
+    () =>
+      [
+        { label: t("profile.meta.preferredAge"), value: formatRangeLabel(preferredAgeRange) },
+        { label: t("profile.meta.preferredGender"), value: preferredGenderLabel },
+        { label: t("profile.meta.preferredRegions"), value: regions },
+        { label: t("profile.meta.preferredJobs"), value: jobGroups },
+        { label: t("profile.meta.preferredLifestyle"), value: preferredLifestyleLabel },
+        { label: t("profile.meta.preferredHeight"), value: formatRangeLabel(preferredHeightRange, " cm") },
+        { label: t("profile.meta.mustHave"), value: mustHaveLabels }
+      ],
+      [jobGroups, mustHaveLabels, preferredAgeRange, preferredGenderLabel, preferredHeightRange, preferredLifestyleLabel, regions, t]
+  );
   const visibilityDescriptionKey =
     isRemoteInactive
       ? "profile.visibility.inactiveDescription"
@@ -619,89 +709,105 @@ function CupidateProfilePanel({
           </View>
         </View>
 
-        <View style={styles.profileSheetMetaList}>
-          {canViewBasicDetails ? (
-            <>
-              {renderMetaLine(t("profile.meta.age"), ageLabel(profile.birthYear))}
-              {renderMetaLine(t("profile.meta.gender"), genderText(profile.gender, t))}
-              {renderMetaLine(
-                t("profile.meta.region"),
-                profile.region ?? profile.preferences.location ?? profile.preferences.region ?? "-"
-              )}
-              {renderMetaLine(t("profile.meta.job"), profile.jobTitle ?? profile.preferences.jobTitle ?? "-")}
-              {canViewFullDetails
-                ? renderMetaLine(
-                    t("profile.meta.height"),
-                    profile.heightCm ?? profile.preferences.heightCm
-                      ? `${profile.heightCm ?? profile.preferences.heightCm} cm`
-                      : "-"
-                  )
-                : null}
-            </>
-          ) : null}
-        </View>
+        <View style={styles.profileDivider} />
+        {!canViewBasicDetails || isRemoteInactive ? (
+          <View style={styles.profileCardNotice}>
+            <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+              {t(visibilityTitleKey)}
+            </PixelText>
+            <PixelText variant="body" style={styles.textBody}>
+              {t(visibilityDescriptionKey)}
+            </PixelText>
+          </View>
+        ) : (
+          <>
+            {canViewFullDetails ? (
+              <View style={styles.profileSummaryBlock}>
+                <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+                  {t("profile.sections.about")}
+                </PixelText>
+                <PixelText variant="body" style={styles.textBody}>
+                  {editState.bio || t("profile.cupidate.noBio")}
+                </PixelText>
+              </View>
+            ) : null}
+
+            {!profile.canEdit && profile.profileVisibility === "basic" ? (
+              <PixelText variant="caption" style={styles.profileMetaText}>
+                {t("profile.visibility.basicDescription")}
+              </PixelText>
+            ) : null}
+
+            <View style={styles.profileFactGrid}>
+              {basicFacts.map((item, index) => (
+                <View key={`${item.label}-${index}`}>{renderFactChip(item.label, item.value)}</View>
+              ))}
+              {canViewFullDetails ? (
+                <View key="lifestyle-fact">{renderFactChip(t("profile.meta.lifestyle"), lifestyleLabel)}</View>
+              ) : null}
+            </View>
+
+            {canViewFullDetails && hobbyTags.length > 0 ? (
+              <View style={styles.profileTagGroup}>
+                <PixelText variant="label" style={styles.fieldLabel}>
+                  {t("profile.meta.hobbies")}
+                </PixelText>
+                <View style={styles.profileTagRow}>{hobbyTags.map((item, index) => renderTagChip(item, index))}</View>
+              </View>
+            ) : null}
+          </>
+        )}
       </PixelBox>
-
-      {!canViewBasicDetails || isRemoteInactive ? (
-        <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
-          <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
-            {t(visibilityTitleKey)}
-          </PixelText>
-          <PixelText variant="body" style={styles.textBody}>
-            {t(visibilityDescriptionKey)}
-          </PixelText>
-        </PixelBox>
-      ) : null}
-
-      {!profile.canEdit && !isRemoteInactive && profile.profileVisibility === "basic" ? (
-        <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
-          <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
-            {t("profile.visibility.basicTitle")}
-          </PixelText>
-          <PixelText variant="body" style={styles.textBody}>
-            {t("profile.visibility.basicDescription")}
-          </PixelText>
-        </PixelBox>
-      ) : null}
-
-      {canViewFullDetails ? (
-        <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
-          <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
-            {t("profile.sections.publicProfile")}
-          </PixelText>
-          <PixelText variant="caption" style={styles.profileMetaText}>
-            {t("profile.cupidate.snapshotHint")}
-          </PixelText>
-          <PixelText variant="body" style={styles.textBody}>
-            {editState.bio || t("profile.cupidate.noBio")}
-          </PixelText>
-          <View style={styles.profileDivider} />
-          {renderMetaLine(t("profile.meta.hobbies"), hobbies)}
-          {renderMetaLine(t("profile.meta.lifestyle"), lifestyleLabel)}
-        </PixelBox>
-      ) : null}
 
       {canViewFullDetails ? (
         <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
           <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
             {t("profile.sections.preferences")}
           </PixelText>
-          <PixelText variant="caption" style={styles.profileMetaText}>
-            {t("profile.visibility.publicDescription")}
-          </PixelText>
-          {renderMetaLine(
-            t("profile.meta.preferredAge"),
-            preferredAgeRange ? `${preferredAgeRange[0]} - ${preferredAgeRange[1]}` : "-"
-          )}
-          {renderMetaLine(t("profile.meta.preferredGender"), preferredGenderLabel)}
-          {renderMetaLine(t("profile.meta.preferredRegions"), regions)}
-          {renderMetaLine(t("profile.meta.preferredJobs"), jobGroups)}
-          {renderMetaLine(t("profile.meta.preferredLifestyle"), preferredLifestyleLabel)}
-          {renderMetaLine(
-            t("profile.meta.preferredHeight"),
-            preferredHeightRange ? `${preferredHeightRange[0]} - ${preferredHeightRange[1]} cm` : "-"
-          )}
-          {renderMetaLine(t("profile.meta.mustHave"), mustHaveLabels)}
+          <View style={styles.profileFactGrid}>
+            {preferenceFacts
+              .filter((item) =>
+                item.label !== t("profile.meta.preferredRegions") &&
+                item.label !== t("profile.meta.preferredJobs") &&
+                item.label !== t("profile.meta.mustHave")
+              )
+              .map((item, index) => (
+                <View key={`${item.label}-${index}`}>{renderFactChip(item.label, item.value)}</View>
+              ))}
+          </View>
+
+          {preferredRegionTags.length > 0 ? (
+            <View style={styles.profileTagGroup}>
+              <PixelText variant="label" style={styles.fieldLabel}>
+                {t("profile.meta.preferredRegions")}
+              </PixelText>
+              <View style={styles.profileTagRow}>
+                {preferredRegionTags.map((item, index) => renderTagChip(item, index))}
+              </View>
+            </View>
+          ) : null}
+
+          {preferredJobGroupTags.length > 0 ? (
+            <View style={styles.profileTagGroup}>
+              <PixelText variant="label" style={styles.fieldLabel}>
+                {t("profile.meta.preferredJobs")}
+              </PixelText>
+              <View style={styles.profileTagRow}>
+                {preferredJobGroupTags.map((item, index) => renderTagChip(item, index))}
+              </View>
+            </View>
+          ) : null}
+
+          {mustHaveTagLabels.length > 0 ? (
+            <View style={styles.profileTagGroup}>
+              <PixelText variant="label" style={styles.fieldLabel}>
+                {t("profile.meta.mustHave")}
+              </PixelText>
+              <View style={styles.profileTagRow}>
+                {mustHaveTagLabels.map((item, index) => renderTagChip(item, index))}
+              </View>
+            </View>
+          ) : null}
         </PixelBox>
       ) : null}
 
@@ -727,193 +833,223 @@ function CupidateProfilePanel({
             {t("profile.manage.caption")}
           </PixelText>
 
-          <PixelText variant="label" style={styles.fieldLabel}>
-            {t("network.fields.name")}
-          </PixelText>
-          <TextInput
-            value={editState.displayName}
-            onChangeText={(value) => setEditState((current) => ({ ...current, displayName: value }))}
-            placeholder={t("network.placeholders.name")}
-            placeholderTextColor={placeholderTextColor}
-            style={styles.input}
-          />
+          <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileManageSubcard}>
+            <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+              {t("profile.manage.basics")}
+            </PixelText>
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.name")}
+            </PixelText>
+            <TextInput
+              value={editState.displayName}
+              onChangeText={(value) => setEditState((current) => ({ ...current, displayName: value }))}
+              placeholder={t("network.placeholders.name")}
+              placeholderTextColor={placeholderTextColor}
+              style={styles.input}
+            />
 
-          <View style={styles.buttonRow}>
-            <View style={styles.halfInput}>
-              <PixelText variant="label" style={styles.fieldLabel}>
-                {t("network.fields.birthYear")}
-              </PixelText>
-              <TextInput
-                value={editState.birthYearInput}
-                onChangeText={(value) => setEditState((current) => ({ ...current, birthYearInput: value }))}
-                keyboardType="numeric"
-                placeholder={t("network.placeholders.birthYear")}
-                placeholderTextColor={placeholderTextColor}
-                style={styles.input}
+            <View style={styles.buttonRow}>
+              <View style={styles.halfInput}>
+                <PixelText variant="label" style={styles.fieldLabel}>
+                  {t("network.fields.birthYear")}
+                </PixelText>
+                <TextInput
+                  value={editState.birthYearInput}
+                  onChangeText={(value) => setEditState((current) => ({ ...current, birthYearInput: value }))}
+                  keyboardType="numeric"
+                  placeholder={t("network.placeholders.birthYear")}
+                  placeholderTextColor={placeholderTextColor}
+                  style={styles.input}
+                />
+              </View>
+
+              <View style={styles.halfInput}>
+                <PixelText variant="label" style={styles.fieldLabel}>
+                  {t("network.fields.height")}
+                </PixelText>
+                <TextInput
+                  value={editState.heightInput}
+                  onChangeText={(value) => setEditState((current) => ({ ...current, heightInput: value }))}
+                  keyboardType="numeric"
+                  placeholder={t("network.placeholders.height")}
+                  placeholderTextColor={placeholderTextColor}
+                  style={styles.input}
+                />
+              </View>
+            </View>
+
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.gender")}
+            </PixelText>
+            <View style={styles.buttonRow}>
+              <PixelButton
+                label={t("network.option.gender.male")}
+                active={editState.gender === "male"}
+                onPress={() => setEditState((current) => ({ ...current, gender: "male" }))}
+              />
+              <PixelButton
+                label={t("network.option.gender.female")}
+                active={editState.gender === "female"}
+                onPress={() => setEditState((current) => ({ ...current, gender: "female" }))}
+              />
+              <PixelButton
+                label={t("network.option.gender.other")}
+                active={editState.gender === "other"}
+                onPress={() => setEditState((current) => ({ ...current, gender: "other" }))}
               />
             </View>
 
-            <View style={styles.halfInput}>
-              <PixelText variant="label" style={styles.fieldLabel}>
-                {t("network.fields.height")}
-              </PixelText>
-              <TextInput
-                value={editState.heightInput}
-                onChangeText={(value) => setEditState((current) => ({ ...current, heightInput: value }))}
-                keyboardType="numeric"
-                placeholder={t("network.placeholders.height")}
-                placeholderTextColor={placeholderTextColor}
-                style={styles.input}
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("profile.manage.activation")}
+            </PixelText>
+            <View style={styles.buttonRow}>
+              <PixelButton
+                label={t("profile.manage.activate")}
+                variant="success"
+                active={editState.isActive}
+                onPress={() => setEditState((current) => ({ ...current, isActive: true }))}
               />
-            </View>
-          </View>
-
-          <PixelText variant="label" style={styles.fieldLabel}>
-            {t("network.fields.gender")}
-          </PixelText>
-          <View style={styles.buttonRow}>
-            <PixelButton
-              label={t("network.option.gender.male")}
-              active={editState.gender === "male"}
-              onPress={() => setEditState((current) => ({ ...current, gender: "male" }))}
-            />
-            <PixelButton
-              label={t("network.option.gender.female")}
-              active={editState.gender === "female"}
-              onPress={() => setEditState((current) => ({ ...current, gender: "female" }))}
-            />
-            <PixelButton
-              label={t("network.option.gender.other")}
-              active={editState.gender === "other"}
-              onPress={() => setEditState((current) => ({ ...current, gender: "other" }))}
-            />
-          </View>
-
-          <PixelText variant="label" style={styles.fieldLabel}>
-            {t("network.fields.profileVisibility")}
-          </PixelText>
-          <PixelText variant="caption" style={styles.profileMetaText}>
-            {t("network.fields.profileVisibilityHint")}
-          </PixelText>
-          <View style={styles.buttonRow}>
-            <PixelButton
-              label={t("network.option.visibility.private")}
-              variant={editState.profileVisibility === "private" ? "primary" : "secondary"}
-              active={editState.profileVisibility === "private"}
-              onPress={() => setEditState((current) => ({ ...current, profileVisibility: "private" }))}
-            />
-            <PixelButton
-              label={t("network.option.visibility.basic")}
-              variant={editState.profileVisibility === "basic" ? "primary" : "secondary"}
-              active={editState.profileVisibility === "basic"}
-              onPress={() => setEditState((current) => ({ ...current, profileVisibility: "basic" }))}
-            />
-            <PixelButton
-              label={t("network.option.visibility.public")}
-              variant={editState.profileVisibility === "public" ? "primary" : "secondary"}
-              active={editState.profileVisibility === "public"}
-              onPress={() => setEditState((current) => ({ ...current, profileVisibility: "public" }))}
-            />
-          </View>
-
-          <View style={styles.buttonRow}>
-            <View style={styles.halfInput}>
-              <PixelText variant="label" style={styles.fieldLabel}>
-                {t("network.fields.region")}
-              </PixelText>
-              <TextInput
-                testID="profile-edit-region"
-                value={editState.locationInput}
-                onChangeText={(value) => setEditState((current) => ({ ...current, locationInput: value }))}
-                placeholder={t("network.placeholders.region")}
-                placeholderTextColor={placeholderTextColor}
-                style={styles.input}
+              <PixelButton
+                label={t("profile.manage.deactivate")}
+                variant="neutral"
+                active={!editState.isActive}
+                onPress={() => setEditState((current) => ({ ...current, isActive: false }))}
               />
             </View>
 
-            <View style={styles.halfInput}>
-              <PixelText variant="label" style={styles.fieldLabel}>
-                {t("network.fields.jobTitle")}
-              </PixelText>
-              <TextInput
-                testID="profile-edit-job-title"
-                value={editState.jobTitleInput}
-                onChangeText={(value) => setEditState((current) => ({ ...current, jobTitleInput: value }))}
-                placeholder={t("network.placeholders.jobTitle")}
-                placeholderTextColor={placeholderTextColor}
-                style={styles.input}
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.profileVisibility")}
+            </PixelText>
+            <PixelText variant="caption" style={styles.profileMetaText}>
+              {t("network.fields.profileVisibilityHint")}
+            </PixelText>
+            <View style={styles.buttonRow}>
+              <PixelButton
+                label={t("network.option.visibility.private")}
+                variant={editState.profileVisibility === "private" ? "primary" : "secondary"}
+                active={editState.profileVisibility === "private"}
+                onPress={() => setEditState((current) => ({ ...current, profileVisibility: "private" }))}
+              />
+              <PixelButton
+                label={t("network.option.visibility.basic")}
+                variant={editState.profileVisibility === "basic" ? "primary" : "secondary"}
+                active={editState.profileVisibility === "basic"}
+                onPress={() => setEditState((current) => ({ ...current, profileVisibility: "basic" }))}
+              />
+              <PixelButton
+                label={t("network.option.visibility.public")}
+                variant={editState.profileVisibility === "public" ? "primary" : "secondary"}
+                active={editState.profileVisibility === "public"}
+                onPress={() => setEditState((current) => ({ ...current, profileVisibility: "public" }))}
               />
             </View>
-          </View>
+          </PixelBox>
 
-          <PixelText variant="label" style={styles.fieldLabel}>
-            {t("network.fields.hobbies")}
-          </PixelText>
-          <TextInput
-            value={editState.hobbiesInput}
-            onChangeText={(value) => setEditState((current) => ({ ...current, hobbiesInput: value }))}
-            placeholder={t("network.placeholders.hobbies")}
-            placeholderTextColor={placeholderTextColor}
-            style={styles.input}
-          />
+          <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileManageSubcard}>
+            <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+              {t("profile.manage.about")}
+            </PixelText>
 
-          <PixelText variant="label" style={styles.fieldLabel}>
-            {t("network.fields.bio")}
-          </PixelText>
-          <TextInput
-            value={editState.bio}
-            onChangeText={(value) => setEditState((current) => ({ ...current, bio: value }))}
-            multiline
-            placeholder={t("network.placeholders.bio")}
-            placeholderTextColor={placeholderTextColor}
-            style={[styles.input, styles.multilineInput]}
-          />
+            <View style={styles.buttonRow}>
+              <View style={styles.halfInput}>
+                <PixelText variant="label" style={styles.fieldLabel}>
+                  {t("network.fields.region")}
+                </PixelText>
+                <TextInput
+                  testID="profile-edit-region"
+                  value={editState.locationInput}
+                  onChangeText={(value) => setEditState((current) => ({ ...current, locationInput: value }))}
+                  placeholder={t("network.placeholders.region")}
+                  placeholderTextColor={placeholderTextColor}
+                  style={styles.input}
+                />
+              </View>
 
-          <PixelText variant="label" style={styles.fieldLabel}>
-            {t("network.fields.smoking")}
-          </PixelText>
-          <View style={styles.buttonRow}>
-            <PixelButton
-              label={t("network.option.smoking.none")}
-              active={editState.smokingHabit === "none"}
-              onPress={() => setEditState((current) => ({ ...current, smokingHabit: "none" }))}
-            />
-            <PixelButton
-              label={t("network.option.smoking.sometimes")}
-              active={editState.smokingHabit === "sometimes"}
-              onPress={() => setEditState((current) => ({ ...current, smokingHabit: "sometimes" }))}
-            />
-            <PixelButton
-              label={t("network.option.smoking.often")}
-              active={editState.smokingHabit === "often"}
-              onPress={() => setEditState((current) => ({ ...current, smokingHabit: "often" }))}
-            />
-          </View>
+              <View style={styles.halfInput}>
+                <PixelText variant="label" style={styles.fieldLabel}>
+                  {t("network.fields.jobTitle")}
+                </PixelText>
+                <TextInput
+                  testID="profile-edit-job-title"
+                  value={editState.jobTitleInput}
+                  onChangeText={(value) => setEditState((current) => ({ ...current, jobTitleInput: value }))}
+                  placeholder={t("network.placeholders.jobTitle")}
+                  placeholderTextColor={placeholderTextColor}
+                  style={styles.input}
+                />
+              </View>
+            </View>
 
-          <PixelText variant="label" style={styles.fieldLabel}>
-            {t("network.fields.drinking")}
-          </PixelText>
-          <View style={styles.buttonRow}>
-            <PixelButton
-              label={t("network.option.drinking.never")}
-              active={editState.drinkingHabit === "never"}
-              onPress={() => setEditState((current) => ({ ...current, drinkingHabit: "never" }))}
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.hobbies")}
+            </PixelText>
+            <TextInput
+              value={editState.hobbiesInput}
+              onChangeText={(value) => setEditState((current) => ({ ...current, hobbiesInput: value }))}
+              placeholder={t("network.placeholders.hobbies")}
+              placeholderTextColor={placeholderTextColor}
+              style={styles.input}
             />
-            <PixelButton
-              label={t("network.option.drinking.social")}
-              active={editState.drinkingHabit === "social"}
-              onPress={() => setEditState((current) => ({ ...current, drinkingHabit: "social" }))}
-            />
-            <PixelButton
-              label={t("network.option.drinking.often")}
-              active={editState.drinkingHabit === "often"}
-              onPress={() => setEditState((current) => ({ ...current, drinkingHabit: "often" }))}
-            />
-          </View>
 
-          <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
-            {t("network.form.preferenceTitle")}
-          </PixelText>
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.bio")}
+            </PixelText>
+            <TextInput
+              value={editState.bio}
+              onChangeText={(value) => setEditState((current) => ({ ...current, bio: value }))}
+              multiline
+              placeholder={t("network.placeholders.bio")}
+              placeholderTextColor={placeholderTextColor}
+              style={[styles.input, styles.multilineInput]}
+            />
+
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.smoking")}
+            </PixelText>
+            <View style={styles.buttonRow}>
+              <PixelButton
+                label={t("network.option.smoking.none")}
+                active={editState.smokingHabit === "none"}
+                onPress={() => setEditState((current) => ({ ...current, smokingHabit: "none" }))}
+              />
+              <PixelButton
+                label={t("network.option.smoking.sometimes")}
+                active={editState.smokingHabit === "sometimes"}
+                onPress={() => setEditState((current) => ({ ...current, smokingHabit: "sometimes" }))}
+              />
+              <PixelButton
+                label={t("network.option.smoking.often")}
+                active={editState.smokingHabit === "often"}
+                onPress={() => setEditState((current) => ({ ...current, smokingHabit: "often" }))}
+              />
+            </View>
+
+            <PixelText variant="label" style={styles.fieldLabel}>
+              {t("network.fields.drinking")}
+            </PixelText>
+            <View style={styles.buttonRow}>
+              <PixelButton
+                label={t("network.option.drinking.never")}
+                active={editState.drinkingHabit === "never"}
+                onPress={() => setEditState((current) => ({ ...current, drinkingHabit: "never" }))}
+              />
+              <PixelButton
+                label={t("network.option.drinking.social")}
+                active={editState.drinkingHabit === "social"}
+                onPress={() => setEditState((current) => ({ ...current, drinkingHabit: "social" }))}
+              />
+              <PixelButton
+                label={t("network.option.drinking.often")}
+                active={editState.drinkingHabit === "often"}
+                onPress={() => setEditState((current) => ({ ...current, drinkingHabit: "often" }))}
+              />
+            </View>
+          </PixelBox>
+
+          <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileManageSubcard}>
+            <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+              {t("profile.manage.preferences")}
+            </PixelText>
 
           <View style={styles.buttonRow}>
             <View style={styles.halfInput}>
@@ -1106,23 +1242,6 @@ function CupidateProfilePanel({
             })}
           </View>
 
-          <PixelText variant="label" style={styles.fieldLabel}>
-            {t("profile.manage.activation")}
-          </PixelText>
-          <View style={styles.buttonRow}>
-            <PixelButton
-              label={t("profile.manage.activate")}
-              variant="success"
-              active={editState.isActive}
-              onPress={() => setEditState((current) => ({ ...current, isActive: true }))}
-            />
-            <PixelButton
-              label={t("profile.manage.deactivate")}
-              variant="neutral"
-              active={!editState.isActive}
-              onPress={() => setEditState((current) => ({ ...current, isActive: false }))}
-            />
-          </View>
           <PixelText variant="caption" style={styles.profileMetaText}>
             {t("profile.manage.activationHint")}
           </PixelText>
@@ -1138,6 +1257,7 @@ function CupidateProfilePanel({
               }}
             />
           </View>
+          </PixelBox>
         </PixelBox>
       ) : null}
     </>

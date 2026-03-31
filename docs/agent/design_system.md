@@ -205,6 +205,22 @@ Rules:
 - `surfaceSectionTitle`: for headings inside beige/light cards.
 - Never mix the two incorrectly.
 
+### 8.6 Profile Sheets
+- `Cupidate Profile` should not split `public summary` and `basic profile` into two stacked cards when the profile is public.
+- Use one top card for:
+  - avatar
+  - display name
+  - owner line
+  - activation / visibility chips
+  - short intro
+  - compact basic facts
+- Basic facts should use a compact two-column chip/grid layout, not a long vertical label stack.
+- `Dating Preferences` stays as a separate card.
+- Owner edit mode should be grouped into:
+  - `Basics`
+  - `About & Lifestyle`
+  - `Dating Preferences`
+
 ## 9. Screen Structure Rules
 ### Home
 Required order:

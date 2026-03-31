@@ -1054,6 +1054,11 @@ export const styles = StyleSheet.create({
     padding: s.md,
     gap: s.sm
   },
+  profileManageSubcard: {
+    backgroundColor: c.surfaceAlt,
+    padding: s.md,
+    gap: s.sm
+  },
   profileSheetHeaderRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -1090,6 +1095,49 @@ export const styles = StyleSheet.create({
     color: c.inkMuted
   },
   profileSheetMetaValue: {
+    color: c.ink
+  },
+  profileCardNotice: {
+    gap: s.xs
+  },
+  profileSummaryBlock: {
+    gap: s.xs
+  },
+  profileFactGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: s.xs
+  },
+  profileFactChip: {
+    width: "48%",
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surfaceAlt,
+    padding: s.sm,
+    gap: 2
+  },
+  profileFactLabel: {
+    color: c.inkMuted
+  },
+  profileFactValue: {
+    color: c.ink
+  },
+  profileTagGroup: {
+    gap: s.xxs
+  },
+  profileTagRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: s.xs
+  },
+  profileTagChip: {
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surfaceAlt,
+    paddingHorizontal: s.xs,
+    paddingVertical: 6
+  },
+  profileTagText: {
     color: c.ink
   },
   profileSheetStatPill: {

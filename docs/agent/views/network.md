@@ -59,6 +59,10 @@ Last Updated: 2026-04-01
   - visibility label
 - row press opens `Cupidate Profile View`
 - visibility rules still apply inside the profile view
+- public cupidate profiles should use:
+  - one merged top card for intro + basic facts
+  - a compact fact grid instead of long vertical meta rows
+  - a separate preferences card
 
 ## 4. Cupids Segment
 ### 4.1 Cupid List

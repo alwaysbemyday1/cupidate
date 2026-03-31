@@ -1142,3 +1142,20 @@ Changes:
 Verification:
 - `npx.cmd tsc --noEmit` passed.
 - `npm.cmd test -- --runInBand src/features/app/views/__tests__/ProfileView.test.tsx src/features/app/__tests__/profileOverlayFlow.test.tsx` passed.
+
+### Task 2026-04-01-04 - Cupidate Profile Layout Rebuild
+Status: Completed
+
+Changes:
+- Merged the public intro and basic profile facts into a single top card for public cupidate profiles.
+- Replaced the old vertical metadata stack with a compact two-column fact-chip layout.
+- Kept `Dating Preferences` as a separate card so `who this person is` and `who they want` read as different layers.
+- Reorganized owner edit mode into three grouped surfaces:
+  - `Basics`
+  - `About & Lifestyle`
+  - `Dating Preferences`
+- Synced the new profile-surface rules back into `design_system.md` and `views/network.md`.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand src/features/app/views/__tests__/ProfileView.test.tsx src/features/app/__tests__/profileOverlayFlow.test.tsx` passed.

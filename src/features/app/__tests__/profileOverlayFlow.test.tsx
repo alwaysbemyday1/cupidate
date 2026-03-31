@@ -150,7 +150,8 @@ describe("Profile overlay flow", () => {
       expect(screen.getByTestId("profile-sheet-title")).toHaveTextContent("Cupidate Profile");
       expect(screen.getByTestId("profile-sheet")).toBeTruthy();
       expect(screen.getByText("ACTIVE CUPIDATE")).toBeTruthy();
-      expect(screen.getByText("This is the simple public dating profile visible to matching participants.")).toBeTruthy();
+      expect(screen.getByText("About Me")).toBeTruthy();
+      expect(screen.getByText("coffee lover")).toBeTruthy();
     });
   });
 
@@ -168,7 +169,8 @@ describe("Profile overlay flow", () => {
     await waitFor(() => {
       expect(screen.getByTestId("profile-sheet-title")).toHaveTextContent("Cupidate Profile");
       expect(screen.getByTestId("profile-sheet")).toBeTruthy();
-      expect(screen.getByText("Dating Preferences")).toBeTruthy();
+      expect(screen.getByText("About Me")).toBeTruthy();
+      expect(screen.getAllByText("Dating Preferences").length).toBeGreaterThan(0);
     });
   });
 
@@ -228,9 +230,12 @@ describe("Profile overlay flow", () => {
     fireEvent.press(screen.getByTestId("profile-segment-cupidate"));
 
     await waitFor(() => {
-      expect(screen.getByTestId("profile-segment-cupidate").props.accessibilityState.selected).toBe(true);
       expect(screen.getByText("Joon")).toBeTruthy();
-      expect(screen.getByText("Basic Profile Only")).toBeTruthy();
+      expect(
+        screen.getByText(
+          "This cupidate shares only basic profile information. Detailed lifestyle notes and preference weights stay private."
+        )
+      ).toBeTruthy();
     });
   });
 

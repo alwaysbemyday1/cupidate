@@ -397,3 +397,8 @@ Task 2026-04-01-03 (Completed)
 - Removed the separate dating-profile status box from `Cupid Profile`.
 - Added an in-profile tab/swipe flow between `Cupid Activity` and `Cupidate Profile` when the cupidate is active.
 - Kept non-active cupid status as a lightweight caption instead of a whole extra card.
+
+Task 2026-04-01-04 (Completed)
+- Rebuilt `Cupidate Profile` so public/basic information lives in one merged top card instead of split summary boxes.
+- Replaced the long vertical fact stack with a compact chip-style fact grid.
+- Reorganized owner edit mode into `Basics`, `About & Lifestyle`, and `Dating Preferences`.
