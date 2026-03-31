@@ -72,6 +72,40 @@ describe("ProfileView", () => {
               displayName: "Jin",
               visibility: "basic"
             },
+            linkedCupidateProfile: {
+              kind: "cupidate",
+              cupidateId: "peer-1",
+              ownerCupidId: "cupid-peer",
+              ownerNickname: "pixel_jin",
+              displayName: "Jin",
+              birthYear: 1993,
+              gender: "male",
+              bio: "Food and film",
+              isActive: true,
+              profileVisibility: "basic",
+              region: "bundang",
+              jobTitle: "PM",
+              heightCm: 181,
+              smokingHabit: "none",
+              drinkingHabit: "social",
+              preferredAgeRange: [24, 32],
+              preferredRegions: ["seoul"],
+              preferredJobGroups: ["design"],
+              preferredSmoking: "ok",
+              preferredDrinking: "social",
+              preferredGenders: ["female"],
+              preferredHeightRange: [158, 170],
+              mustHaveConditionKeys: ["shared_hobbies"],
+              preferences: {
+                hobbies: ["movie", "ramen"]
+              },
+              canEdit: false,
+              stats: {
+                totalRequests: 7,
+                ongoingMatches: 2,
+                completedMatches: 1
+              }
+            },
             stats: {
               cupidateCount: 1,
               activeCupidateCount: 1,
@@ -86,9 +120,12 @@ describe("ProfileView", () => {
       </I18nProvider>
     );
 
+    expect(screen.getByTestId("profile-segment-activity")).toBeTruthy();
+    expect(screen.getByTestId("profile-segment-cupidate")).toBeTruthy();
     expect(screen.getByText("Matches Guided")).toBeTruthy();
     expect(screen.getByText("Ongoing")).toBeTruthy();
     expect(screen.getByText("Romance Conversions")).toBeTruthy();
+    expect(screen.queryByText("Dating Profile Status")).toBeNull();
     expect(screen.queryByText("Managed")).toBeNull();
     expect(screen.queryByText("Active")).toBeNull();
   });

@@ -1034,6 +1034,20 @@ export const styles = StyleSheet.create({
     gap: s.sm,
     paddingBottom: s.md
   },
+  profilePagerViewport: {
+    width: "100%",
+    minHeight: 320
+  },
+  profilePagerScroll: {
+    width: "100%"
+  },
+  profilePagerContent: {
+    alignItems: "flex-start"
+  },
+  profilePagerPage: {
+    gap: s.sm,
+    paddingRight: s.xs
+  },
   profileSheetCard: {},
   profileSheetCardContent: {
     backgroundColor: c.surface,

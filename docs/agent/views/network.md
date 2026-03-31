@@ -72,9 +72,10 @@ Last Updated: 2026-04-01
 - row press opens `Cupid Profile View`
 - inbound pending requests must expose in-row `Accept` / `Decline` actions
 - cupid profile should show:
-  - matchmaking stats
-  - current dating profile status
-  - direct entry into linked cupidate profile when active
+  - `Cupid Activity` summary
+  - when the user has an active cupidate, a swipe/tab transition between:
+    - `Cupid Activity`
+    - `Cupidate Profile`
 
 ### 4.2 Add Cupid Composer
 - opened from a floating action button, not from a sub-tab

@@ -81,6 +81,7 @@ export type CupidProfileSummary = {
     displayName: string | null;
     visibility: CupidateRecord["profileVisibility"] | null;
   };
+  linkedCupidateProfile: CupidateProfileSummary | null;
   stats: {
     cupidateCount: number;
     activeCupidateCount: number;

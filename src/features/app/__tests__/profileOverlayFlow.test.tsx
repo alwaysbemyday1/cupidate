@@ -210,7 +210,6 @@ describe("Profile overlay flow", () => {
 
     fireEvent.press(screen.getByTestId("tab-network"));
     fireEvent.press(screen.getByTestId("network-segment-cupids"));
-    fireEvent.press(screen.getByTestId("network-subsegment-cupids-list"));
 
     await waitFor(() => {
       expect(screen.getByTestId("profile-open-cupid-local-cupid-a")).toBeTruthy();
@@ -220,16 +219,18 @@ describe("Profile overlay flow", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("profile-sheet-title")).toHaveTextContent("Cupid Profile");
+      expect(screen.getByTestId("profile-segment-activity")).toBeTruthy();
+      expect(screen.getByTestId("profile-segment-cupidate")).toBeTruthy();
       expect(screen.getByText("Shows how this cupid has guided matches and relationship handoffs across the network.")).toBeTruthy();
       expect(screen.getByText("Romance Conversions")).toBeTruthy();
-      expect(screen.getByText("This cupid is currently open for introductions as Joon.")).toBeTruthy();
-      expect(screen.getByTestId("profile-open-linked-cupidate")).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByTestId("profile-open-linked-cupidate"));
+    fireEvent.press(screen.getByTestId("profile-segment-cupidate"));
 
     await waitFor(() => {
-      expect(screen.getByTestId("profile-sheet-title")).toHaveTextContent("Cupidate Profile");
+      expect(screen.getByTestId("profile-segment-cupidate").props.accessibilityState.selected).toBe(true);
+      expect(screen.getByText("Joon")).toBeTruthy();
+      expect(screen.getByText("Basic Profile Only")).toBeTruthy();
     });
   });
 

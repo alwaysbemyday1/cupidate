@@ -1,5 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
-import { Pressable, ScrollView, TextInput, View } from "react-native";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  type LayoutChangeEvent,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+  Pressable,
+  ScrollView,
+  TextInput,
+  View
+} from "react-native";
 
 import {
   MAX_MUST_HAVE_CONDITIONS,
@@ -9,6 +17,7 @@ import {
 import { useI18n } from "../../i18n/context";
 import { PixelBox } from "../components/PixelBox";
 import { PixelButton } from "../components/PixelButton";
+import { PixelSegmentTabs } from "../components/PixelSegmentTabs";
 import { PixelText } from "../components/PixelText";
 import type {
   CupidProfileSummary,
@@ -280,15 +289,22 @@ function buildEditState(profile: CupidateProfileSummary): CupidateEditState {
   };
 }
 
-function CupidProfilePanel({
+type CupidProfileTabKey = "activity" | "cupidate";
+
+function CupidProfileActivityPanel({
   profile,
-  t,
-  onOpenCupidateProfile
+  t
 }: {
   profile: CupidProfileSummary;
   t: ReturnType<typeof useI18n>["t"];
-  onOpenCupidateProfile?: (cupidateId: string) => void;
 }) {
+  const datingStatusText =
+    profile.datingProfile.status !== "active"
+      ? t(cupidDatingStatusKey(profile.datingProfile.status), {
+          value: profile.datingProfile.displayName ?? profile.nickname
+        })
+      : null;
+
   return (
     <>
       <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
@@ -305,6 +321,11 @@ function CupidProfilePanel({
             <PixelText variant="body" style={styles.textBody}>
               {t("profile.cupid.id", { id: profile.cupidId })}
             </PixelText>
+            {datingStatusText ? (
+              <PixelText variant="caption" style={styles.profileMetaText}>
+                {datingStatusText}
+              </PixelText>
+            ) : null}
             <View style={styles.profileSheetStatusChip}>
               <PixelText variant="caption" style={styles.networkStatusText}>
                 {t(relationKey(profile.relationship))}
@@ -312,30 +333,6 @@ function CupidProfilePanel({
             </View>
           </View>
         </View>
-      </PixelBox>
-
-      <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
-        <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
-          {t("profile.sections.datingProfile")}
-        </PixelText>
-        <PixelText variant="body" style={styles.textBody}>
-          {t(cupidDatingStatusKey(profile.datingProfile.status), {
-            value: profile.datingProfile.displayName ?? profile.nickname
-          })}
-        </PixelText>
-        {profile.datingProfile.visibility ? (
-          renderMetaLine(t("profile.meta.visibility"), visibilityText(profile.datingProfile.visibility, t))
-        ) : null}
-        {profile.datingProfile.status === "active" && profile.datingProfile.cupidateId && onOpenCupidateProfile ? (
-          <View style={styles.buttonRow}>
-            <PixelButton
-              label={t("profile.actions.openCupidate")}
-              variant="primary"
-              testID="profile-open-linked-cupidate"
-              onPress={() => onOpenCupidateProfile(profile.datingProfile.cupidateId!)}
-            />
-          </View>
-        ) : null}
       </PixelBox>
 
       <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
@@ -351,6 +348,91 @@ function CupidProfilePanel({
           {renderStatPill(t("profile.stats.romanceConversions"), profile.stats.completedMatches)}
         </View>
       </PixelBox>
+    </>
+  );
+}
+
+function CupidProfilePanel({
+  profile,
+  t
+}: {
+  profile: CupidProfileSummary;
+  t: ReturnType<typeof useI18n>["t"];
+}) {
+  const hasLinkedCupidate = !!profile.linkedCupidateProfile;
+  const [activeTab, setActiveTab] = useState<CupidProfileTabKey>("activity");
+  const [pagerWidth, setPagerWidth] = useState(0);
+  const pagerRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    setActiveTab("activity");
+  }, [profile.cupidId]);
+
+  function handlePagerLayout(event: LayoutChangeEvent) {
+    const nextWidth = event.nativeEvent.layout.width;
+    if (nextWidth > 0 && nextWidth !== pagerWidth) {
+      setPagerWidth(nextWidth);
+    }
+  }
+
+  function syncToTab(nextTab: CupidProfileTabKey) {
+    setActiveTab(nextTab);
+
+    if (!hasLinkedCupidate || pagerWidth <= 0 || !pagerRef.current) {
+      return;
+    }
+
+    const nextIndex = nextTab === "activity" ? 0 : 1;
+    pagerRef.current.scrollTo({
+      x: nextIndex * pagerWidth,
+      animated: true
+    });
+  }
+
+  function handlePagerMomentumEnd(event: NativeSyntheticEvent<NativeScrollEvent>) {
+    if (!hasLinkedCupidate || pagerWidth <= 0) {
+      return;
+    }
+
+    const pageIndex = Math.round(event.nativeEvent.contentOffset.x / pagerWidth);
+    setActiveTab(pageIndex <= 0 ? "activity" : "cupidate");
+  }
+
+  if (!hasLinkedCupidate || !profile.linkedCupidateProfile) {
+    return <CupidProfileActivityPanel profile={profile} t={t} />;
+  }
+
+  return (
+    <>
+      <PixelSegmentTabs
+        compact
+        activeKey={activeTab}
+        items={[
+          { key: "activity", label: t("profile.tabs.activity"), testID: "profile-segment-activity" },
+          { key: "cupidate", label: t("profile.tabs.cupidate"), testID: "profile-segment-cupidate" }
+        ]}
+        onSelect={syncToTab}
+      />
+
+      <View style={styles.profilePagerViewport} onLayout={handlePagerLayout}>
+        <ScrollView
+          ref={pagerRef}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={handlePagerMomentumEnd}
+          contentContainerStyle={styles.profilePagerContent}
+          style={styles.profilePagerScroll}
+          testID="profile-cupid-pager"
+        >
+          <View style={[styles.profilePagerPage, pagerWidth ? { width: pagerWidth } : null]}>
+            <CupidProfileActivityPanel profile={profile} t={t} />
+          </View>
+          <View style={[styles.profilePagerPage, pagerWidth ? { width: pagerWidth } : null]}>
+            <CupidateProfilePanel profile={profile.linkedCupidateProfile} t={t} />
+          </View>
+        </ScrollView>
+      </View>
     </>
   );
 }
@@ -1065,7 +1147,6 @@ function CupidateProfilePanel({
 export function ProfileView({
   profile,
   onClose,
-  onOpenCupidateProfile,
   onSaveCupidateProfile,
   isSavingCupidateProfile
 }: ProfileViewProps) {
@@ -1094,7 +1175,7 @@ export function ProfileView({
 
           <ScrollView style={styles.profileSheetScroll} contentContainerStyle={styles.profileSheetScrollContent}>
             {profile.kind === "cupid" ? (
-              <CupidProfilePanel profile={profile} t={t} onOpenCupidateProfile={onOpenCupidateProfile} />
+              <CupidProfilePanel profile={profile} t={t} />
             ) : (
               <CupidateProfilePanel
                 profile={profile}

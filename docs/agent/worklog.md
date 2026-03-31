@@ -1127,3 +1127,18 @@ Changes:
 Verification:
 - `npx.cmd tsc --noEmit` passed.
 - `npm.cmd test -- --runInBand src/features/app/__tests__/networkDiscoveryFlow.test.tsx src/features/network/repository/__tests__/inMemoryNetworkRepository.test.ts` passed.
+
+### Task 2026-04-01-03 - Cupid Profile Pager
+Status: Completed
+
+Changes:
+- Removed the separate dating-profile status card from `Cupid Profile`.
+- Renamed the cupid stat surface to `Cupid Activity`.
+- When a cupid has an active cupidate, the profile sheet now supports a two-mode pager:
+  - `Cupid Activity`
+  - `Cupidate Profile`
+- Kept inactive/no-cupidate state as a compact caption inside the header instead of a whole extra card.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand src/features/app/views/__tests__/ProfileView.test.tsx src/features/app/__tests__/profileOverlayFlow.test.tsx` passed.

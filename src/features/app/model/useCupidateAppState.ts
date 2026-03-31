@@ -199,6 +199,53 @@ function pickRepresentativeCupidate(cupidates: CupidateRecord[]) {
   return cupidates.find((item) => item.isActive) ?? cupidates[0];
 }
 
+function buildCupidateProfileSummary({
+  cupidate,
+  ownerNickname,
+  myCupidId,
+  relatedRequests
+}: {
+  cupidate: CupidateRecord;
+  ownerNickname: string;
+  myCupidId: string;
+  relatedRequests: MatchRequest[];
+}): CupidateProfileSummary {
+  return {
+    kind: "cupidate",
+    cupidateId: cupidate.cupidateId,
+    ownerCupidId: cupidate.ownerCupidId,
+    ownerNickname,
+    displayName: cupidate.displayName,
+    birthYear: cupidate.birthYear,
+    gender: cupidate.gender,
+    bio: cupidate.bio,
+    isActive: cupidate.isActive,
+    profileVisibility: cupidate.profileVisibility,
+    region: cupidate.region,
+    jobTitle: cupidate.jobTitle,
+    heightCm: cupidate.heightCm,
+    smokingHabit: cupidate.smokingHabit,
+    drinkingHabit: cupidate.drinkingHabit,
+    preferredAgeRange: cupidate.preferredAgeRange,
+    preferredRegions: cupidate.preferredRegions,
+    preferredJobGroups: cupidate.preferredJobGroups,
+    preferredSmoking: cupidate.preferredSmoking,
+    preferredDrinking: cupidate.preferredDrinking,
+    preferredGenders: cupidate.preferredGenders,
+    preferredHeightRange: cupidate.preferredHeightRange,
+    mustHaveConditionKeys: cupidate.mustHaveConditionKeys,
+    preferences: cupidate.preferences,
+    canEdit: cupidate.ownerCupidId === myCupidId,
+    stats: {
+      totalRequests: relatedRequests.length,
+      ongoingMatches: relatedRequests.filter(
+        (request) => request.status === "requested" || request.status === "accepted"
+      ).length,
+      completedMatches: relatedRequests.filter((request) => request.status === "completed").length
+    }
+  };
+}
+
 export function pairKey(sourceCupidateId: string, targetCupidateId: string) {
   return `${sourceCupidateId}:${targetCupidateId}`;
 }
@@ -543,6 +590,14 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
           displayName: activeCupidate?.displayName ?? representativeCupidate?.displayName ?? null,
           visibility: activeCupidate?.profileVisibility ?? representativeCupidate?.profileVisibility ?? null
         },
+        linkedCupidateProfile: activeCupidate
+          ? buildCupidateProfileSummary({
+              cupidate: activeCupidate,
+              ownerNickname: cupid?.nickname ?? cupidId,
+              myCupidId,
+              relatedRequests
+            })
+          : null,
         stats: {
           cupidateCount: ownedCupidates.length,
           activeCupidateCount: ownedCupidates.filter((item) => item.isActive).length,
@@ -563,40 +618,12 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     const relatedRequests = requestsByCupidateId.get(cupidate.cupidateId) ?? [];
     const owner = cupidById.get(cupidate.ownerCupidId);
 
-    return {
-      kind: "cupidate",
-      cupidateId: cupidate.cupidateId,
-      ownerCupidId: cupidate.ownerCupidId,
+    return buildCupidateProfileSummary({
+      cupidate,
       ownerNickname: owner?.nickname ?? cupidate.ownerCupidId,
-      displayName: cupidate.displayName,
-      birthYear: cupidate.birthYear,
-      gender: cupidate.gender,
-      bio: cupidate.bio,
-      isActive: cupidate.isActive,
-      profileVisibility: cupidate.profileVisibility,
-      region: cupidate.region,
-      jobTitle: cupidate.jobTitle,
-      heightCm: cupidate.heightCm,
-      smokingHabit: cupidate.smokingHabit,
-      drinkingHabit: cupidate.drinkingHabit,
-      preferredAgeRange: cupidate.preferredAgeRange,
-      preferredRegions: cupidate.preferredRegions,
-      preferredJobGroups: cupidate.preferredJobGroups,
-      preferredSmoking: cupidate.preferredSmoking,
-      preferredDrinking: cupidate.preferredDrinking,
-      preferredGenders: cupidate.preferredGenders,
-      preferredHeightRange: cupidate.preferredHeightRange,
-      mustHaveConditionKeys: cupidate.mustHaveConditionKeys,
-      preferences: cupidate.preferences,
-      canEdit: cupidate.ownerCupidId === myCupidId,
-      stats: {
-        totalRequests: relatedRequests.length,
-        ongoingMatches: relatedRequests.filter(
-          (request) => request.status === "requested" || request.status === "accepted"
-        ).length,
-        completedMatches: relatedRequests.filter((request) => request.status === "completed").length
-      }
-    };
+      myCupidId,
+      relatedRequests
+    });
   }, [cupidById, cupidates, myCupidId, representativeCupidateByOwnerId, requests, requestsByCupidateId, selectedProfileTarget]);
 
   const notifications = useMemo<HomeNotification[]>(
