@@ -1,6 +1,6 @@
 ﻿# Home View Spec (Prototype Rebuild)
 
-Last Updated: 2026-03-30
+Last Updated: 2026-03-31
 
 ## 1. 화면 목적
 - 앱 진입 즉시 "알림/추천/요약"을 확인하고 다음 액션으로 이동시키는 관제형 홈.
@@ -12,18 +12,20 @@ Last Updated: 2026-03-30
 
 2) Alarm Feed 섹션
 - 최신 알림 3~5건
-- 아이콘 + 텍스트 1행 구조
-- 읽지 않음 상태 강조
+- 상태 배지 + 핵심 문장 1행 구조
+- 같은 상태를 두 줄로 반복하지 않는다
 
 3) Today's Matches 섹션
 - 추천 카드 2열
-- 카드당 `프로필 2인 + 매칭률(%)`
+- 카드당 `프로필 2인 + 매칭률(%) + 공개 가능한 기본 메타(region/job)`
 - 탭 시 Matching 상세로 이동
+- generic `Cupidate` 같은 보조 라벨은 반복하지 않는다
 
 4) Recent Summary 섹션
-- 총 Cupidate 수
-- 활성 매칭 수
-- 주선 성공 수 배지
+- 활성 cupidate 수
+- 비활성 cupidate 수
+- 연결된 cupid 수
+- 진행 중 요청 수
 
 5) Readiness 섹션
 - 아래 조건에서만 노출되는 상태 안내 카드
@@ -37,6 +39,7 @@ Last Updated: 2026-03-30
 - `Manage Network`
 - `Review Matches`
 - `My Settings`
+- readiness 이슈가 있는 경우 `Manage Network` CTA를 더 강하게 강조한다
 
 7) 하단 고정 탭바
 - `HOME / NETWORK / MATCH / MY`

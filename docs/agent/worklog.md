@@ -54,6 +54,32 @@ Verification:
 Notes:
 - This pass was aimed at making Matching easier to scan on-device while keeping the privacy model consistent with Profile and Network.
 
+### Task 2026-03-31-03 - Home View QA Hardening
+Status: Completed
+
+Changes:
+- Removed redundant copy from Home feed and recommendation cards:
+  - no extra notification status line under the main message
+  - no generic `Suggested Pair` / `Cupidate` helper labels inside recommendation cards
+- Recommendation cards now surface only the details that help action:
+  - pair names
+  - public region/job meta when available
+  - match score
+- Reworked the Home summary block to reflect the actual POC bottlenecks:
+  - active cupidates
+  - inactive cupidates
+  - connected cupids
+  - active requests
+- Made quick-action emphasis dynamic so unresolved readiness states push the user toward Network first.
+- Added a focused component test to keep the Home card/snapshot layout concise.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand src/features/app/views/__tests__/HomeView.test.tsx src/features/app/__tests__/i18nFlow.test.tsx` passed.
+
+Notes:
+- This pass was aimed at making Home read like a dashboard instead of a stack of repeated explanations.
+
 ## 2026-03-30
 
 ### Task 2026-03-30-07 - Network IA Simplification to Cupid-First Flow

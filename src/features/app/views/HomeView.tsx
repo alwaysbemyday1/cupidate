@@ -39,16 +39,21 @@ function notificationBadgeStyle(status: HomeNotification["status"]) {
   return null;
 }
 
-function notificationStatusKey(status: HomeNotification["status"]) {
-  return `home.notification.status.${status}`;
-}
-
 function notificationTextKey(status: HomeNotification["status"]) {
   return `home.notification.${status}`;
 }
 
 function notificationBadgeKey(status: HomeNotification["status"]) {
   return `home.notification.badge.${status}`;
+}
+
+function buildRecommendationMeta(cupidate: CupidateRecord | undefined) {
+  if (!cupidate) {
+    return undefined;
+  }
+
+  const parts = [cupidate.region, cupidate.jobTitle].filter(Boolean);
+  return parts.length > 0 ? parts.join(" / ") : undefined;
 }
 
 export function HomeView({
@@ -87,6 +92,8 @@ export function HomeView({
               description: t("home.readiness.noConnectionsDescription")
             }
           : null;
+  const networkButtonVariant = readinessState ? "primary" : "secondary";
+  const matchingButtonVariant = readinessState ? "secondary" : "primary";
 
   return (
     <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
@@ -129,9 +136,6 @@ export function HomeView({
                     target: item.targetLabel
                   })}
                 </PixelText>
-                <PixelText variant="caption" style={styles.feedDescription}>
-                  {t(notificationStatusKey(item.status))}
-                </PixelText>
               </View>
             </View>
           ))
@@ -160,17 +164,16 @@ export function HomeView({
                 style={styles.recommendationPressable}
               >
                 <PixelBox style={styles.recommendationCard} contentStyle={styles.recommendationCardContent}>
-                  <PixelText variant="label" style={styles.summaryLabel}>
-                    {t("home.recommendation.title")}
-                  </PixelText>
                   <View style={styles.recommendationHeader}>
                     <View style={styles.recommendationMiniCard}>
                       <PixelText variant="body" style={styles.recommendationMiniName}>
                         {source?.displayName ?? item.sourceCupidateId}
                       </PixelText>
-                      <PixelText variant="caption" style={styles.recommendationMiniMeta}>
-                        {t("home.recommendation.profileLabel")}
-                      </PixelText>
+                      {buildRecommendationMeta(source) ? (
+                        <PixelText variant="caption" style={styles.listMeta}>
+                          {buildRecommendationMeta(source)}
+                        </PixelText>
+                      ) : null}
                     </View>
                     <PixelText variant="screenTitle" style={styles.recommendationHeart}>
                       {"<3"}
@@ -179,9 +182,11 @@ export function HomeView({
                       <PixelText variant="body" style={styles.recommendationMiniName}>
                         {target?.displayName ?? item.targetCupidateId}
                       </PixelText>
-                      <PixelText variant="caption" style={styles.recommendationMiniMeta}>
-                        {t("home.recommendation.profileLabel")}
-                      </PixelText>
+                      {buildRecommendationMeta(target) ? (
+                        <PixelText variant="caption" style={styles.listMeta}>
+                          {buildRecommendationMeta(target)}
+                        </PixelText>
+                      ) : null}
                     </View>
                   </View>
                   <View style={styles.recommendationRateChip}>
@@ -203,10 +208,18 @@ export function HomeView({
         <View style={styles.metricRow}>
           <View style={styles.metricPill}>
             <PixelText variant="screenTitle" style={styles.metricValue}>
-              {homeSummary.myCupidates}
+              {activeCupidateCount}
             </PixelText>
             <PixelText variant="caption" style={styles.metricLabel}>
-              {t("home.metrics.cupidates")}
+              {t("home.metrics.active")}
+            </PixelText>
+          </View>
+          <View style={styles.metricPill}>
+            <PixelText variant="screenTitle" style={styles.metricValue}>
+              {inactiveCupidateCount}
+            </PixelText>
+            <PixelText variant="caption" style={styles.metricLabel}>
+              {t("home.metrics.inactive")}
             </PixelText>
           </View>
           <View style={styles.metricPill}>
@@ -215,14 +228,6 @@ export function HomeView({
             </PixelText>
             <PixelText variant="caption" style={styles.metricLabel}>
               {t("home.metrics.connected")}
-            </PixelText>
-          </View>
-          <View style={styles.metricPill}>
-            <PixelText variant="screenTitle" style={styles.metricValue}>
-              {homeSummary.recommendations}
-            </PixelText>
-            <PixelText variant="caption" style={styles.metricLabel}>
-              {t("home.metrics.recommendations")}
             </PixelText>
           </View>
           <View style={styles.metricPill}>
@@ -255,9 +260,9 @@ export function HomeView({
         {t("home.sections.quickActions")}
       </PixelText>
       <View style={styles.buttonRow}>
-        <PixelButton label={t("home.actions.addNetwork")} variant="secondary" onPress={onGoNetwork} />
-        <PixelButton label={t("home.actions.reviewMatches")} variant="primary" onPress={onGoMatching} />
-        <PixelButton label={t("home.actions.updateProfile")} variant="primary" onPress={onGoMy} />
+        <PixelButton label={t("home.actions.addNetwork")} variant={networkButtonVariant} onPress={onGoNetwork} />
+        <PixelButton label={t("home.actions.reviewMatches")} variant={matchingButtonVariant} onPress={onGoMatching} />
+        <PixelButton label={t("home.actions.updateProfile")} variant="secondary" onPress={onGoMy} />
       </View>
     </ScrollView>
   );

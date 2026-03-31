@@ -174,9 +174,6 @@ export const styles = StyleSheet.create({
     flex: 1,
     gap: s.xxs
   },
-  feedDescription: {
-    color: c.inkMuted
-  },
   recommendationRow: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -210,9 +207,6 @@ export const styles = StyleSheet.create({
   },
   recommendationMiniName: {
     color: c.ink
-  },
-  recommendationMiniMeta: {
-    color: c.inkMuted
   },
   recommendationHeart: {
     color: c.pink
