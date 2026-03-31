@@ -67,6 +67,7 @@ Completed Work
 - [x] Matching tab QA hardening for concise cards and visibility-safe insights (Task 2026-03-31-02)
 - [x] Home view QA hardening for concise cards and actionable readiness summary (Task 2026-03-31-03)
 - [x] My view QA hardening for clear account/settings/network separation (Task 2026-03-31-04)
+- [x] Network shell QA hardening for compact guides and FAB entry (Task 2026-04-01-01)
 
 Next Tasks (Rebuild Track)
  - Task 2026-03-30-03: Device QA pass on Home readiness -> Network -> activation -> Matching flow

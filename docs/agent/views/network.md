@@ -1,6 +1,6 @@
 # Network View Spec (Cupid-First QA Pass)
 
-Last Updated: 2026-03-30
+Last Updated: 2026-04-01
 
 ## 1. Screen Purpose
 - Manage my cupid network first, then surface cupidates that become available through that network.
@@ -21,10 +21,11 @@ Last Updated: 2026-03-30
 
 3. segment content
 - `Cupids` segment:
-  - explanation card for cupid-first flow
-  - sub-toggle: `Cupid List` / `Add Cupid`
+  - compact guide card only
+  - cupid roster directly visible without an extra sub-tab
+  - floating add button at bottom-right opens the add-cupid composer
 - `Cupidates` segment:
-  - explanation card for automatic cupidate surfacing
+  - compact guide card only
   - `My Dating Profile`
   - `Active Cupidates in Network`
 
@@ -60,7 +61,7 @@ Last Updated: 2026-03-30
 - visibility rules still apply inside the profile view
 
 ## 4. Cupids Segment
-### 4.1 Cupid List Subview
+### 4.1 Cupid List
 - shows currently connected or pending cupids
 - each row should include:
   - nickname
@@ -75,22 +76,23 @@ Last Updated: 2026-03-30
   - current dating profile status
   - direct entry into linked cupidate profile when active
 
-### 4.2 Add Cupid Subview
-- dedicated registration/search view for finding another cupid by nickname
+### 4.2 Add Cupid Composer
+- opened from a floating action button, not from a sub-tab
+- dedicated registration/search view for finding another cupid
 - should contain:
   - search input
   - search result list
   - select action
   - send connection request action
-- empty/loading/error states must stay inside this subview only
+- empty/loading/error states must stay inside this composer only
 
 ## 5. Redundancy Cleanup Rules
 - Remove dead controls that do not change real behavior.
 - Do not surface a separate `Board` view.
 - Do not surface a separate `Register Cupidate` flow for other people.
-- Do not show cupid connection search inside the cupid list subview.
-- Avoid duplicate titles where the selected sub-tab already defines the mode.
-- Keep one clear purpose per subview.
+- Do not show a second layer of `Cupid List` / `Add Cupid` tabs inside the `Cupids` segment.
+- Avoid duplicate titles where the selected primary tab already defines the mode.
+- Keep one clear purpose per segment.
 - Roster rows should explain both:
   - connection state
   - dating profile state

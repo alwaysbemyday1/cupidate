@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, TextInput, View } from "react-native";
 
 import { useI18n } from "../../i18n/context";
@@ -19,8 +19,6 @@ type ConnectionSearchResult = {
   cupidateName: string | null;
   profileVisibility: "private" | "basic" | "public" | null;
 };
-
-type CupidSubview = "list" | "register";
 
 type NetworkViewProps = {
   networkSegment: NetworkSegment;
@@ -46,16 +44,6 @@ type NetworkViewProps = {
 };
 
 const placeholderTextColor = designTokens.color.inkMuted;
-
-function buildAvatarSeed(label: string) {
-  const trimmed = label.trim();
-
-  if (!trimmed) {
-    return "CP";
-  }
-
-  return Array.from(trimmed.replace(/\s+/g, "")).slice(0, 2).join("").toUpperCase();
-}
 
 function ageLabel(birthYear: number | null | undefined) {
   if (!birthYear) {
@@ -153,159 +141,291 @@ export function NetworkView({
   onRetryNetworkError
 }: NetworkViewProps) {
   const { t } = useI18n();
-  const [cupidSubview, setCupidSubview] = useState<CupidSubview>("list");
+  const [isAddCupidComposerOpen, setIsAddCupidComposerOpen] = useState(false);
 
   const connectedCupidNameById = useMemo(
     () => new Map(connections.map((item) => [item.cupidId, item.name])),
     [connections]
   );
 
+  useEffect(() => {
+    if (networkSegment !== "cupids") {
+      setIsAddCupidComposerOpen(false);
+    }
+  }, [networkSegment]);
+
   const showSearchEmptyState =
     networkSegment === "cupids" &&
-    cupidSubview === "register" &&
+    isAddCupidComposerOpen &&
     connectionSearchQuery.trim().length > 0 &&
     !isSearchingCupids &&
     connectionSearchResults.length === 0;
 
   async function handleAddConnection() {
     await onAddConnection();
-    setCupidSubview("list");
+    setIsAddCupidComposerOpen(false);
   }
 
   return (
-    <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
-      {isNetworkLoading ? (
-        <StateCard tone="loading" title={t("network.loading.title")} description={t("network.loading.description")} />
-      ) : null}
-      {networkError ? (
-        <StateCard
-          tone="error"
-          title={t("network.error.title")}
-          description={networkError}
-          actionLabel={t("network.error.retry")}
-          actionVariant="warning"
-          onAction={onRetryNetworkError}
-        />
-      ) : null}
-
-      <PixelSegmentTabs
-        activeKey={networkSegment}
-        items={[
-          { key: "cupids", label: t("network.segment.cupids"), testID: "network-segment-cupids" },
-          { key: "cupidates", label: t("network.segment.cupidates"), testID: "network-segment-cupidates" }
-        ]}
-        onSelect={onChangeNetworkSegment}
-      />
-
-      {networkSegment === "cupids" ? (
-        <>
-          <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
-            {t("network.sections.cupidsHub")}
-          </PixelText>
-
-          <PixelBox style={styles.networkFormCard} contentStyle={styles.networkFormContent}>
-            <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
-              {t("network.auto.title")}
-            </PixelText>
-            <PixelText variant="body" style={styles.textBody}>
-              {t("network.auto.description")}
-            </PixelText>
-          </PixelBox>
-
-          <PixelSegmentTabs
-            compact
-            activeKey={cupidSubview}
-            items={[
-              { key: "list", label: t("network.subsegment.cupidList"), testID: "network-subsegment-cupids-list" },
-              { key: "register", label: t("network.subsegment.cupidRegister"), testID: "network-subsegment-cupids-register" }
-            ]}
-            onSelect={setCupidSubview}
+    <View style={styles.panel}>
+      <ScrollView style={styles.panel} contentContainerStyle={styles.panelContent}>
+        {isNetworkLoading ? (
+          <StateCard tone="loading" title={t("network.loading.title")} description={t("network.loading.description")} />
+        ) : null}
+        {networkError ? (
+          <StateCard
+            tone="error"
+            title={t("network.error.title")}
+            description={networkError}
+            actionLabel={t("network.error.retry")}
+            actionVariant="warning"
+            onAction={onRetryNetworkError}
           />
+        ) : null}
 
-          {cupidSubview === "list" ? (
-            <>
-              <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
-                {t("network.sections.connectedRoster")}
+        <PixelSegmentTabs
+          activeKey={networkSegment}
+          items={[
+            { key: "cupids", label: t("network.segment.cupids"), testID: "network-segment-cupids" },
+            { key: "cupidates", label: t("network.segment.cupidates"), testID: "network-segment-cupidates" }
+          ]}
+          onSelect={onChangeNetworkSegment}
+        />
+
+        {networkSegment === "cupids" ? (
+          <>
+            <PixelBox style={styles.networkGuideCard} contentStyle={styles.networkGuideContent}>
+              <PixelText variant="body" style={styles.textBody}>
+                {t("network.guide.cupids.primary")}
               </PixelText>
-              {connections.length === 0 ? (
-                <StateCard
-                  tone="empty"
-                  title={t("network.empty.connectionsTitle")}
-                  description={t("network.empty.connectionsDescription")}
-                />
-              ) : (
-                <PixelBox style={styles.networkRosterCard} contentStyle={styles.networkRosterContent}>
-                  {connections.map((item) => (
-                    <Pressable
-                      key={item.connectionId}
-                      onPress={() => onOpenCupidProfile(item.cupidId)}
-                      testID={`profile-open-cupid-${item.cupidId}`}
-                      style={styles.networkProfilePressable}
-                    >
-                      <View style={styles.networkRosterItem}>
-                        <View style={styles.networkRosterItemHeader}>
-                          <View style={styles.networkRosterMain}>
-                            <PixelText variant="body" style={styles.listName}>
-                              {item.name}
-                            </PixelText>
-                            <PixelText variant="caption" style={styles.networkRosterMeta}>
-                              {t("network.connection.id", { id: item.cupidId })}
-                            </PixelText>
-                            <PixelText variant="caption" style={styles.networkRosterMeta}>
-                              {t(`network.connection.direction.${item.direction}`)}
-                            </PixelText>
-                            <PixelText variant="caption" style={styles.networkRosterMeta}>
-                              {item.datingProfileStatus === "active" && item.activeCupidateName
-                                ? t("network.connection.profile.activeWithName", {
-                                    value: item.activeCupidateName
-                                  })
-                                : t(datingStatusKey(item.datingProfileStatus))}
-                            </PixelText>
-                          </View>
-                          <View style={styles.networkStatusColumn}>
-                            <View style={[styles.networkStatusChip, connectionStatusStyle(item.status)]}>
-                              <PixelText variant="caption" style={styles.networkStatusText}>
-                                {t(connectionStatusKey(item.status))}
-                              </PixelText>
-                            </View>
-                            <View style={[styles.networkStatusChip, datingStatusStyle(item.datingProfileStatus)]}>
-                              <PixelText variant="caption" style={styles.networkStatusText}>
-                                {t(datingStatusKey(item.datingProfileStatus))}
-                              </PixelText>
-                            </View>
-                            </View>
-                          </View>
-                          {item.status === "pending" && item.direction === "inbound" ? (
-                            <View style={styles.buttonRow}>
-                              <PixelButton
-                                label={t("network.actions.acceptConnection")}
-                                variant="success"
-                                onPress={() => {
-                                  void onRespondToConnection(item.connectionId, "accept");
-                                }}
-                              />
-                              <PixelButton
-                                label={t("network.actions.declineConnection")}
-                                variant="danger"
-                                onPress={() => {
-                                  void onRespondToConnection(item.connectionId, "decline");
-                                }}
-                              />
-                            </View>
-                          ) : null}
+              <PixelText variant="caption" style={styles.profileMetaText}>
+                {t("network.guide.cupids.secondary")}
+              </PixelText>
+            </PixelBox>
+
+            {connections.length === 0 ? (
+              <StateCard
+                tone="empty"
+                title={t("network.empty.connectionsTitle")}
+                description={t("network.empty.connectionsDescription")}
+              />
+            ) : (
+              <PixelBox style={styles.networkRosterCard} contentStyle={styles.networkRosterContent}>
+                {connections.map((item) => (
+                  <Pressable
+                    key={item.connectionId}
+                    onPress={() => onOpenCupidProfile(item.cupidId)}
+                    testID={`profile-open-cupid-${item.cupidId}`}
+                    style={styles.networkProfilePressable}
+                  >
+                    <View style={styles.networkRosterItem}>
+                      <View style={styles.networkRosterItemHeader}>
+                        <View style={styles.networkRosterMain}>
+                          <PixelText variant="body" style={styles.listName}>
+                            {item.name}
+                          </PixelText>
+                          <PixelText variant="caption" style={styles.networkRosterMeta}>
+                            {t("network.connection.id", { id: item.cupidId })}
+                          </PixelText>
+                          <PixelText variant="caption" style={styles.networkRosterMeta}>
+                            {t(`network.connection.direction.${item.direction}`)}
+                          </PixelText>
+                          <PixelText variant="caption" style={styles.networkRosterMeta}>
+                            {item.datingProfileStatus === "active" && item.activeCupidateName
+                              ? t("network.connection.profile.activeWithName", {
+                                  value: item.activeCupidateName
+                                })
+                              : t(datingStatusKey(item.datingProfileStatus))}
+                          </PixelText>
                         </View>
-                      </Pressable>
-                  ))}
-                </PixelBox>
-              )}
-            </>
-          ) : null}
+                        <View style={styles.networkStatusColumn}>
+                          <View style={[styles.networkStatusChip, connectionStatusStyle(item.status)]}>
+                            <PixelText variant="caption" style={styles.networkStatusText}>
+                              {t(connectionStatusKey(item.status))}
+                            </PixelText>
+                          </View>
+                          <View style={[styles.networkStatusChip, datingStatusStyle(item.datingProfileStatus)]}>
+                            <PixelText variant="caption" style={styles.networkStatusText}>
+                              {t(datingStatusKey(item.datingProfileStatus))}
+                            </PixelText>
+                          </View>
+                        </View>
+                      </View>
+                      {item.status === "pending" && item.direction === "inbound" ? (
+                        <View style={styles.buttonRow}>
+                          <PixelButton
+                            label={t("network.actions.acceptConnection")}
+                            variant="success"
+                            onPress={() => {
+                              void onRespondToConnection(item.connectionId, "accept");
+                            }}
+                          />
+                          <PixelButton
+                            label={t("network.actions.declineConnection")}
+                            variant="danger"
+                            onPress={() => {
+                              void onRespondToConnection(item.connectionId, "decline");
+                            }}
+                          />
+                        </View>
+                      ) : null}
+                    </View>
+                  </Pressable>
+                ))}
+              </PixelBox>
+            )}
+          </>
+        ) : null}
 
-          {cupidSubview === "register" ? (
-            <PixelBox style={styles.networkFormCard} contentStyle={styles.networkFormContent}>
-              <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
-                {t("network.sections.discovery")}
+        {networkSegment === "cupidates" ? (
+          <>
+            <PixelBox style={styles.networkGuideCard} contentStyle={styles.networkGuideContent}>
+              <PixelText variant="body" style={styles.textBody}>
+                {t("network.guide.cupidates.primary")}
               </PixelText>
+              <PixelText variant="caption" style={styles.profileMetaText}>
+                {t("network.guide.cupidates.secondary")}
+              </PixelText>
+            </PixelBox>
+
+            <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
+              {t("network.sections.myCupidate")}
+            </PixelText>
+            {myCupidate ? (
+              <PixelBox style={styles.networkRosterCard} contentStyle={styles.networkRosterContent}>
+                <Pressable
+                  onPress={() => onOpenCupidateProfile(myCupidate.cupidateId)}
+                  testID={`profile-open-cupidate-${myCupidate.cupidateId}`}
+                  style={styles.networkProfilePressable}
+                >
+                  <View style={styles.networkRosterItem}>
+                    <View style={styles.networkRosterItemHeader}>
+                      <View style={styles.networkRosterMain}>
+                        <PixelText variant="body" style={styles.listName}>
+                          {myCupidate.displayName}
+                        </PixelText>
+                        <PixelText variant="caption" style={styles.networkRosterMeta}>
+                          {renderCupidateMeta(myCupidate, currentCupidId, t)}
+                        </PixelText>
+                        <PixelText variant="caption" style={styles.networkRosterMeta}>
+                          {t("network.cupidate.visibility", {
+                            value: t(visibilityKey(myCupidate.profileVisibility ?? "basic"))
+                          })}
+                        </PixelText>
+                      </View>
+                      <View style={styles.networkStatusColumn}>
+                        <View
+                          style={[
+                            styles.networkStatusChip,
+                            myCupidate.isActive ? styles.networkStatusMatched : styles.networkStatusPending
+                          ]}
+                        >
+                          <PixelText variant="caption" style={styles.networkStatusText}>
+                            {myCupidate.isActive
+                              ? t("network.cupidate.activation.active")
+                              : t("network.cupidate.activation.inactive")}
+                          </PixelText>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                </Pressable>
+              </PixelBox>
+            ) : (
+              <StateCard
+                tone="empty"
+                title={t("network.empty.myCupidateTitle")}
+                description={t("network.empty.myCupidateDescription")}
+              />
+            )}
+
+            <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
+              {t("network.sections.networkCupidates")}
+            </PixelText>
+            {networkCupidates.length === 0 ? (
+              <StateCard
+                tone="empty"
+                title={t("network.empty.networkCupidatesTitle")}
+                description={t("network.empty.networkCupidatesDescription")}
+              />
+            ) : (
+              <PixelBox style={styles.networkRosterCard} contentStyle={styles.networkRosterContent}>
+                {networkCupidates.map((item) => (
+                  <Pressable
+                    key={item.cupidateId}
+                    onPress={() => onOpenCupidateProfile(item.cupidateId)}
+                    testID={`profile-open-cupidate-${item.cupidateId}`}
+                    style={styles.networkProfilePressable}
+                  >
+                    <View style={styles.networkRosterItem}>
+                      <View style={styles.networkRosterItemHeader}>
+                        <View style={styles.networkRosterMain}>
+                          <PixelText variant="body" style={styles.listName}>
+                            {item.displayName}
+                          </PixelText>
+                          <PixelText variant="caption" style={styles.networkRosterMeta}>
+                            {t("network.cupidate.owner", {
+                              value: connectedCupidNameById.get(item.ownerCupidId) ?? item.ownerCupidId
+                            })}
+                          </PixelText>
+                          <PixelText variant="caption" style={styles.networkRosterMeta}>
+                            {renderCupidateMeta(item, currentCupidId, t)}
+                          </PixelText>
+                          <PixelText variant="caption" style={styles.networkRosterMeta}>
+                            {t("network.cupidate.visibility", {
+                              value: t(visibilityKey(item.profileVisibility ?? "basic"))
+                            })}
+                          </PixelText>
+                        </View>
+                        <View style={styles.networkStatusColumn}>
+                          <View style={[styles.networkStatusChip, styles.networkStatusMatched]}>
+                            <PixelText variant="caption" style={styles.networkStatusText}>
+                              {t("network.cupidate.activation.active")}
+                            </PixelText>
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                  </Pressable>
+                ))}
+              </PixelBox>
+            )}
+          </>
+        ) : null}
+      </ScrollView>
+
+      <Pressable
+        accessibilityRole="button"
+        testID="network-add-cupid-fab"
+        style={styles.networkFab}
+        onPress={() => setIsAddCupidComposerOpen(true)}
+      >
+        <View style={styles.networkFabInner}>
+          <PixelText variant="screenTitle" style={styles.networkFabPlus}>
+            +
+          </PixelText>
+          <PixelText variant="caption" style={styles.networkFabLabel}>
+            {t("network.actions.openAddCupid")}
+          </PixelText>
+        </View>
+      </Pressable>
+
+      {isAddCupidComposerOpen ? (
+        <View style={styles.networkComposerOverlay} testID="network-add-cupid-sheet">
+          <Pressable style={styles.networkComposerScrim} onPress={() => setIsAddCupidComposerOpen(false)} />
+          <View style={styles.networkComposerWrapper}>
+            <PixelBox style={styles.networkComposerFrame} contentStyle={styles.networkComposerContent}>
+              <View style={styles.networkComposerTopRow}>
+                <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+                  {t("network.sections.discovery")}
+                </PixelText>
+                <PixelButton
+                  label={t("network.actions.closeComposer")}
+                  variant="secondary"
+                  onPress={() => setIsAddCupidComposerOpen(false)}
+                />
+              </View>
+
               <PixelText variant="caption" style={styles.fieldHint}>
                 {t("network.discovery.caption")}
               </PixelText>
@@ -397,129 +517,9 @@ export function NetworkView({
                 />
               </View>
             </PixelBox>
-          ) : null}
-        </>
+          </View>
+        </View>
       ) : null}
-
-      {networkSegment === "cupidates" ? (
-        <>
-          <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
-            {t("network.sections.cupidatesHub")}
-          </PixelText>
-
-          <PixelBox style={styles.networkFormCard} contentStyle={styles.networkFormContent}>
-            <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
-              {t("network.auto.title")}
-            </PixelText>
-            <PixelText variant="body" style={styles.textBody}>
-              {t("network.cupidates.description")}
-            </PixelText>
-          </PixelBox>
-
-          <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
-            {t("network.sections.myCupidate")}
-          </PixelText>
-          {myCupidate ? (
-            <PixelBox style={styles.networkRosterCard} contentStyle={styles.networkRosterContent}>
-              <Pressable
-                onPress={() => onOpenCupidateProfile(myCupidate.cupidateId)}
-                testID={`profile-open-cupidate-${myCupidate.cupidateId}`}
-                style={styles.networkProfilePressable}
-              >
-                <View style={styles.networkRosterItem}>
-                  <View style={styles.networkRosterItemHeader}>
-                    <View style={styles.networkRosterMain}>
-                      <PixelText variant="body" style={styles.listName}>
-                        {myCupidate.displayName}
-                      </PixelText>
-                      <PixelText variant="caption" style={styles.networkRosterMeta}>
-                        {renderCupidateMeta(myCupidate, currentCupidId, t)}
-                      </PixelText>
-                        <PixelText variant="caption" style={styles.networkRosterMeta}>
-                          {t("network.cupidate.visibility", {
-                            value: t(visibilityKey(myCupidate.profileVisibility ?? "basic"))
-                          })}
-                        </PixelText>
-                    </View>
-                    <View style={styles.networkStatusColumn}>
-                      <View
-                        style={[
-                          styles.networkStatusChip,
-                          myCupidate.isActive ? styles.networkStatusMatched : styles.networkStatusPending
-                        ]}
-                      >
-                        <PixelText variant="caption" style={styles.networkStatusText}>
-                          {myCupidate.isActive
-                            ? t("network.cupidate.activation.active")
-                            : t("network.cupidate.activation.inactive")}
-                        </PixelText>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              </Pressable>
-            </PixelBox>
-          ) : (
-            <StateCard
-              tone="empty"
-              title={t("network.empty.myCupidateTitle")}
-              description={t("network.empty.myCupidateDescription")}
-            />
-          )}
-
-          <PixelText variant="sectionTitle" style={styles.pageSectionTitle}>
-            {t("network.sections.networkCupidates")}
-          </PixelText>
-          {networkCupidates.length === 0 ? (
-            <StateCard
-              tone="empty"
-              title={t("network.empty.networkCupidatesTitle")}
-              description={t("network.empty.networkCupidatesDescription")}
-            />
-          ) : (
-            <PixelBox style={styles.networkRosterCard} contentStyle={styles.networkRosterContent}>
-              {networkCupidates.map((item) => (
-                <Pressable
-                  key={item.cupidateId}
-                  onPress={() => onOpenCupidateProfile(item.cupidateId)}
-                  testID={`profile-open-cupidate-${item.cupidateId}`}
-                  style={styles.networkProfilePressable}
-                >
-                  <View style={styles.networkRosterItem}>
-                    <View style={styles.networkRosterItemHeader}>
-                      <View style={styles.networkRosterMain}>
-                        <PixelText variant="body" style={styles.listName}>
-                          {item.displayName}
-                        </PixelText>
-                        <PixelText variant="caption" style={styles.networkRosterMeta}>
-                          {t("network.cupidate.owner", {
-                            value: connectedCupidNameById.get(item.ownerCupidId) ?? item.ownerCupidId
-                          })}
-                        </PixelText>
-                        <PixelText variant="caption" style={styles.networkRosterMeta}>
-                          {renderCupidateMeta(item, currentCupidId, t)}
-                        </PixelText>
-                        <PixelText variant="caption" style={styles.networkRosterMeta}>
-                          {t("network.cupidate.visibility", {
-                            value: t(visibilityKey(item.profileVisibility ?? "basic"))
-                          })}
-                        </PixelText>
-                      </View>
-                      <View style={styles.networkStatusColumn}>
-                        <View style={[styles.networkStatusChip, styles.networkStatusMatched]}>
-                          <PixelText variant="caption" style={styles.networkStatusText}>
-                            {t("network.cupidate.activation.active")}
-                          </PixelText>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-                </Pressable>
-              ))}
-            </PixelBox>
-          )}
-        </>
-      ) : null}
-    </ScrollView>
+    </View>
   );
 }

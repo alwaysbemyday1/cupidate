@@ -610,8 +610,61 @@ export const styles = StyleSheet.create({
     padding: s.md,
     gap: s.sm
   },
+  networkGuideCard: {},
+  networkGuideContent: {
+    backgroundColor: c.surface,
+    paddingHorizontal: s.md,
+    paddingVertical: s.sm,
+    gap: s.xxs
+  },
   networkSearchResults: {
     gap: s.xs
+  },
+  networkFab: {
+    position: "absolute",
+    right: s.md,
+    bottom: z.tabBarHeight + z.tabBarInset + s.md
+  },
+  networkFabInner: {
+    minWidth: 76,
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.pink,
+    paddingHorizontal: s.sm,
+    paddingVertical: s.xs,
+    alignItems: "center",
+    gap: 2
+  },
+  networkFabPlus: {
+    color: c.inkInverse
+  },
+  networkFabLabel: {
+    color: c.inkInverse
+  },
+  networkComposerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "flex-end"
+  },
+  networkComposerScrim: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(17, 25, 40, 0.5)"
+  },
+  networkComposerWrapper: {
+    paddingHorizontal: s.md,
+    paddingBottom: z.tabBarHeight + z.tabBarInset + s.md
+  },
+  networkComposerFrame: {},
+  networkComposerContent: {
+    backgroundColor: c.surface,
+    padding: s.md,
+    gap: s.sm,
+    maxHeight: 520
+  },
+  networkComposerTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: s.sm
   },
   matchingPanelCard: {},
   matchingPanelContent: {

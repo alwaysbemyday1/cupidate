@@ -106,6 +106,28 @@ Verification:
 Notes:
 - This pass was aimed at making My feel like a settings hub instead of a mixed dashboard/status dump.
 
+## 2026-04-01
+
+### Task 2026-04-01-01 - Network Shell QA Hardening
+Status: Completed
+
+Changes:
+- Removed the extra `Cupid List / Add Cupid` sub-tab layer from Network.
+- Replaced the oversized explanatory blocks with compact two-line guide cards for:
+  - `Cupids`
+  - `Cupidates`
+- Made the cupid roster the default content of the `Cupids` segment.
+- Added a floating `Add Cupid` entry button so connection creation is now a clear secondary action instead of a parallel tab mode.
+- Moved the add-cupid search UI into an overlay composer opened from the FAB.
+- Updated Network navigation and discovery tests to match the new structure.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand src/features/app/__tests__/networkDiscoveryFlow.test.tsx src/features/app/__tests__/navigationTabs.test.tsx App.test.tsx` passed.
+
+Notes:
+- This pass focused on reducing duplicated IA in Network before touching the add-flow copy and profile layouts.
+
 ## 2026-03-30
 
 ### Task 2026-03-30-07 - Network IA Simplification to Cupid-First Flow
