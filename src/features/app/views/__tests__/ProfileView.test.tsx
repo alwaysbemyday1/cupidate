@@ -122,6 +122,9 @@ describe("ProfileView", () => {
 
     expect(screen.getByTestId("profile-segment-activity")).toBeTruthy();
     expect(screen.getByTestId("profile-segment-cupidate")).toBeTruthy();
+    expect(screen.queryByTestId("profile-sheet-scroll")).toBeNull();
+    expect(screen.getByTestId("profile-page-activity-scroll")).toBeTruthy();
+    expect(screen.getByTestId("profile-page-cupidate-scroll")).toBeTruthy();
     expect(screen.getByText("Matches Guided")).toBeTruthy();
     expect(screen.getByText("Ongoing")).toBeTruthy();
     expect(screen.getByText("Romance Conversions")).toBeTruthy();

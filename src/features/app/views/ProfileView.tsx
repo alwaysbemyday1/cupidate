@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import {
   type LayoutChangeEvent,
   type NativeScrollEvent,
@@ -322,6 +322,26 @@ function buildEditState(profile: CupidateProfileSummary): CupidateEditState {
 
 type CupidProfileTabKey = "activity" | "cupidate";
 
+function ProfilePageScroll({
+  children,
+  testID
+}: {
+  children: ReactNode;
+  testID?: string;
+}) {
+  return (
+    <ScrollView
+      nestedScrollEnabled
+      showsVerticalScrollIndicator={false}
+      style={styles.profilePageScroll}
+      contentContainerStyle={styles.profilePageScrollContent}
+      testID={testID}
+    >
+      {children}
+    </ScrollView>
+  );
+}
+
 function CupidProfileActivityPanel({
   profile,
   t
@@ -427,7 +447,11 @@ function CupidProfilePanel({
   }
 
   if (!hasLinkedCupidate || !profile.linkedCupidateProfile) {
-    return <CupidProfileActivityPanel profile={profile} t={t} />;
+    return (
+      <ProfilePageScroll testID="profile-page-activity-scroll">
+        <CupidProfileActivityPanel profile={profile} t={t} />
+      </ProfilePageScroll>
+    );
   }
 
   return (
@@ -446,6 +470,7 @@ function CupidProfilePanel({
         <ScrollView
           ref={pagerRef}
           horizontal
+          nestedScrollEnabled
           pagingEnabled
           showsHorizontalScrollIndicator={false}
           onMomentumScrollEnd={handlePagerMomentumEnd}
@@ -454,10 +479,14 @@ function CupidProfilePanel({
           testID="profile-cupid-pager"
         >
           <View style={[styles.profilePagerPage, pagerWidth ? { width: pagerWidth } : null]}>
-            <CupidProfileActivityPanel profile={profile} t={t} />
+            <ProfilePageScroll testID="profile-page-activity-scroll">
+              <CupidProfileActivityPanel profile={profile} t={t} />
+            </ProfilePageScroll>
           </View>
           <View style={[styles.profilePagerPage, pagerWidth ? { width: pagerWidth } : null]}>
-            <CupidateProfilePanel profile={profile.linkedCupidateProfile} t={t} />
+            <ProfilePageScroll testID="profile-page-cupidate-scroll">
+              <CupidateProfilePanel profile={profile.linkedCupidateProfile} t={t} />
+            </ProfilePageScroll>
           </View>
         </ScrollView>
       </View>
@@ -1290,18 +1319,24 @@ export function ProfileView({
             />
           </View>
 
-          <ScrollView style={styles.profileSheetScroll} contentContainerStyle={styles.profileSheetScrollContent}>
+          <View style={styles.profileSheetBody}>
             {profile.kind === "cupid" ? (
               <CupidProfilePanel profile={profile} t={t} />
             ) : (
-              <CupidateProfilePanel
-                profile={profile}
-                isSaving={isSavingCupidateProfile}
-                onSave={onSaveCupidateProfile}
-                t={t}
-              />
+              <ScrollView
+                style={styles.profileSheetScroll}
+                contentContainerStyle={styles.profileSheetScrollContent}
+                testID="profile-sheet-scroll"
+              >
+                <CupidateProfilePanel
+                  profile={profile}
+                  isSaving={isSavingCupidateProfile}
+                  onSave={onSaveCupidateProfile}
+                  t={t}
+                />
+              </ScrollView>
             )}
-          </ScrollView>
+          </View>
         </PixelBox>
       </View>
     </View>

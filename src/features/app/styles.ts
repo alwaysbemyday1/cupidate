@@ -1073,6 +1073,10 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: s.sm
   },
+  profileSheetBody: {
+    flex: 1,
+    minHeight: 0
+  },
   profileSheetTitle: {
     color: c.ink
   },
@@ -1085,18 +1089,29 @@ export const styles = StyleSheet.create({
     paddingBottom: s.md
   },
   profilePagerViewport: {
+    flex: 1,
     width: "100%",
-    minHeight: 320
+    minHeight: 0
   },
   profilePagerScroll: {
+    flex: 1,
     width: "100%"
   },
   profilePagerContent: {
-    alignItems: "flex-start"
+    flexGrow: 1,
+    alignItems: "stretch"
   },
   profilePagerPage: {
+    flex: 1,
+    minHeight: 0
+  },
+  profilePageScroll: {
+    flex: 1
+  },
+  profilePageScrollContent: {
     gap: s.sm,
-    paddingRight: s.xs
+    paddingRight: s.xs,
+    paddingBottom: s.md
   },
   profileSheetCard: {},
   profileSheetCardContent: {
