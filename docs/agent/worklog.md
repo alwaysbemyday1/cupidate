@@ -108,6 +108,40 @@ Notes:
 
 ## 2026-04-01
 
+### Task 2026-04-01-08 - FAB Dock Visibility Polish
+Status: Completed
+
+Changes:
+- Reduced the Network FAB shadow so it no longer overpowers the dock.
+- Tucked the FAB deeper into the bottom-right dock corner with a smaller circular footprint.
+- Hid the FAB while:
+  - a profile overlay is open
+  - the add-cupid composer itself is open
+- Added app-level coverage to ensure the FAB disappears once a profile sheet is opened from Network.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand src/features/app/__tests__/profileOverlayFlow.test.tsx src/features/app/__tests__/navigationTabs.test.tsx src/features/app/__tests__/networkDiscoveryFlow.test.tsx` passed.
+
+### Task 2026-04-01-09 - Profile Width + Density Pass
+Status: Completed
+
+Changes:
+- Fixed cupid profile page width consistency so the pager tabs and underlying card content stretch to the same usable width.
+- Tightened the profile-page scroll content to remove the visual width mismatch caused by trailing right padding.
+- Rebuilt the cupidate top info area into compact fact pills instead of equal-width fact boxes.
+- Kept the same data surface while reducing vertical waste in:
+  - age
+  - gender
+  - region
+  - job
+  - height
+  - lifestyle
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand src/features/app/views/__tests__/ProfileView.test.tsx src/features/app/__tests__/profileOverlayFlow.test.tsx src/features/app/__tests__/matchingFlow.test.tsx` passed.
+
 ### Task 2026-04-01-05 - Compact-Screen Layout Hardening
 Status: Completed
 

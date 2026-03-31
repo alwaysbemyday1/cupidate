@@ -71,6 +71,8 @@ Completed Work
 - [x] Compact-screen layout hardening across Home/Matching/Profile (Task 2026-04-01-05)
 - [x] Docked Network FAB polish + cupid ID cleanup (Task 2026-04-01-06)
 - [x] Independent vertical scrolling per cupid profile page (Task 2026-04-01-07)
+- [x] Dock-tucked FAB visibility polish over profile overlays (Task 2026-04-01-08)
+- [x] Profile width alignment + cupidate fact-density pass (Task 2026-04-01-09)
 
 Next Tasks (Rebuild Track)
  - Task 2026-03-30-03: Device QA pass on Home readiness -> Network -> activation -> Matching flow
