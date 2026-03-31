@@ -226,21 +226,19 @@ export class SupabaseNetworkRepository implements NetworkRepository {
       return [];
     }
 
-    const userId = await getRequiredUserId(this.client);
     const { data, error } = await this.client
-      .from("cupids")
-      .select("id,nickname")
-      .neq("id", userId)
-      .ilike("nickname", `%${trimmed}%`)
-      .order("nickname", { ascending: true })
-      .limit(20)
-      .returns<CupidRow[]>();
+      .rpc("search_cupid_directory", {
+        search_query: trimmed
+      })
+      .returns<CupidRow[] | null>();
 
     if (error) {
       throw error;
     }
 
-    return data.map((item) => ({
+    const rows = Array.isArray(data) ? data : [];
+
+    return rows.map((item) => ({
       id: item.id,
       nickname: item.nickname
     }));

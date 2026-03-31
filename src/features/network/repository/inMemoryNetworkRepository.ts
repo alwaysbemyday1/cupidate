@@ -18,11 +18,13 @@ import type {
 const NOW = () => new Date().toISOString();
 
 type InMemoryNetworkRepositoryOptions = {
-  currentCupid?: CurrentCupid;
-  cupids?: CurrentCupid[];
+  currentCupid?: CurrentCupid & { email?: string | null };
+  cupids?: Array<CurrentCupid & { email?: string | null }>;
   cupidates?: NetworkCupidate[];
   connections?: Omit<NetworkConnection, "counterpartCupidId" | "counterpartNickname" | "direction">[];
 };
+
+type InMemoryCupid = CurrentCupid & { email?: string | null };
 
 function randomId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 10_000)}`;
@@ -62,19 +64,23 @@ function hydrateCupidate(input: CreateCupidateInput, ownerCupidId: string): Netw
 }
 
 export class InMemoryNetworkRepository implements NetworkRepository {
-  private currentCupid: CurrentCupid;
-  private cupidsById: Map<string, CurrentCupid>;
+  private currentCupid: InMemoryCupid;
+  private cupidsById: Map<string, InMemoryCupid>;
   private cupidates: NetworkCupidate[];
   private connections: Omit<NetworkConnection, "counterpartCupidId" | "counterpartNickname" | "direction">[];
 
   constructor(options?: InMemoryNetworkRepositoryOptions) {
-    this.currentCupid = options?.currentCupid ?? { id: "local-cupid-me", nickname: "local_me" };
+    this.currentCupid = options?.currentCupid ?? {
+      id: "local-cupid-me",
+      nickname: "local_me",
+      email: "local_me@cupidate.app"
+    };
 
     this.cupidsById = new Map(
       [
         this.currentCupid,
-        { id: "local-cupid-a", nickname: "connected_a" },
-        { id: "local-cupid-b", nickname: "connected_b" },
+        { id: "local-cupid-a", nickname: "connected_a", email: "connected_a@cupidate.app" },
+        { id: "local-cupid-b", nickname: "connected_b", email: "connected_b@cupidate.app" },
         ...(options?.cupids ?? [])
       ].map((item) => [item.id, item])
     );
@@ -84,7 +90,10 @@ export class InMemoryNetworkRepository implements NetworkRepository {
   }
 
   async getCurrentCupid(): Promise<CurrentCupid | null> {
-    return this.currentCupid;
+    return {
+      id: this.currentCupid.id,
+      nickname: this.currentCupid.nickname
+    };
   }
 
   async searchCupids(query: string): Promise<DiscoverableCupid[]> {
@@ -106,7 +115,10 @@ export class InMemoryNetworkRepository implements NetworkRepository {
       .filter((item) => item.id !== this.currentCupid.id)
       .filter((item) => !connectedCupidIds.has(item.id))
       .filter(
-        (item) => item.nickname.toLowerCase().includes(normalized) || item.id.toLowerCase().includes(normalized)
+        (item) =>
+          item.nickname.toLowerCase().includes(normalized) ||
+          item.id.toLowerCase().includes(normalized) ||
+          item.email?.toLowerCase().includes(normalized)
       )
       .sort((a, b) => a.nickname.localeCompare(b.nickname))
       .slice(0, 20)
@@ -117,7 +129,7 @@ export class InMemoryNetworkRepository implements NetworkRepository {
   }
 
   async upsertCurrentCupidNickname(nickname: string): Promise<CurrentCupid> {
-    const next: CurrentCupid = {
+    const next: InMemoryCupid = {
       ...this.currentCupid,
       nickname: nickname.trim()
     };
@@ -244,7 +256,8 @@ export class InMemoryNetworkRepository implements NetworkRepository {
     if (!this.cupidsById.has(input.addresseeCupidId)) {
       this.cupidsById.set(input.addresseeCupidId, {
         id: input.addresseeCupidId,
-        nickname: `cupid_${input.addresseeCupidId.slice(-4)}`
+        nickname: `cupid_${input.addresseeCupidId.slice(-4)}`,
+        email: `${input.addresseeCupidId.slice(-4)}@cupidate.app`
       });
     }
 

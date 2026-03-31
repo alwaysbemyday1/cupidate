@@ -19,11 +19,13 @@ describe("Network discovery flow", () => {
         cupids: [
           {
             id: "local-cupid-a",
-            nickname: "network_buddy"
+            nickname: "network_buddy",
+            email: "network_buddy@cupidate.app"
           },
           {
             id: "local-cupid-b",
-            nickname: "runner_friend"
+            nickname: "runner_friend",
+            email: "runner_friend@cupidate.app"
           }
         ],
         cupidates: [],
@@ -45,7 +47,7 @@ describe("Network discovery flow", () => {
     fireEvent.press(screen.getByTestId("network-add-cupid-fab"));
 
     await waitFor(() => {
-      expect(screen.getByText("Search Cupid by Nickname")).toBeTruthy();
+      expect(screen.getByText("Search by Email or Username")).toBeTruthy();
     });
   }
 
@@ -54,10 +56,13 @@ describe("Network discovery flow", () => {
 
     await openConnectedCupidsSegment();
 
-    fireEvent.changeText(screen.getByPlaceholderText("e.g. connected_a"), "zzzz");
+    fireEvent.changeText(
+      screen.getByPlaceholderText("e.g. demo-yuna@cupidate.app or navy_yuna"),
+      "zzzz"
+    );
 
     await waitFor(() => {
-      expect(screen.getByText("No available cupid found for this query.")).toBeTruthy();
+      expect(screen.getByText("No cupid matched that email or username.")).toBeTruthy();
     });
   });
 
@@ -66,7 +71,10 @@ describe("Network discovery flow", () => {
 
     await openConnectedCupidsSegment();
 
-    fireEvent.changeText(screen.getByPlaceholderText("e.g. connected_a"), "buddy");
+    fireEvent.changeText(
+      screen.getByPlaceholderText("e.g. demo-yuna@cupidate.app or navy_yuna"),
+      "network_buddy@cupidate.app"
+    );
 
     await waitFor(() => {
       expect(screen.getByText("network_buddy")).toBeTruthy();

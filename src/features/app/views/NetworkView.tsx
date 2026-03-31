@@ -426,9 +426,14 @@ export function NetworkView({
                 />
               </View>
 
-              <PixelText variant="caption" style={styles.fieldHint}>
-                {t("network.discovery.caption")}
-              </PixelText>
+              <PixelBox style={styles.networkGuideCard} contentStyle={styles.networkGuideContent}>
+                <PixelText variant="body" style={styles.textBody}>
+                  {t("network.discovery.primary")}
+                </PixelText>
+                <PixelText variant="caption" style={styles.profileMetaText}>
+                  {t("network.discovery.secondary")}
+                </PixelText>
+              </PixelBox>
 
               <PixelText variant="label" style={styles.fieldLabel}>
                 {t("network.fields.searchCupid")}

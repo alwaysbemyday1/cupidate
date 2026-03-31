@@ -128,11 +128,11 @@ describe("InMemoryNetworkRepository", () => {
     expect(updated.respondedAt).toBeTruthy();
   });
 
-  it("searches discoverable cupids by nickname", async () => {
+  it("searches discoverable cupids by nickname or email", async () => {
     const repository = new InMemoryNetworkRepository({
       cupids: [
-        { id: "local-cupid-c", nickname: "jupiter" },
-        { id: "local-cupid-d", nickname: "juno" }
+        { id: "local-cupid-c", nickname: "jupiter", email: "jupiter@cupidate.app" },
+        { id: "local-cupid-d", nickname: "juno", email: "juno@cupidate.app" }
       ],
       connections: [
         {
@@ -147,9 +147,11 @@ describe("InMemoryNetworkRepository", () => {
       ]
     });
 
-    const results = await repository.searchCupids("ju");
+    const nicknameResults = await repository.searchCupids("ju");
+    const emailResults = await repository.searchCupids("juno@cupidate.app");
 
-    expect(results.map((item) => item.nickname)).toEqual(["juno", "jupiter"]);
-    expect(results.some((item) => item.id === "local-cupid-a")).toBe(false);
+    expect(nicknameResults.map((item) => item.nickname)).toEqual(["juno", "jupiter"]);
+    expect(nicknameResults.some((item) => item.id === "local-cupid-a")).toBe(false);
+    expect(emailResults.map((item) => item.nickname)).toEqual(["juno"]);
   });
 });

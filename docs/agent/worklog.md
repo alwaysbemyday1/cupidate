@@ -1112,3 +1112,18 @@ Verification:
 
 Notes:
 - This pass focused on reducing user confusion before device QA.
+
+### Task 2026-04-01-02 - Add Cupid Composer Search Hardening
+Status: Completed
+
+Changes:
+- Reworked the `Add Cupid` composer copy so it clearly explains the cupid-first model:
+  - add the cupid first
+  - active cupidates appear in the cupidate list automatically
+- Expanded discovery search from nickname-only to `email or username`.
+- Added a new Supabase RPC for cupid directory search with hardened search path settings.
+- Updated in-memory discovery logic and tests so email lookups behave the same way in local mode.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand src/features/app/__tests__/networkDiscoveryFlow.test.tsx src/features/network/repository/__tests__/inMemoryNetworkRepository.test.ts` passed.

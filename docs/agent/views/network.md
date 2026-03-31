@@ -80,7 +80,10 @@ Last Updated: 2026-04-01
 - opened from a floating action button, not from a sub-tab
 - dedicated registration/search view for finding another cupid
 - should contain:
-  - search input
+  - a short guidance card that explains:
+    - adding a cupid is enough
+    - connected users who already activated cupidate appear in `Cupidates` automatically
+  - search input for `email or username`
   - search result list
   - select action
   - send connection request action
