@@ -85,9 +85,8 @@ export function MyView({
 }: MyViewProps) {
   const { locale, setLocale, t } = useI18n();
   const avatarSeed = buildAvatarSeed(myNickname);
-  const profileStatus = accountMode === "supabase" ? t("my.status.supabase") : t("my.status.local");
+  const accountModeLabel = accountMode === "supabase" ? t("my.status.supabase") : t("my.status.local");
   const joinedLabel = formatJoinedAt(joinedAt, t("my.fallback.localBuild"), t("my.fallback.unknown"));
-  const accountStatus = notificationEnabled ? t("my.status.alertsOn") : t("my.status.alertsOff");
   const visibilityLabel = privacyNetworkOnly ? t("my.visibility.network") : t("my.visibility.private");
   const notificationLabel = notificationEnabled ? t("my.notification.on") : t("my.notification.off");
 
@@ -125,9 +124,6 @@ export function MyView({
             <PixelText variant="body" style={styles.textBody}>
               {t("my.fields.cupidId", { id: currentCupidId })}
             </PixelText>
-            <PixelText variant="caption" style={styles.profileMetaText}>
-              {profileStatus}
-            </PixelText>
           </View>
         </View>
 
@@ -137,14 +133,15 @@ export function MyView({
             variant="primary"
             onPress={onSaveMyNickname}
           />
-          <PixelButton
-            label={t("my.buttons.refreshSession")}
-            variant="secondary"
-            onPress={() => {
-              void onRefreshAccount?.();
-            }}
-            disabled={!onRefreshAccount}
-          />
+          {onRefreshAccount ? (
+            <PixelButton
+              label={t("my.buttons.refreshSession")}
+              variant="secondary"
+              onPress={() => {
+                void onRefreshAccount();
+              }}
+            />
+          ) : null}
         </View>
       </PixelBox>
 
@@ -161,7 +158,7 @@ export function MyView({
         </PixelText>
         <View style={styles.profileDivider} />
         <PixelText variant="body" style={styles.textBody}>
-          {t("my.fields.status", { value: accountStatus })}
+          {t("my.fields.mode", { value: accountModeLabel })}
         </PixelText>
       </PixelBox>
 
@@ -271,12 +268,9 @@ export function MyView({
       ) : (
         <View style={styles.summaryGrid}>
           <SummaryCard label={t("my.summary.connections")} value={connectionCount} />
+          <SummaryCard label={t("my.summary.cupidates")} value={cupidateCount} />
+          <SummaryCard label={t("my.summary.active")} value={activeCupidateCount} />
           <SummaryCard label={t("my.summary.requests")} value={requestCount} />
-          <SummaryCard
-            label={t("my.summary.visibility")}
-            value={privacyNetworkOnly ? t("my.summary.visibilityNetwork") : t("my.summary.visibilityPrivate")}
-          />
-          <SummaryCard label={t("my.summary.notifications")} value={notificationLabel} />
         </View>
       )}
     </ScrollView>

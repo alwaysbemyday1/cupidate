@@ -1,6 +1,6 @@
 ﻿# My View Spec (Prototype Rebuild)
 
-Last Updated: 2026-03-30
+Last Updated: 2026-03-31
 
 ## 1. 화면 목적
 - 내 계정 상태, 언어, 알림/공개 설정, cupidate 준비 현황을 확인하는 설정 허브.
@@ -14,15 +14,14 @@ Last Updated: 2026-03-30
 - 아바타
 - 닉네임
 - Cupid ID
-- 현재 계정 모드(local / supabase)
 - 버튼:
   - `닉네임 저장`
-  - `세션 새로고침`
+  - `세션 새로고침` (`supabase` 연결일 때만 노출)
 
 3) Account Details 섹션 (`PixelBox`)
 - 이메일
 - 가입일
-- 상태
+- 계정 모드(local / supabase)
 
 4) Language Settings 섹션 (`PixelBox`)
 - 앱 언어 전환
@@ -41,11 +40,11 @@ Last Updated: 2026-03-30
 - cupidate가 없으면 empty card + `Open Network`
 - inactive가 있으면 Network로 이동하는 CTA 제공
 
-7) Account Summary 섹션
+7) Network Snapshot 섹션
 - Connections
+- Cupidates
+- Active
 - Requests
-- Visibility
-- Notifications
 
 8) 하단 탭바
 - My 활성 상태
@@ -85,3 +84,4 @@ Mutations:
 - 모바일 스크롤과 하단 탭바 충돌 없음
 - 내 cupidate 활성화 여부를 혼동하지 않게 표현
 - 계정 노출 설정과 cupidate 프로필 공개범위를 혼동하지 않게 표현
+- 계정 정보 / 앱 설정 / 네트워크 현황이 서로 다른 역할로 읽히게 구분됨

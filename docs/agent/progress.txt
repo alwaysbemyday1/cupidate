@@ -66,6 +66,7 @@ Completed Work
 - [x] Profile view QA hardening for inactive/visibility gating (Task 2026-03-31-01)
 - [x] Matching tab QA hardening for concise cards and visibility-safe insights (Task 2026-03-31-02)
 - [x] Home view QA hardening for concise cards and actionable readiness summary (Task 2026-03-31-03)
+- [x] My view QA hardening for clear account/settings/network separation (Task 2026-03-31-04)
 
 Next Tasks (Rebuild Track)
  - Task 2026-03-30-03: Device QA pass on Home readiness -> Network -> activation -> Matching flow

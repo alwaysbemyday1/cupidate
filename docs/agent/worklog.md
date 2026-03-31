@@ -80,6 +80,32 @@ Verification:
 Notes:
 - This pass was aimed at making Home read like a dashboard instead of a stack of repeated explanations.
 
+### Task 2026-03-31-04 - My View QA Hardening
+Status: Completed
+
+Changes:
+- Clarified My section roles so the screen now reads in three clean layers:
+  - account identity
+  - app settings
+  - network snapshot
+- Removed duplicated account-mode/status surfacing from Profile Overview and moved account mode into Account Details.
+- Hid the dead `Refresh Session` CTA when there is no Supabase refresh action available.
+- Fixed the lingering English section title mismatch:
+  - `Matching Preferences` -> `App Settings`
+- Reworked the bottom summary into a true network snapshot:
+  - connections
+  - cupidates
+  - active
+  - requests
+- Added a focused component test to keep the My screen free of dead buttons and duplicated summary semantics.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand src/features/app/views/__tests__/MyView.test.tsx src/features/app/__tests__/i18nFlow.test.tsx` passed.
+
+Notes:
+- This pass was aimed at making My feel like a settings hub instead of a mixed dashboard/status dump.
+
 ## 2026-03-30
 
 ### Task 2026-03-30-07 - Network IA Simplification to Cupid-First Flow
