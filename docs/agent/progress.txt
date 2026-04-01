@@ -73,6 +73,9 @@ Completed Work
 - [x] Independent vertical scrolling per cupid profile page (Task 2026-04-01-07)
 - [x] Dock-tucked FAB visibility polish over profile overlays (Task 2026-04-01-08)
 - [x] Profile width alignment + cupidate fact-density pass (Task 2026-04-01-09)
+- [x] Matching request/suggestion card simplification (Task 2026-04-02-01)
+- [x] Matching insight compaction for faster decisions (Task 2026-04-02-02)
+- [x] Matching PRD/document sync after QA pass (Task 2026-04-02-03)
 
 Next Tasks (Rebuild Track)
  - Task 2026-03-30-03: Device QA pass on Home readiness -> Network -> activation -> Matching flow

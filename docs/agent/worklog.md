@@ -22,6 +22,53 @@ Verification:
 - `npx.cmd tsc --noEmit` passed.
 - `npm.cmd test -- --runInBand src/features/app/views/__tests__/ProfileView.test.tsx src/features/app/__tests__/profileOverlayFlow.test.tsx` passed.
 
+### Task 2026-04-02-01 - Matching Card Simplification
+Status: Completed
+
+Changes:
+- Simplified pending request cards so they focus on:
+  - pair
+  - score
+  - current state
+  - next action
+- Simplified suggestion cards so they focus on:
+  - pair
+  - score
+  - one concise reason
+  - request CTA
+- Removed repeated low-value state framing from suggestion cards.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand src/features/app/__tests__/matchingFlow.test.tsx src/features/app/__tests__/navigationTabs.test.tsx src/features/app/__tests__/activationGateFlow.test.tsx` passed.
+
+### Task 2026-04-02-02 - Matching Insight Compaction
+Status: Completed
+
+Changes:
+- Rebuilt `Matching Insights` into a shorter decision-support block.
+- Replaced the older avatar-chart-avatar layout with:
+  - pair row
+  - score/status/date row
+  - compact `Score`
+  - compact `Flow`
+  - conditional `Why It Fits`
+- Reduced breakdown and feedback height so the screen stays operational on small devices.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand src/features/app/__tests__/matchingFlow.test.tsx src/features/app/__tests__/navigationTabs.test.tsx src/features/app/__tests__/activationGateFlow.test.tsx` passed.
+
+### Task 2026-04-02-03 - Matching Docs Sync
+Status: Completed
+
+Changes:
+- Rewrote `docs/agent/views/matching.md` in clean UTF-8.
+- Synced `progress.txt` with the latest matching QA hardening tasks.
+
+Verification:
+- Manual document review completed.
+
 Notes:
 - This pass was aimed at making the profile sheet trustworthy: the UI now matches both profile visibility and cupidate activation state.
 
