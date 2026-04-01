@@ -27,7 +27,7 @@ describe("App navigation tabs", () => {
     fireEvent.press(screen.getByTestId("tab-network"));
 
     await waitFor(() => {
-      expect(screen.getByText("Cupids are the people who introduce others and keep the network moving.")).toBeTruthy();
+      expect(screen.getByText("Cupids are allies who guide introductions.")).toBeTruthy();
       expect(screen.getByTestId("network-add-cupid-fab")).toBeTruthy();
     });
 

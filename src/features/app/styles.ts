@@ -602,6 +602,12 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: s.sm
   },
+  networkRosterTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: s.xs
+  },
   networkRosterMain: {
     flex: 1,
     minWidth: 0,
@@ -616,6 +622,13 @@ export const styles = StyleSheet.create({
     borderColor: c.border,
     paddingHorizontal: s.xs,
     paddingVertical: 6
+  },
+  networkInlineBadge: {
+    alignSelf: "flex-start",
+    borderWidth: b.normal,
+    borderColor: c.border,
+    paddingHorizontal: 6,
+    paddingVertical: 3
   },
   networkStatusColumn: {
     alignItems: "flex-end",
@@ -658,29 +671,34 @@ export const styles = StyleSheet.create({
   },
   networkFabShadow: {
     backgroundColor: c.shadow,
-    borderRadius: 30,
+    borderRadius: 24,
     paddingRight: 2,
     paddingBottom: 2
   },
   networkFabInner: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    minWidth: 76,
+    height: 42,
+    borderRadius: 21,
     borderWidth: b.normal,
     borderColor: c.border,
     backgroundColor: c.pink,
     alignItems: "center",
     justifyContent: "center",
-    gap: 2
+    paddingHorizontal: s.sm
+  },
+  networkFabLabelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4
   },
   networkFabPlus: {
     color: c.inkInverse,
-    lineHeight: 18
+    lineHeight: 16
   },
   networkFabLabel: {
     color: c.inkInverse,
     textAlign: "center",
-    fontSize: 11,
     lineHeight: 12
   },
   networkComposerOverlay: {

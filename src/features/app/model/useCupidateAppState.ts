@@ -371,6 +371,30 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     return grouped;
   }, [cupidatesByOwnerId]);
 
+  const requests = useMemo<MatchRequest[]>(
+    () =>
+      (matchCandidatesQuery.data ?? []).map((item) => ({
+        id: item.id,
+        sourceCupidateId: item.sourceCupidateId,
+        targetCupidateId: item.targetCupidateId,
+        status: mapMatchRequestStatus(item.status, item.reason),
+        createdAt: item.createdAt
+      })),
+    [matchCandidatesQuery.data]
+  );
+
+  const myCupidates = useMemo(
+    () => cupidates.filter((item) => item.ownerCupidId === myCupidId),
+    [cupidates, myCupidId]
+  );
+
+  const connectedCupidates = useMemo(
+    () => cupidates.filter((item) => item.ownerCupidId !== myCupidId),
+    [cupidates, myCupidId]
+  );
+
+  const myCupidateIds = useMemo(() => new Set(myCupidates.map((item) => item.cupidateId)), [myCupidates]);
+
   const rawConnections = useMemo(
     () =>
       (connectionsQuery.data ?? []).map((item) => ({
@@ -379,7 +403,9 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
         name: item.counterpartNickname ?? item.counterpartCupidId,
         region: "-",
         status: mapConnectionStatus(item.status),
-        direction: item.direction
+        direction: item.direction,
+        requestedAt: item.createdAt,
+        allianceStartedAt: item.respondedAt
       })),
     [connectionsQuery.data]
   );
@@ -387,18 +413,26 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
   const connections = useMemo<CupidConnection[]>(
     () =>
       rawConnections.map((item) => {
+        const ownedCupidates = cupidatesByOwnerId.get(item.cupidId) ?? [];
+        const ownedCupidateIds = new Set(ownedCupidates.map((cupidate) => cupidate.cupidateId));
         const representativeCupidate = representativeCupidateByOwnerId.get(item.cupidId) ?? null;
         const activeCupidate = representativeCupidate?.isActive ? representativeCupidate : null;
+        const sharedMatchCount = requests.filter(
+          (request) =>
+            (myCupidateIds.has(request.sourceCupidateId) && ownedCupidateIds.has(request.targetCupidateId)) ||
+            (myCupidateIds.has(request.targetCupidateId) && ownedCupidateIds.has(request.sourceCupidateId))
+        ).length;
 
         return {
           ...item,
+          sharedMatchCount,
           datingProfileStatus: activeCupidate ? "active" : representativeCupidate ? "inactive" : "none",
           activeCupidateId: activeCupidate?.cupidateId ?? null,
           activeCupidateVisibility: activeCupidate?.profileVisibility ?? null,
           activeCupidateName: activeCupidate?.displayName ?? null
         };
       }),
-    [rawConnections, representativeCupidateByOwnerId]
+    [cupidatesByOwnerId, myCupidateIds, rawConnections, representativeCupidateByOwnerId, requests]
   );
 
   const existingConnectionCupidIds = useMemo(() => new Set(connections.map((item) => item.cupidId)), [connections]);
@@ -431,16 +465,6 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
           };
         }),
     [cupidSearchQuery.data, existingConnectionCupidIds, myCupidId, representativeCupidateByOwnerId]
-  );
-
-  const myCupidates = useMemo(
-    () => cupidates.filter((item) => item.ownerCupidId === myCupidId),
-    [cupidates, myCupidId]
-  );
-
-  const connectedCupidates = useMemo(
-    () => cupidates.filter((item) => item.ownerCupidId !== myCupidId),
-    [cupidates, myCupidId]
   );
 
   const activeMyCupidates = useMemo(
@@ -488,18 +512,6 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
 
     return matches.slice(0, 20);
   }, [activeConnectedCupidates, activeMyCupidates, connections, myCupidId]);
-
-  const requests = useMemo<MatchRequest[]>(
-    () =>
-      (matchCandidatesQuery.data ?? []).map((item) => ({
-        id: item.id,
-        sourceCupidateId: item.sourceCupidateId,
-        targetCupidateId: item.targetCupidateId,
-        status: mapMatchRequestStatus(item.status, item.reason),
-        createdAt: item.createdAt
-      })),
-    [matchCandidatesQuery.data]
-  );
 
   const requestByPair = useMemo(() => {
     const map = new Map<string, MatchRequest>();

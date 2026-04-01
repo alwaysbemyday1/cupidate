@@ -21,6 +21,9 @@ export type CupidConnection = {
   region: string;
   status: "connected" | "pending" | "blocked";
   direction: "outbound" | "inbound";
+  requestedAt: string;
+  allianceStartedAt: string | null;
+  sharedMatchCount: number;
   datingProfileStatus: "active" | "inactive" | "none";
   activeCupidateId: string | null;
   activeCupidateVisibility: CupidateRecord["profileVisibility"] | null;

@@ -91,7 +91,7 @@ describe("Network discovery flow", () => {
 
     await waitFor(() => {
       expect(screen.getByText("network_buddy")).toBeTruthy();
-      expect(screen.getByText("pending")).toBeTruthy();
+      expect(screen.getByText("Connection request sent")).toBeTruthy();
       expect(screen.queryByTestId("network-add-cupid-sheet")).toBeNull();
     });
   });

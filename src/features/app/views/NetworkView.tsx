@@ -59,6 +59,22 @@ function joinMeta(parts: Array<string | undefined | null>) {
   return parts.filter(Boolean).join(" / ");
 }
 
+function formatDateLabel(value: string | null | undefined) {
+  if (!value) {
+    return "--";
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value.slice(0, 10);
+  }
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}.${month}.${day}`;
+}
+
 function genderKey(gender: string) {
   switch (gender) {
     case "male":
@@ -70,22 +86,6 @@ function genderKey(gender: string) {
     default:
       return "network.option.unspecified";
   }
-}
-
-function connectionStatusKey(status: CupidConnection["status"]) {
-  return `network.connection.status.${status}`;
-}
-
-function connectionStatusStyle(status: CupidConnection["status"]) {
-  if (status === "connected") {
-    return styles.networkStatusMatched;
-  }
-
-  if (status === "pending") {
-    return styles.networkStatusPending;
-  }
-
-  return styles.networkStatusBlocked;
 }
 
 function datingStatusKey(status: CupidConnection["datingProfileStatus"]) {
@@ -231,31 +231,43 @@ export function NetworkView({
                     <View style={styles.networkRosterItem}>
                       <View style={styles.networkRosterItemHeader}>
                         <View style={styles.networkRosterMain}>
-                          <PixelText variant="body" style={styles.listName}>
-                            {item.name}
-                          </PixelText>
-                          <PixelText variant="caption" style={styles.networkRosterMeta}>
-                            {t(`network.connection.direction.${item.direction}`)}
-                          </PixelText>
-                          <PixelText variant="caption" style={styles.networkRosterMeta}>
-                            {item.datingProfileStatus === "active" && item.activeCupidateName
-                              ? t("network.connection.profile.activeWithName", {
-                                  value: item.activeCupidateName
-                                })
-                              : t(datingStatusKey(item.datingProfileStatus))}
-                          </PixelText>
-                        </View>
-                        <View style={styles.networkStatusColumn}>
-                          <View style={[styles.networkStatusChip, connectionStatusStyle(item.status)]}>
-                            <PixelText variant="caption" style={styles.networkStatusText}>
-                              {t(connectionStatusKey(item.status))}
+                          <View style={styles.networkRosterTitleRow}>
+                            <PixelText variant="body" style={styles.listName}>
+                              {item.name}
                             </PixelText>
+                            {item.datingProfileStatus === "active" ? (
+                              <View style={[styles.networkInlineBadge, datingStatusStyle(item.datingProfileStatus)]}>
+                                <PixelText variant="caption" style={styles.networkStatusText}>
+                                  {t("network.connection.badge.cupidate")}
+                                </PixelText>
+                              </View>
+                            ) : null}
                           </View>
-                          <View style={[styles.networkStatusChip, datingStatusStyle(item.datingProfileStatus)]}>
-                            <PixelText variant="caption" style={styles.networkStatusText}>
-                              {t(datingStatusKey(item.datingProfileStatus))}
-                            </PixelText>
-                          </View>
+                          {item.status === "connected" ? (
+                            <>
+                              <PixelText variant="caption" style={styles.networkRosterMeta}>
+                                {t("network.connection.meta.sharedMatches", {
+                                  count: item.sharedMatchCount
+                                })}
+                              </PixelText>
+                              <PixelText variant="caption" style={styles.networkRosterMeta}>
+                                {t("network.connection.meta.alliedSince", {
+                                  value: formatDateLabel(item.allianceStartedAt ?? item.requestedAt)
+                                })}
+                              </PixelText>
+                            </>
+                          ) : (
+                            <>
+                              <PixelText variant="caption" style={styles.networkRosterMeta}>
+                                {t(`network.connection.meta.${item.direction}`)}
+                              </PixelText>
+                              <PixelText variant="caption" style={styles.networkRosterMeta}>
+                                {t("network.connection.meta.requestedAt", {
+                                  value: formatDateLabel(item.requestedAt)
+                                })}
+                              </PixelText>
+                            </>
+                          )}
                         </View>
                       </View>
                       {item.status === "pending" && item.direction === "inbound" ? (
@@ -409,20 +421,22 @@ export function NetworkView({
           style={[
             styles.networkFab,
             {
-              right: designTokens.spacing.sm,
-              bottom: Math.max(insets.bottom, 2) + 6
+              right: 2,
+              bottom: Math.max(insets.bottom, 0) + 2
             }
           ]}
           onPress={() => setIsAddCupidComposerOpen(true)}
         >
           <View style={styles.networkFabShadow}>
             <View style={styles.networkFabInner}>
-              <PixelText variant="screenTitle" style={styles.networkFabPlus}>
-                +
-              </PixelText>
-              <PixelText variant="caption" style={styles.networkFabLabel}>
-                {t("network.actions.fabAdd")}
-              </PixelText>
+              <View style={styles.networkFabLabelRow}>
+                <PixelText variant="screenTitle" style={styles.networkFabPlus}>
+                  +
+                </PixelText>
+                <PixelText variant="caption" style={styles.networkFabLabel}>
+                  {t("network.actions.fabAdd")}
+                </PixelText>
+              </View>
             </View>
           </View>
         </Pressable>
