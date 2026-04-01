@@ -48,14 +48,14 @@ describe("Network connection inbox flow", () => {
 
     await waitFor(() => {
       expect(screen.getByText("incoming_friend")).toBeTruthy();
-      expect(screen.getByText("Incoming request")).toBeTruthy();
+      expect(screen.getByText("Incoming cupid request")).toBeTruthy();
       expect(screen.getByText("Accept")).toBeTruthy();
     });
 
     fireEvent.press(screen.getByText("Accept"));
 
     await waitFor(() => {
-      expect(screen.getByText("connected")).toBeTruthy();
+      expect(screen.getByText("Allied since 2026.04.01")).toBeTruthy();
       expect(screen.queryByText("Accept")).toBeNull();
     });
   });
