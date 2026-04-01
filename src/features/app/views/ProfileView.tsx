@@ -71,6 +71,22 @@ function ageLabel(birthYear: number | null) {
   return `${new Date().getFullYear() - birthYear}`;
 }
 
+function formatDateLabel(value: string | null | undefined) {
+  if (!value) {
+    return "--";
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value.slice(0, 10);
+  }
+
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(
+    2,
+    "0"
+  )}`;
+}
+
 function buildAvatarSeed(label: string) {
   const trimmed = label.trim();
 
@@ -171,10 +187,6 @@ function preferredDrinkingText(
   return t("network.option.unspecified");
 }
 
-function relationKey(relationship: CupidProfileSummary["relationship"]) {
-  return `profile.relationship.${relationship}`;
-}
-
 function visibilityText(
   visibility: "private" | "basic" | "public",
   t: ReturnType<typeof useI18n>["t"]
@@ -232,6 +244,19 @@ function renderCompactFactPill(label: string, value: string, key?: string) {
         {label}
       </PixelText>
       <PixelText variant="body" style={styles.profileCompactFactValue} numberOfLines={2}>
+        {value}
+      </PixelText>
+    </View>
+  );
+}
+
+function renderSummaryFactCell(label: string, value: string, key?: string) {
+  return (
+    <View key={key} style={styles.profileHeroFactCell}>
+      <PixelText variant="caption" style={styles.profileHeroFactLabel}>
+        {label}
+      </PixelText>
+      <PixelText variant="body" style={styles.profileHeroFactValue} numberOfLines={2}>
         {value}
       </PixelText>
     </View>
@@ -362,12 +387,9 @@ function CupidProfileActivityPanel({
   profile: CupidProfileSummary;
   t: ReturnType<typeof useI18n>["t"];
 }) {
-  const datingStatusText =
-    profile.datingProfile.status !== "active"
-      ? t(cupidDatingStatusKey(profile.datingProfile.status), {
-          value: profile.datingProfile.displayName ?? profile.nickname
-        })
-      : null;
+  const datingStatusText = t(cupidDatingStatusKey(profile.datingProfile.status), {
+    value: profile.datingProfile.displayName ?? profile.nickname
+  });
 
   return (
     <>
@@ -382,15 +404,20 @@ function CupidProfileActivityPanel({
             <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
               {profile.nickname}
             </PixelText>
-            {datingStatusText ? (
-              <PixelText variant="caption" style={styles.profileMetaText}>
-                {datingStatusText}
-              </PixelText>
-            ) : null}
-            <View style={styles.profileSheetStatusChip}>
-              <PixelText variant="caption" style={styles.networkStatusText}>
-                {t(relationKey(profile.relationship))}
-              </PixelText>
+            <PixelText variant="caption" style={styles.profileMetaText}>
+              {datingStatusText}
+            </PixelText>
+            <View style={styles.profileSheetMetaList}>
+              {profile.stats.allianceStartedAt
+                ? renderMetaLine(
+                    t("profile.meta.allianceStarted"),
+                    formatDateLabel(profile.stats.allianceStartedAt)
+                  )
+                : null}
+              {renderMetaLine(
+                t("profile.meta.sharedMatches"),
+                t("profile.stats.sharedMatchesCount", { count: profile.stats.sharedMatchesCount })
+              )}
             </View>
           </View>
         </View>
@@ -519,9 +546,13 @@ function CupidateProfilePanel({
   t: ReturnType<typeof useI18n>["t"];
 }) {
   const [editState, setEditState] = useState<CupidateEditState>(() => buildEditState(profile));
+  const [isAboutExpanded, setIsAboutExpanded] = useState(true);
+  const [isPreferenceExpanded, setIsPreferenceExpanded] = useState(false);
 
   useEffect(() => {
     setEditState(buildEditState(profile));
+    setIsAboutExpanded(true);
+    setIsPreferenceExpanded(false);
   }, [profile]);
 
   const hobbyTags = useMemo(() => parseTags(editState.hobbiesInput), [editState.hobbiesInput]);
@@ -582,11 +613,18 @@ function CupidateProfilePanel({
   const isRemoteInactive = !profile.canEdit && !profile.isActive;
   const canViewBasicDetails = profile.canEdit || (!isRemoteInactive && profile.profileVisibility !== "private");
   const canViewFullDetails = profile.canEdit || (!isRemoteInactive && profile.profileVisibility === "public");
-  const basicFacts = useMemo(
+  const identityLabel = useMemo(() => {
+    const age = ageLabel(profile.birthYear);
+    const gender = genderText(profile.gender, t);
+    const parts = [age !== "--" ? age : null, gender !== t("network.option.unspecified") ? gender : null].filter(
+      Boolean
+    );
+
+    return parts.length > 0 ? parts.join(" · ") : null;
+  }, [profile.birthYear, profile.gender, t]);
+  const summaryFacts = useMemo(
     () =>
       [
-        { label: t("profile.meta.age"), value: ageLabel(profile.birthYear) },
-        { label: t("profile.meta.gender"), value: genderText(profile.gender, t) },
         {
           label: t("profile.meta.region"),
           value: profile.region ?? profile.preferences.location ?? profile.preferences.region ?? "-"
@@ -600,12 +638,17 @@ function CupidateProfilePanel({
                   ? `${profile.heightCm ?? profile.preferences.heightCm} cm`
                   : "-"
             }
+          : null,
+        canViewFullDetails
+          ? {
+              label: t("profile.meta.lifestyle"),
+              value: lifestyleLabel
+            }
           : null
       ].filter(Boolean) as Array<{ label: string; value: string }>,
     [
       canViewFullDetails,
-      profile.birthYear,
-      profile.gender,
+      lifestyleLabel,
       profile.heightCm,
       profile.jobTitle,
       profile.preferences.heightCm,
@@ -629,19 +672,20 @@ function CupidateProfilePanel({
       ],
       [jobGroups, mustHaveLabels, preferredAgeRange, preferredGenderLabel, preferredHeightRange, preferredLifestyleLabel, regions, t]
   );
-  const compactTopFacts = useMemo(
-    () => [
-      ...basicFacts,
-      ...(canViewFullDetails
-        ? [
-            {
-              label: t("profile.meta.lifestyle"),
-              value: lifestyleLabel
-            }
-          ]
-        : [])
-    ],
-    [basicFacts, canViewFullDetails, lifestyleLabel, t]
+  const aboutPreview = useMemo(
+    () => (editState.bio || t("profile.cupidate.noBio")).slice(0, 90),
+    [editState.bio, t]
+  );
+  const preferencePreview = useMemo(
+    () =>
+      [
+        formatRangeLabel(preferredAgeRange),
+        preferredGenderLabel,
+        regions !== "-" ? regions : null
+      ]
+        .filter(Boolean)
+        .join(" · "),
+    [preferredAgeRange, preferredGenderLabel, regions]
   );
   const visibilityDescriptionKey =
     isRemoteInactive
@@ -741,10 +785,17 @@ function CupidateProfilePanel({
             </PixelText>
           </View>
           <View style={styles.profileSheetHeaderInfo}>
-            <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
-              {profile.displayName}
-            </PixelText>
-            <PixelText variant="body" style={styles.textBody}>
+            <View style={styles.profileHeroNameRow}>
+              <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+                {profile.displayName}
+              </PixelText>
+              {identityLabel ? (
+                <PixelText variant="caption" style={styles.profileHeroIdentity}>
+                  ({identityLabel})
+                </PixelText>
+              ) : null}
+            </View>
+            <PixelText variant="caption" style={styles.profileMetaText}>
               {t("profile.cupidate.owner", { owner: profile.ownerNickname })}
             </PixelText>
             <View style={styles.profileSheetHeaderBadges}>
@@ -774,34 +825,16 @@ function CupidateProfilePanel({
           </View>
         ) : (
           <>
-            {canViewFullDetails ? (
-              <View style={styles.profileSummaryBlock}>
-                <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
-                  {t("profile.sections.about")}
-                </PixelText>
-                <PixelText variant="body" style={styles.textBody}>
-                  {editState.bio || t("profile.cupidate.noBio")}
-                </PixelText>
-              </View>
-            ) : null}
+            <View style={styles.profileHeroFactGrid}>
+              {summaryFacts.map((item, index) =>
+                renderSummaryFactCell(item.label, item.value, `${item.label}-${index}`)
+              )}
+            </View>
 
             {!profile.canEdit && profile.profileVisibility === "basic" ? (
               <PixelText variant="caption" style={styles.profileMetaText}>
                 {t("profile.visibility.basicDescription")}
               </PixelText>
-            ) : null}
-
-            <View style={styles.profileCompactFactWrap}>
-              {compactTopFacts.map((item, index) => renderCompactFactPill(item.label, item.value, `${item.label}-${index}`))}
-            </View>
-
-            {canViewFullDetails && hobbyTags.length > 0 ? (
-              <View style={styles.profileTagGroup}>
-                <PixelText variant="label" style={styles.fieldLabel}>
-                  {t("profile.meta.hobbies")}
-                </PixelText>
-                <View style={styles.profileTagRow}>{hobbyTags.map((item, index) => renderTagChip(item, index))}</View>
-              </View>
             ) : null}
           </>
         )}
@@ -809,53 +842,103 @@ function CupidateProfilePanel({
 
       {canViewFullDetails ? (
         <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
-          <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
-            {t("profile.sections.preferences")}
-          </PixelText>
-          <View style={styles.profileFactGrid}>
-            {preferenceFacts
-              .filter((item) =>
-                item.label !== t("profile.meta.preferredRegions") &&
-                item.label !== t("profile.meta.preferredJobs") &&
-                item.label !== t("profile.meta.mustHave")
-              )
-              .map((item, index) => (
-                renderFactChip(item.label, item.value, `${item.label}-${index}`)
-              ))}
-          </View>
-
-          {preferredRegionTags.length > 0 ? (
-            <View style={styles.profileTagGroup}>
-              <PixelText variant="label" style={styles.fieldLabel}>
-                {t("profile.meta.preferredRegions")}
+          <Pressable onPress={() => setIsAboutExpanded((current) => !current)} testID="profile-toggle-about">
+            <View style={styles.profileDisclosureHeader}>
+              <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+                {t("profile.sections.about")}
               </PixelText>
-              <View style={styles.profileTagRow}>
-                {preferredRegionTags.map((item, index) => renderTagChip(item, index))}
-              </View>
-            </View>
-          ) : null}
-
-          {preferredJobGroupTags.length > 0 ? (
-            <View style={styles.profileTagGroup}>
-              <PixelText variant="label" style={styles.fieldLabel}>
-                {t("profile.meta.preferredJobs")}
+              <PixelText variant="caption" style={styles.profileDisclosureAction}>
+                {isAboutExpanded ? t("profile.actions.collapse") : t("profile.actions.expand")}
               </PixelText>
-              <View style={styles.profileTagRow}>
-                {preferredJobGroupTags.map((item, index) => renderTagChip(item, index))}
-              </View>
             </View>
-          ) : null}
-
-          {mustHaveTagLabels.length > 0 ? (
-            <View style={styles.profileTagGroup}>
-              <PixelText variant="label" style={styles.fieldLabel}>
-                {t("profile.meta.mustHave")}
+          </Pressable>
+          {isAboutExpanded ? (
+            <View style={styles.profileDisclosureBody}>
+              <PixelText variant="body" style={styles.textBody}>
+                {editState.bio || t("profile.cupidate.noBio")}
               </PixelText>
-              <View style={styles.profileTagRow}>
-                {mustHaveTagLabels.map((item, index) => renderTagChip(item, index))}
-              </View>
+              {hobbyTags.length > 0 ? (
+                <View style={styles.profileTagGroup}>
+                  <PixelText variant="label" style={styles.fieldLabel}>
+                    {t("profile.meta.hobbies")}
+                  </PixelText>
+                  <View style={styles.profileTagRow}>{hobbyTags.map((item, index) => renderTagChip(item, index))}</View>
+                </View>
+              ) : null}
             </View>
-          ) : null}
+          ) : (
+            <PixelText variant="caption" style={styles.profileMetaText}>
+              {aboutPreview}
+            </PixelText>
+          )}
+        </PixelBox>
+      ) : null}
+
+      {canViewFullDetails ? (
+        <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
+          <Pressable
+            onPress={() => setIsPreferenceExpanded((current) => !current)}
+            testID="profile-toggle-preferences"
+          >
+            <View style={styles.profileDisclosureHeader}>
+              <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+                {t("profile.sections.preferences")}
+              </PixelText>
+              <PixelText variant="caption" style={styles.profileDisclosureAction}>
+                {isPreferenceExpanded ? t("profile.actions.collapse") : t("profile.actions.expand")}
+              </PixelText>
+            </View>
+          </Pressable>
+          {isPreferenceExpanded ? (
+            <View style={styles.profileDisclosureBody}>
+              <View style={styles.profileFactGrid}>
+                {preferenceFacts
+                  .filter((item) =>
+                    item.label !== t("profile.meta.preferredRegions") &&
+                    item.label !== t("profile.meta.preferredJobs") &&
+                    item.label !== t("profile.meta.mustHave")
+                  )
+                  .map((item, index) => renderFactChip(item.label, item.value, `${item.label}-${index}`))}
+              </View>
+
+              {preferredRegionTags.length > 0 ? (
+                <View style={styles.profileTagGroup}>
+                  <PixelText variant="label" style={styles.fieldLabel}>
+                    {t("profile.meta.preferredRegions")}
+                  </PixelText>
+                  <View style={styles.profileTagRow}>
+                    {preferredRegionTags.map((item, index) => renderTagChip(item, index))}
+                  </View>
+                </View>
+              ) : null}
+
+              {preferredJobGroupTags.length > 0 ? (
+                <View style={styles.profileTagGroup}>
+                  <PixelText variant="label" style={styles.fieldLabel}>
+                    {t("profile.meta.preferredJobs")}
+                  </PixelText>
+                  <View style={styles.profileTagRow}>
+                    {preferredJobGroupTags.map((item, index) => renderTagChip(item, index))}
+                  </View>
+                </View>
+              ) : null}
+
+              {mustHaveTagLabels.length > 0 ? (
+                <View style={styles.profileTagGroup}>
+                  <PixelText variant="label" style={styles.fieldLabel}>
+                    {t("profile.meta.mustHave")}
+                  </PixelText>
+                  <View style={styles.profileTagRow}>
+                    {mustHaveTagLabels.map((item, index) => renderTagChip(item, index))}
+                  </View>
+                </View>
+              ) : null}
+            </View>
+          ) : (
+            <PixelText variant="caption" style={styles.profileMetaText}>
+              {preferencePreview || "-"}
+            </PixelText>
+          )}
         </PixelBox>
       ) : null}
 

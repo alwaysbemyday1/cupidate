@@ -583,6 +583,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     if (selectedProfileTarget.kind === "cupid") {
       const cupidId = selectedProfileTarget.cupidId;
       const cupid = cupidById.get(cupidId);
+      const connection = connections.find((item) => item.cupidId === cupidId) ?? null;
       const ownedCupidates = cupidates.filter((item) => item.ownerCupidId === cupidId);
       const representativeCupidate = representativeCupidateByOwnerId.get(cupidId) ?? null;
       const activeCupidate = representativeCupidate?.isActive ? representativeCupidate : null;
@@ -613,6 +614,8 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
         stats: {
           cupidateCount: ownedCupidates.length,
           activeCupidateCount: ownedCupidates.filter((item) => item.isActive).length,
+          allianceStartedAt: connection?.allianceStartedAt ?? null,
+          sharedMatchesCount: connection?.sharedMatchCount ?? 0,
           introductions: relatedRequests.length,
           ongoingMatches: relatedRequests.filter(
             (request) => request.status === "requested" || request.status === "accepted"
@@ -636,7 +639,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
       myCupidId,
       relatedRequests
     });
-  }, [cupidById, cupidates, myCupidId, representativeCupidateByOwnerId, requests, requestsByCupidateId, selectedProfileTarget]);
+  }, [connections, cupidById, cupidates, myCupidId, representativeCupidateByOwnerId, requests, requestsByCupidateId, selectedProfileTarget]);
 
   const notifications = useMemo<HomeNotification[]>(
     () =>

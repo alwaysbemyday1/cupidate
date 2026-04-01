@@ -88,6 +88,8 @@ export type CupidProfileSummary = {
   stats: {
     cupidateCount: number;
     activeCupidateCount: number;
+    allianceStartedAt: string | null;
+    sharedMatchesCount: number;
     introductions: number;
     ongoingMatches: number;
     completedMatches: number;

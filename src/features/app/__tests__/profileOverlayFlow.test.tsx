@@ -170,7 +170,7 @@ describe("Profile overlay flow", () => {
       expect(screen.getByTestId("profile-sheet-title")).toHaveTextContent("Cupidate Profile");
       expect(screen.getByTestId("profile-sheet")).toBeTruthy();
       expect(screen.getByText("About Me")).toBeTruthy();
-      expect(screen.getAllByText("Dating Preferences").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("What I'm Looking For").length).toBeGreaterThan(0);
     });
   });
 
@@ -188,7 +188,7 @@ describe("Profile overlay flow", () => {
     await waitFor(() => {
       expect(screen.getByText("This cupidate shares only basic profile information. Detailed lifestyle notes and preference weights stay private.")).toBeTruthy();
       expect(screen.queryByText("Public Snapshot")).toBeNull();
-      expect(screen.queryByText("Dating Preferences")).toBeNull();
+      expect(screen.queryByText("What I'm Looking For")).toBeNull();
       expect(screen.queryByText("Height")).toBeNull();
     });
 
@@ -203,7 +203,7 @@ describe("Profile overlay flow", () => {
     await waitFor(() => {
       expect(screen.getByText("Private Cupidate Profile")).toBeTruthy();
       expect(screen.getByText("This cupidate keeps the dating profile private. Other cupids can only confirm that the profile exists.")).toBeTruthy();
-      expect(screen.queryByText("Dating Preferences")).toBeNull();
+      expect(screen.queryByText("What I'm Looking For")).toBeNull();
     });
   });
 

@@ -1165,6 +1165,15 @@ export const styles = StyleSheet.create({
     minWidth: 0,
     gap: s.xxs
   },
+  profileHeroNameRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    flexWrap: "wrap",
+    gap: s.xs
+  },
+  profileHeroIdentity: {
+    color: c.inkMuted
+  },
   profileSheetHeaderBadges: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -1194,8 +1203,44 @@ export const styles = StyleSheet.create({
   profileCardNotice: {
     gap: s.xs
   },
+  profileHeroFactGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: s.xs
+  },
+  profileHeroFactCell: {
+    flexGrow: 1,
+    flexBasis: 120,
+    maxWidth: "100%",
+    minWidth: 0,
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surfaceAlt,
+    paddingHorizontal: s.sm,
+    paddingVertical: s.xs,
+    gap: 2
+  },
+  profileHeroFactLabel: {
+    color: c.inkMuted
+  },
+  profileHeroFactValue: {
+    color: c.ink,
+    flexShrink: 1
+  },
   profileSummaryBlock: {
     gap: s.xs
+  },
+  profileDisclosureHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: s.sm
+  },
+  profileDisclosureAction: {
+    color: c.blueDark
+  },
+  profileDisclosureBody: {
+    gap: s.sm
   },
   profileCompactFactWrap: {
     flexDirection: "row",

@@ -54,7 +54,7 @@ describe("ProfileView", () => {
       )
     ).toBeTruthy();
     expect(screen.queryByText("Public Snapshot")).toBeNull();
-    expect(screen.queryByText("Dating Preferences")).toBeNull();
+    expect(screen.queryByText("What I'm Looking For")).toBeNull();
   });
 
   it("keeps cupid summary focused on matchmaking outcomes", () => {
@@ -109,6 +109,8 @@ describe("ProfileView", () => {
             stats: {
               cupidateCount: 1,
               activeCupidateCount: 1,
+              allianceStartedAt: "2026-03-28T00:00:00.000Z",
+              sharedMatchesCount: 3,
               introductions: 7,
               ongoingMatches: 2,
               completedMatches: 1
