@@ -840,9 +840,22 @@ export const styles = StyleSheet.create({
     gap: s.xs
   },
   matchingSuggestionFooter: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    flexWrap: "wrap",
     gap: s.sm
   },
+  matchingSuggestionMeta: {
+    flex: 1,
+    minWidth: 0,
+    gap: s.xxs
+  },
   matchingSuggestionActions: {
+    width: "100%",
+    maxWidth: 168
+  },
+  matchingSuggestionActionCell: {
     width: "100%"
   },
   matchingInsightCard: {},

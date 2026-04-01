@@ -165,6 +165,18 @@ function buildReasonLine(
   return null;
 }
 
+function buildRequestHint(status: MatchRequestStatus | undefined, t: ReturnType<typeof useI18n>["t"]) {
+  if (status === "requested") {
+    return t("matching.card.hint.requested");
+  }
+
+  if (status === "accepted") {
+    return t("matching.card.hint.accepted");
+  }
+
+  return null;
+}
+
 export function MatchingView({
   recommendations,
   cupidates,
@@ -389,7 +401,8 @@ export function MatchingView({
             const canRevealCardDetails =
               canRevealDetailedMatchingContext(cupidateMap.get(item.sourceCupidateId), currentCupidId) &&
               canRevealDetailedMatchingContext(cupidateMap.get(item.targetCupidateId), currentCupidId);
-            const reasonLine = buildReasonLine(item, canRevealCardDetails, t);
+            const requestHint = buildRequestHint(item.request?.status, t);
+            const reasonLine = requestHint ?? buildReasonLine(item, canRevealCardDetails, t);
 
             return (
               <PixelBox
@@ -492,7 +505,7 @@ export function MatchingView({
         />
       ) : (
         <PixelBox style={styles.matchingPanelCard} contentStyle={styles.matchingPanelContent}>
-          {suggestionCards.slice(0, 4).map((item) => {
+          {suggestionCards.slice(0, 3).map((item) => {
             const canRevealCardDetails =
               canRevealDetailedMatchingContext(cupidateMap.get(item.sourceCupidateId), currentCupidId) &&
               canRevealDetailedMatchingContext(cupidateMap.get(item.targetCupidateId), currentCupidId);
@@ -516,26 +529,27 @@ export function MatchingView({
                 )}
               </View>
               <View style={styles.matchingSuggestionFooter}>
-                <View style={styles.matchingMetaRow}>
-                  <View style={styles.matchingScoreChip}>
-                    <PixelText variant="caption" style={styles.matchingScoreText}>
-                      {t("matching.card.score", { rate: item.matchScore })}
-                    </PixelText>
+                <View style={styles.matchingSuggestionMeta}>
+                  <View style={styles.matchingMetaRow}>
+                    <View style={styles.matchingScoreChip}>
+                      <PixelText variant="caption" style={styles.matchingScoreText}>
+                        {t("matching.card.score", { rate: item.matchScore })}
+                      </PixelText>
+                    </View>
                   </View>
-                  <View style={[styles.matchingStatusChip, statusChipStyle(undefined)]}>
-                    <PixelText variant="caption" style={styles.matchingStatusText}>
-                      {t(statusDisplayKey("none"))}
+                  {reasonLine ? (
+                    <PixelText variant="caption" style={styles.matchingReasonText}>
+                      {reasonLine}
                     </PixelText>
-                  </View>
+                  ) : (
+                    <PixelText variant="caption" style={styles.matchingReasonText}>
+                      {t("matching.card.hint.suggestion")}
+                    </PixelText>
+                  )}
                 </View>
-                {reasonLine ? (
-                  <PixelText variant="caption" style={styles.matchingReasonText}>
-                    {reasonLine}
-                  </PixelText>
-                ) : null}
 
                 <View style={styles.matchingSuggestionActions}>
-                  <View style={styles.matchingActionCell}>
+                  <View style={styles.matchingSuggestionActionCell}>
                     <PixelButton
                       label={isMutatingMatching ? t("matching.actions.processing") : t("matching.actions.request")}
                       variant="primary"
