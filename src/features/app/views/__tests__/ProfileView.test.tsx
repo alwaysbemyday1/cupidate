@@ -127,9 +127,12 @@ describe("ProfileView", () => {
     expect(screen.queryByTestId("profile-sheet-scroll")).toBeNull();
     expect(screen.getByTestId("profile-page-activity-scroll")).toBeTruthy();
     expect(screen.getByTestId("profile-page-cupidate-scroll")).toBeTruthy();
+    expect(screen.getAllByText("ACTIVE CUPIDATE").length).toBeGreaterThan(0);
+    expect(screen.getByText("Linked cupidate")).toBeTruthy();
     expect(screen.getByText("Matches Guided")).toBeTruthy();
     expect(screen.getByText("Ongoing")).toBeTruthy();
     expect(screen.getByText("Romance Conversions")).toBeTruthy();
+    expect(screen.queryByText("Shows how this cupid has guided matches and relationship handoffs across the network.")).toBeNull();
     expect(screen.queryByText("Dating Profile Status")).toBeNull();
     expect(screen.queryByText("Managed")).toBeNull();
     expect(screen.queryByText("Active")).toBeNull();

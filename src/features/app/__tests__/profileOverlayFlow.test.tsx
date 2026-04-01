@@ -149,7 +149,7 @@ describe("Profile overlay flow", () => {
     await waitFor(() => {
       expect(screen.getByTestId("profile-sheet-title")).toHaveTextContent("Cupidate Profile");
       expect(screen.getByTestId("profile-sheet")).toBeTruthy();
-      expect(screen.getByText("ACTIVE CUPIDATE")).toBeTruthy();
+      expect(screen.getAllByText("ACTIVE CUPIDATE").length).toBeGreaterThan(0);
       expect(screen.getByText("About Me")).toBeTruthy();
       expect(screen.getByText("coffee lover")).toBeTruthy();
     });
@@ -225,14 +225,15 @@ describe("Profile overlay flow", () => {
       expect(screen.queryByTestId("network-add-cupid-fab")).toBeNull();
       expect(screen.getByTestId("profile-segment-activity")).toBeTruthy();
       expect(screen.getByTestId("profile-segment-cupidate")).toBeTruthy();
-      expect(screen.getByText("Shows how this cupid has guided matches and relationship handoffs across the network.")).toBeTruthy();
+      expect(screen.getAllByText("ACTIVE CUPIDATE").length).toBeGreaterThan(0);
+      expect(screen.getByText("Linked cupidate")).toBeTruthy();
       expect(screen.getByText("Romance Conversions")).toBeTruthy();
     });
 
     fireEvent.press(screen.getByTestId("profile-segment-cupidate"));
 
     await waitFor(() => {
-      expect(screen.getByText("Joon")).toBeTruthy();
+      expect(screen.getAllByText("Joon").length).toBeGreaterThan(0);
       expect(
         screen.getByText(
           "This cupidate shares only basic profile information. Detailed lifestyle notes and preference weights stay private."

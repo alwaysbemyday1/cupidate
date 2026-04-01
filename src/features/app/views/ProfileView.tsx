@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+﻿import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import {
   type LayoutChangeEvent,
   type NativeScrollEvent,
@@ -194,8 +194,16 @@ function visibilityText(
   return t(`network.option.visibility.${visibility}`);
 }
 
-function cupidDatingStatusKey(status: CupidProfileSummary["datingProfile"]["status"]) {
-  return `profile.cupid.dating.${status}`;
+function cupidDatingBadgeKey(status: CupidProfileSummary["datingProfile"]["status"]) {
+  if (status === "active") {
+    return "profile.cupid.badge.active";
+  }
+
+  if (status === "inactive") {
+    return "profile.cupid.badge.inactive";
+  }
+
+  return "profile.cupid.badge.guideOnly";
 }
 
 function renderMetaLine(label: string, value: string) {
@@ -387,9 +395,9 @@ function CupidProfileActivityPanel({
   profile: CupidProfileSummary;
   t: ReturnType<typeof useI18n>["t"];
 }) {
-  const datingStatusText = t(cupidDatingStatusKey(profile.datingProfile.status), {
-    value: profile.datingProfile.displayName ?? profile.nickname
-  });
+  const datingBadgeKey = cupidDatingBadgeKey(profile.datingProfile.status);
+  const isActiveCupidate = profile.datingProfile.status === "active";
+  const isPausedCupidate = profile.datingProfile.status === "inactive";
 
   return (
     <>
@@ -404,10 +412,36 @@ function CupidProfileActivityPanel({
             <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
               {profile.nickname}
             </PixelText>
-            <PixelText variant="caption" style={styles.profileMetaText}>
-              {datingStatusText}
-            </PixelText>
+            <View style={styles.profileSheetHeaderBadges}>
+              <View
+                style={[
+                  styles.profileSheetStatusChip,
+                  isActiveCupidate
+                    ? styles.profileSheetStatusChipActive
+                    : isPausedCupidate
+                      ? styles.profileSheetStatusChipPaused
+                      : styles.profileSheetStatusChipGuide
+                ]}
+              >
+                <PixelText
+                  variant="caption"
+                  style={isActiveCupidate ? styles.profileSheetStatusTextDark : styles.profileSheetStatusTextLight}
+                >
+                  {t(datingBadgeKey)}
+                </PixelText>
+              </View>
+              {isActiveCupidate && profile.datingProfile.visibility ? (
+                <View style={[styles.profileSheetStatusChip, styles.profileSheetStatusChipNeutral]}>
+                  <PixelText variant="caption" style={styles.profileSheetStatusTextDark}>
+                    {visibilityText(profile.datingProfile.visibility, t)}
+                  </PixelText>
+                </View>
+              ) : null}
+            </View>
             <View style={styles.profileSheetMetaList}>
+              {isActiveCupidate && profile.datingProfile.displayName
+                ? renderMetaLine(t("profile.meta.linkedCupidate"), profile.datingProfile.displayName)
+                : null}
               {profile.stats.allianceStartedAt
                 ? renderMetaLine(
                     t("profile.meta.allianceStarted"),
@@ -426,9 +460,6 @@ function CupidProfileActivityPanel({
       <PixelBox style={styles.profileSheetCard} contentStyle={styles.profileSheetCardContent}>
         <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
           {t("profile.sections.matchmaking")}
-        </PixelText>
-        <PixelText variant="body" style={styles.textBody}>
-          {t("profile.cupid.summary")}
         </PixelText>
         <View style={styles.summaryGrid}>
           {renderStatPill(t("profile.stats.matchmakingRequests"), profile.stats.introductions)}
@@ -620,7 +651,7 @@ function CupidateProfilePanel({
       Boolean
     );
 
-    return parts.length > 0 ? parts.join(" · ") : null;
+    return parts.length > 0 ? parts.join(" / ") : null;
   }, [profile.birthYear, profile.gender, t]);
   const summaryFacts = useMemo(
     () =>
@@ -684,7 +715,7 @@ function CupidateProfilePanel({
         regions !== "-" ? regions : null
       ]
         .filter(Boolean)
-        .join(" · "),
+        .join(" / "),
     [preferredAgeRange, preferredGenderLabel, regions]
   );
   const visibilityDescriptionKey =
@@ -799,13 +830,21 @@ function CupidateProfilePanel({
               {t("profile.cupidate.owner", { owner: profile.ownerNickname })}
             </PixelText>
             <View style={styles.profileSheetHeaderBadges}>
-              <View style={styles.profileSheetStatusChip}>
-                <PixelText variant="caption" style={styles.networkStatusText}>
+              <View
+                style={[
+                  styles.profileSheetStatusChip,
+                  editState.isActive ? styles.profileSheetStatusChipActive : styles.profileSheetStatusChipPaused
+                ]}
+              >
+                <PixelText
+                  variant="caption"
+                  style={editState.isActive ? styles.profileSheetStatusTextDark : styles.profileSheetStatusTextLight}
+                >
                   {editState.isActive ? t("profile.cupidate.active") : t("profile.cupidate.inactive")}
                 </PixelText>
               </View>
-              <View style={styles.profileSheetStatusChip}>
-                <PixelText variant="caption" style={styles.networkStatusText}>
+              <View style={[styles.profileSheetStatusChip, styles.profileSheetStatusChipNeutral]}>
+                <PixelText variant="caption" style={styles.profileSheetStatusTextDark}>
                   {visibilityText(editState.profileVisibility, t)}
                 </PixelText>
               </View>

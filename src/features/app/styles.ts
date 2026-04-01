@@ -1197,9 +1197,26 @@ export const styles = StyleSheet.create({
     alignSelf: "flex-start",
     borderWidth: b.normal,
     borderColor: c.border,
-    backgroundColor: c.gold,
     paddingHorizontal: s.xs,
     paddingVertical: 4
+  },
+  profileSheetStatusChipActive: {
+    backgroundColor: c.gold
+  },
+  profileSheetStatusChipPaused: {
+    backgroundColor: c.warning
+  },
+  profileSheetStatusChipGuide: {
+    backgroundColor: c.blueDark
+  },
+  profileSheetStatusChipNeutral: {
+    backgroundColor: c.surfaceAlt
+  },
+  profileSheetStatusTextDark: {
+    color: c.ink
+  },
+  profileSheetStatusTextLight: {
+    color: c.inkInverse
   },
   profileSheetMetaList: {
     gap: s.xs
