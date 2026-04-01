@@ -864,33 +864,18 @@ export const styles = StyleSheet.create({
     padding: s.md,
     gap: s.sm
   },
-  matchingInsightHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+  matchingInsightSection: {
     gap: s.xs
   },
-  matchingInsightProfileCard: {
-    width: 68,
-    alignItems: "center",
-    gap: s.xs
-  },
-  matchingInsightAvatar: {
-    width: 44,
-    height: 44,
-    borderWidth: b.normal,
-    borderColor: c.border,
-    backgroundColor: c.surfaceAlt,
-    alignItems: "center",
-    justifyContent: "center"
+  matchingInsightLabel: {
+    color: c.inkMuted
   },
   matchingBreakdownChart: {
-    flex: 1,
     flexDirection: "row",
     alignItems: "flex-end",
     justifyContent: "space-between",
     gap: 6,
-    minHeight: 138,
+    minHeight: 104,
     borderWidth: b.normal,
     borderColor: c.border,
     backgroundColor: c.surfaceAlt,
@@ -898,8 +883,7 @@ export const styles = StyleSheet.create({
     paddingVertical: s.sm
   },
   matchingLimitedInsightBox: {
-    flex: 1,
-    minHeight: 138,
+    minHeight: 84,
     borderWidth: b.normal,
     borderColor: c.border,
     backgroundColor: c.surfaceAlt,
@@ -914,7 +898,7 @@ export const styles = StyleSheet.create({
   },
   matchingBreakdownTrack: {
     width: "100%",
-    minHeight: 80,
+    minHeight: 62,
     justifyContent: "flex-end",
     borderWidth: b.normal,
     borderColor: c.border,
@@ -933,7 +917,6 @@ export const styles = StyleSheet.create({
   matchingInsightMetaRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     flexWrap: "wrap",
     gap: s.xs
   },

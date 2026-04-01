@@ -315,7 +315,7 @@ export function MatchingView({
       items.push(t("matching.feedback.pending"));
     }
 
-    return items.slice(0, 3);
+    return items.slice(0, 2);
     }, [canRevealFocusDetails, focusBreakdown, focusCard, t]);
 
   function statusChipStyle(status?: MatchRequestStatus) {
@@ -576,31 +576,46 @@ export function MatchingView({
         />
       ) : (
         <PixelBox style={styles.matchingInsightCard} contentStyle={styles.matchingInsightContent}>
-          <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
-            {t("matching.sections.breakdown")}
-          </PixelText>
+          <View style={styles.matchingCardTopRow}>
+            {renderMiniProfile(
+              focusCard.sourceCupidateId,
+              focusCard.sourceName,
+              buildCupidateSubtitle(focusSourceCupidate, currentCupidId)
+            )}
+            <PixelText variant="screenTitle" style={styles.recommendationHeart}>
+              {"<3"}
+            </PixelText>
+            {renderMiniProfile(
+              focusCard.targetCupidateId,
+              focusCard.targetName,
+              buildCupidateSubtitle(focusTargetCupidate, currentCupidId)
+            )}
+          </View>
 
-          <View style={styles.matchingInsightHeader}>
-            <Pressable
-              onPress={() => onOpenCupidateProfile(focusCard.sourceCupidateId)}
-              testID={`profile-open-cupidate-${focusCard.sourceCupidateId}`}
-            >
-              <View style={styles.matchingInsightProfileCard}>
-                <View style={styles.matchingInsightAvatar}>
-                  <PixelText variant="body" style={styles.networkAvatarText}>
-                    {buildAvatarSeed(focusCard.sourceName)}
-                  </PixelText>
-                </View>
-                <PixelText variant="body" style={styles.matchingMiniName}>
-                  {focusCard.sourceName}
-                </PixelText>
-              </View>
-            </Pressable>
+          <View style={styles.matchingInsightMetaRow}>
+            <View style={styles.matchingScoreChip}>
+              <PixelText variant="caption" style={styles.matchingScoreText}>
+                {t("matching.card.score", { rate: focusCard.matchScore })}
+              </PixelText>
+            </View>
+            <View style={[styles.matchingStatusChip, statusChipStyle(focusCard.request?.status)]}>
+              <PixelText variant="caption" style={styles.matchingStatusText}>
+                {t(statusDisplayKey(focusCard.request?.status ?? "none"))}
+              </PixelText>
+            </View>
+            <PixelText variant="caption" style={styles.listMeta}>
+              {t("matching.card.created", { value: formatDateLabel(focusCard.createdAt) })}
+            </PixelText>
+          </View>
 
+          <View style={styles.matchingInsightSection}>
+            <PixelText variant="caption" style={styles.matchingInsightLabel}>
+              {t("matching.sections.breakdown")}
+            </PixelText>
             {canRevealFocusDetails ? (
               <View style={styles.matchingBreakdownChart}>
                 {focusBreakdown.map((item) => {
-                  const barHeight = Math.max(8, Math.round((item.value / item.max) * 72));
+                  const barHeight = Math.max(8, Math.round((item.value / item.max) * 56));
 
                   return (
                     <View key={item.key} style={styles.matchingBreakdownItem}>
@@ -624,94 +639,60 @@ export function MatchingView({
                 </PixelText>
               </View>
             )}
-
-            <Pressable
-              onPress={() => onOpenCupidateProfile(focusCard.targetCupidateId)}
-              testID={`profile-open-cupidate-${focusCard.targetCupidateId}`}
-            >
-              <View style={styles.matchingInsightProfileCard}>
-                <View style={styles.matchingInsightAvatar}>
-                  <PixelText variant="body" style={styles.networkAvatarText}>
-                    {buildAvatarSeed(focusCard.targetName)}
-                  </PixelText>
-                </View>
-                <PixelText variant="body" style={styles.matchingMiniName}>
-                  {focusCard.targetName}
-                </PixelText>
-              </View>
-            </Pressable>
           </View>
 
-          <View style={styles.matchingInsightMetaRow}>
-            <View style={styles.matchingScoreChip}>
-              <PixelText variant="caption" style={styles.matchingScoreText}>
-                {t("matching.card.score", { rate: focusCard.matchScore })}
-              </PixelText>
-            </View>
-            <View style={[styles.matchingStatusChip, statusChipStyle(focusCard.request?.status)]}>
-              <PixelText variant="caption" style={styles.matchingStatusText}>
-                {t(statusDisplayKey(focusCard.request?.status ?? "none"))}
-              </PixelText>
-            </View>
-            <PixelText variant="caption" style={styles.listMeta}>
-              {t("matching.card.created", { value: formatDateLabel(focusCard.createdAt) })}
+          <View style={styles.matchingInsightSection}>
+            <PixelText variant="caption" style={styles.matchingInsightLabel}>
+              {t("matching.sections.timeline")}
             </PixelText>
-          </View>
+            <View style={styles.matchingTimelineRow}>
+              {[0, 1, 2].map((index) => {
+                const currentIndex = timelineIndex(focusCard.request?.status);
+                const state =
+                  currentIndex < 0 ? "wait" : index < currentIndex ? "done" : index === currentIndex ? "live" : "wait";
 
-          <View style={styles.profileDivider} />
+                const labelKey =
+                  index === 0 ? "matching.timeline.request" : index === 1 ? "matching.timeline.approval" : "matching.timeline.contact";
 
-          <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
-            {t("matching.sections.timeline")}
-          </PixelText>
-          <View style={styles.matchingTimelineRow}>
-            {[0, 1, 2].map((index) => {
-              const currentIndex = timelineIndex(focusCard.request?.status);
-              const state =
-                currentIndex < 0 ? "wait" : index < currentIndex ? "done" : index === currentIndex ? "live" : "wait";
-
-              const labelKey =
-                index === 0 ? "matching.timeline.request" : index === 1 ? "matching.timeline.approval" : "matching.timeline.contact";
-
-              return (
-                <View key={labelKey} style={styles.matchingTimelineStep}>
-                  <View
-                    style={[
-                      styles.matchingTimelineMarker,
-                      state === "done"
-                        ? styles.matchingTimelineMarkerDone
-                        : state === "live"
-                          ? styles.matchingTimelineMarkerLive
-                          : styles.matchingTimelineMarkerWait
-                    ]}
-                  >
-                    <PixelText variant="caption" style={styles.matchingTimelineMarkerText}>
-                      {index + 1}
-                    </PixelText>
-                  </View>
-                  <PixelText variant="caption" style={styles.matchingTimelineLabel}>
-                    {t(labelKey)}
-                  </PixelText>
-                  <PixelText variant="caption" style={styles.matchingTimelineState}>
-                    {t(`matching.timeline.state.${state}`)}
-                  </PixelText>
-                  {index < 2 ? (
+                return (
+                  <View key={labelKey} style={styles.matchingTimelineStep}>
                     <View
                       style={[
-                        styles.matchingTimelineConnector,
-                        state === "done" ? styles.matchingTimelineConnectorDone : null
+                        styles.matchingTimelineMarker,
+                        state === "done"
+                          ? styles.matchingTimelineMarkerDone
+                          : state === "live"
+                            ? styles.matchingTimelineMarkerLive
+                            : styles.matchingTimelineMarkerWait
                       ]}
-                    />
-                  ) : null}
-                </View>
-              );
-            })}
+                    >
+                      <PixelText variant="caption" style={styles.matchingTimelineMarkerText}>
+                        {index + 1}
+                      </PixelText>
+                    </View>
+                    <PixelText variant="caption" style={styles.matchingTimelineLabel}>
+                      {t(labelKey)}
+                    </PixelText>
+                    <PixelText variant="caption" style={styles.matchingTimelineState}>
+                      {t(`matching.timeline.state.${state}`)}
+                    </PixelText>
+                    {index < 2 ? (
+                      <View
+                        style={[
+                          styles.matchingTimelineConnector,
+                          state === "done" ? styles.matchingTimelineConnectorDone : null
+                        ]}
+                      />
+                    ) : null}
+                  </View>
+                );
+              })}
+            </View>
           </View>
 
           {canRevealFocusDetails ? (
-            <>
-              <View style={styles.profileDivider} />
-
-              <PixelText variant="sectionTitle" style={styles.surfaceSectionTitle}>
+            <View style={styles.matchingInsightSection}>
+              <PixelText variant="caption" style={styles.matchingInsightLabel}>
                 {t("matching.sections.feedback")}
               </PixelText>
               <View style={styles.matchingFeedbackList}>
@@ -726,7 +707,7 @@ export function MatchingView({
                   );
                 })}
               </View>
-            </>
+            </View>
           ) : null}
         </PixelBox>
       )}

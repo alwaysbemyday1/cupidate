@@ -120,7 +120,7 @@ describe("Matching flow", () => {
           "Detailed scoring is hidden because one of these dating profiles is not fully visible right now."
         ).length
       ).toBe(1);
-      expect(screen.queryByText("Feedback Summary")).toBeNull();
+      expect(screen.queryByText("Why It Fits")).toBeNull();
       expect(screen.queryByText("Suggested: Mina + Joon")).toBeNull();
     });
 
