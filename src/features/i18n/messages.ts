@@ -46,6 +46,9 @@ const enMessages: Record<string, string> = {
     "home.notification.badge.rejected": "NO",
     "home.notification.badge.completed": "DONE",
     "home.recommendation.score": "Matching Rate {rate}%",
+    "home.recommendation.connector": "MATCH",
+    "home.recommendation.priority": "Priority fit: {value}",
+    "home.recommendation.shared": "Shared spark: {value}",
 
     "network.sections.cupidatesHub": "Cupidates",
     "network.sections.cupidsHub": "My Network",
@@ -479,6 +482,9 @@ const koMessages: Record<string, string> = {
   "home.notification.badge.rejected": "거절",
   "home.notification.badge.completed": "완료",
   "home.recommendation.score": "매칭률 {rate}%",
+  "home.recommendation.connector": "매칭",
+  "home.recommendation.priority": "우선조건이 잘 맞아요: {value}",
+  "home.recommendation.shared": "함께 통하는 포인트: {value}",
 
   "network.sections.cupidatesHub": "큐피데이트",
   "network.sections.cupidsHub": "내 네트워크",

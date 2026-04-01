@@ -103,6 +103,8 @@ describe("HomeView", () => {
     expect(screen.queryByText("Approved")).toBeNull();
     expect(screen.queryByText("Suggested Pair")).toBeNull();
     expect(screen.queryByText("Cupidate")).toBeNull();
+    expect(screen.getByText("MATCH")).toBeTruthy();
+    expect(screen.getByText("Priority fit: Region")).toBeTruthy();
     expect(screen.getByText("seoul / Brand Strategist")).toBeTruthy();
     expect(screen.getByText("bundang / Product Engineer")).toBeTruthy();
     expect(screen.getByText("Active Cupidates")).toBeTruthy();

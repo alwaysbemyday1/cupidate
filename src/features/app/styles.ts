@@ -214,6 +214,21 @@ export const styles = StyleSheet.create({
     color: c.ink,
     flexShrink: 1
   },
+  recommendationConnector: {
+    alignSelf: "center",
+    minWidth: 52,
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surfaceAlt,
+    paddingHorizontal: s.xs,
+    paddingVertical: 6,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  recommendationConnectorText: {
+    color: c.blueDark,
+    textAlign: "center"
+  },
   recommendationHeart: {
     color: c.pink
   },
@@ -227,6 +242,9 @@ export const styles = StyleSheet.create({
   },
   recommendationRateText: {
     color: c.inkInverse
+  },
+  recommendationReasonText: {
+    color: c.inkMuted
   },
   metricRow: {
     flexDirection: "row",

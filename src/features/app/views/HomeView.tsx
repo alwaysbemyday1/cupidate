@@ -52,8 +52,28 @@ function buildRecommendationMeta(cupidate: CupidateRecord | undefined) {
     return undefined;
   }
 
+  if (!cupidate.isActive || cupidate.profileVisibility === "private") {
+    return undefined;
+  }
+
   const parts = [cupidate.region, cupidate.jobTitle].filter(Boolean);
   return parts.length > 0 ? parts.join(" / ") : undefined;
+}
+
+function buildRecommendationReason(item: RecommendationItem, t: ReturnType<typeof useI18n>["t"]) {
+  if (item.reason.priorityMatches.length > 0) {
+    return t("home.recommendation.priority", {
+      value: item.reason.priorityMatches.map((key) => t(`network.option.mustHave.${key}`)).join(", ")
+    });
+  }
+
+  if (item.reason.matchedHobbies.length > 0) {
+    return t("home.recommendation.shared", {
+      value: item.reason.matchedHobbies.join(", ")
+    });
+  }
+
+  return null;
 }
 
 export function HomeView({
@@ -156,6 +176,7 @@ export function HomeView({
           {topRecommendations.map((item) => {
             const source = cupidateMap.get(item.sourceCupidateId);
             const target = cupidateMap.get(item.targetCupidateId);
+            const recommendationReason = buildRecommendationReason(item, t);
 
             return (
               <Pressable
@@ -175,9 +196,11 @@ export function HomeView({
                         </PixelText>
                       ) : null}
                     </View>
-                    <PixelText variant="screenTitle" style={styles.recommendationHeart}>
-                      {"<3"}
-                    </PixelText>
+                    <View style={styles.recommendationConnector}>
+                      <PixelText variant="caption" style={styles.recommendationConnectorText}>
+                        {t("home.recommendation.connector")}
+                      </PixelText>
+                    </View>
                     <View style={styles.recommendationMiniCard}>
                       <PixelText variant="body" style={styles.recommendationMiniName} numberOfLines={2}>
                         {target?.displayName ?? item.targetCupidateId}
@@ -194,6 +217,11 @@ export function HomeView({
                       {t("home.recommendation.score", { rate: item.matchScore })}
                     </PixelText>
                   </View>
+                  {recommendationReason ? (
+                    <PixelText variant="caption" style={styles.recommendationReasonText} numberOfLines={2}>
+                      {recommendationReason}
+                    </PixelText>
+                  ) : null}
                 </PixelBox>
               </Pressable>
             );
