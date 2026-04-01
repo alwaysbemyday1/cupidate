@@ -407,3 +407,20 @@ Task 2026-04-01-04 (Completed)
 - Rebuilt `Cupidate Profile` so public/basic information lives in one merged top card instead of split summary boxes.
 - Replaced the long vertical fact stack with a compact chip-style fact grid.
 - Reorganized owner edit mode into `Basics`, `About & Lifestyle`, and `Dating Preferences`.
+
+Task 2026-04-01-05 (Completed)
+- Simplified the `Cupids` roster so rows focus on:
+  - nickname
+  - active cupidate marker
+  - shared matchmaking count
+  - alliance/request date
+- Reworked the Network FAB into a more docked bottom-right control with a readable `추가` label.
+- Shortened the guide copy in both Network segments to stay readable on compact mobile widths.
+
+Task 2026-04-01-06 (Completed)
+- Rebuilt `Cupid Profile` header content around useful activity context instead of generic relationship chips.
+- Reworked `Cupidate Profile` top summary to feel closer to a dating app profile:
+  - name + age/gender in one line
+  - `{owner}의 큐피데이트`
+  - essential facts immediately visible
+  - collapsible `내 소개` and `이런 사람이면 좋아요`

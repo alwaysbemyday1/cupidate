@@ -1249,3 +1249,39 @@ Changes:
 Verification:
 - `npx.cmd tsc --noEmit` passed.
 - `npm.cmd test -- --runInBand src/features/app/views/__tests__/ProfileView.test.tsx src/features/app/__tests__/profileOverlayFlow.test.tsx` passed.
+
+### Task 2026-04-01-05 - Cupid Roster Cleanup
+Status: Completed
+
+Changes:
+- Simplified the `Cupids` roster rows so they no longer spend space on duplicate status chips.
+- Kept only the metadata that helps action:
+  - active cupidate marker
+  - shared matchmaking count
+  - alliance/request date
+- Reworked the Network FAB into a tighter docked control that keeps the `추가` label readable.
+- Shortened the guide copy so the compact explanation cards stay readable on smaller Android widths.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand src/features/app/__tests__/networkDiscoveryFlow.test.tsx src/features/app/__tests__/navigationTabs.test.tsx` passed.
+
+### Task 2026-04-01-06 - Profile Summary + Detail Toggle Rebuild
+Status: Completed
+
+Changes:
+- Reworked `Cupid Profile` so the header focuses on:
+  - dating-profile status context
+  - alliance start date
+  - shared matchmaking count
+- Rebuilt `Cupidate Profile` into a more dating-app-like structure:
+  - name + age/gender in one header line
+  - `{owner}의 큐피데이트`
+  - essential public facts shown immediately
+  - collapsible `내 소개`
+  - collapsible `이런 사람이면 좋아요`
+- Renamed the public preference surface away from the generic `소개팅 선호도` label.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand src/features/app/views/__tests__/ProfileView.test.tsx src/features/app/__tests__/profileOverlayFlow.test.tsx` passed.

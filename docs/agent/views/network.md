@@ -22,8 +22,9 @@ Last Updated: 2026-04-01
 3. segment content
 - `Cupids` segment:
   - compact guide card only
+  - guide copy stays as two short lines on compact mobile widths
   - cupid roster directly visible without an extra sub-tab
-  - floating add button at bottom-right opens the add-cupid composer
+  - docked floating add button at bottom-right opens the add-cupid composer
 - `Cupidates` segment:
   - compact guide card only
   - `My Dating Profile`
@@ -60,25 +61,34 @@ Last Updated: 2026-04-01
 - row press opens `Cupidate Profile View`
 - visibility rules still apply inside the profile view
 - public cupidate profiles should use:
-  - one merged top card for intro + basic facts
-  - a compact fact grid instead of long vertical meta rows
-  - a separate preferences card
+  - one merged top summary card
+  - name with age/gender attached in the header line
+  - owner line formatted as `{owner}의 큐피데이트`
+  - essential public facts visible immediately at the top
+  - collapsible detail surfaces below:
+    - `내 소개`
+    - `이런 사람이면 좋아요`
+  - no wasteful tall fact stacks or oversized empty chips
 
 ## 4. Cupids Segment
 ### 4.1 Cupid List
 - shows currently connected or pending cupids
 - each row should include:
   - nickname
-  - connection status badge
-  - direction label for inbound/outbound pending requests
-  - dating profile status badge (`Active` / `Inactive` / `No Dating Profile`)
+  - a small cupidate marker only when that cupid currently has an active cupidate
+  - useful relationship metadata:
+    - shared matchmaking count
+    - alliance start date for connected cupids
+    - request date for pending cupids
 - row press opens `Cupid Profile View`
 - inbound pending requests must expose in-row `Accept` / `Decline` actions
 - cupid profile should show:
   - `Cupid Activity` summary
+  - alliance + shared-match context near the top
   - when the user has an active cupidate, a swipe/tab transition between:
     - `Cupid Activity`
     - `Cupidate Profile`
+ - remove redundant relationship chips when the surrounding context already explains the relationship
 
 ### 4.2 Add Cupid Composer
 - opened from a floating action button, not from a sub-tab
