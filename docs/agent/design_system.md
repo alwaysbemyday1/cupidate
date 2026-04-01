@@ -218,6 +218,71 @@ Rules:
   - stronger silhouette than surrounding cards
   - round or rounded-square face
   - short visible label, full accessibility label
+
+### 8.6 Icon Asset Brief
+- We now need a real icon pack for the dock and small UI connectors.
+- Do not use emoji-like hearts, soft gradients, or glossy app-store icon styling.
+- Icons must feel like in-game UI glyphs, not marketing illustrations.
+
+Required set:
+- `tab-home`
+- `tab-network`
+- `tab-match`
+- `tab-my`
+- optional: one neutral `match-link` glyph for pair cards
+
+Concept direction:
+- `tab-home`
+  - tiny pixel house / doorway / roof silhouette
+- `tab-network`
+  - two small busts or three linked nodes
+- `tab-match`
+  - two portrait cards facing inward with a tiny connector spark
+  - do not use a floating heart
+- `tab-my`
+  - single bust / profile badge
+- `match-link`
+  - small neutral connector badge
+  - use link / spark / bracket language, not a romantic heart
+
+Production spec:
+- base canvas: `32x32 px`
+- target readable size in app: `16x16 ~ 18x18 px`
+- transparent background
+- hard black outline
+- max `3~4` fill colors per icon, excluding outline
+- no anti-aliasing
+- no blur
+- no semi-transparent glow
+- no built-in drop shadow
+- keep `2 px` safe padding so the silhouette survives scaling
+
+State spec:
+- provide two states per nav icon:
+  - `inactive`
+  - `active`
+- the silhouette should stay the same across states
+- only accent colors should change between states
+
+Export spec:
+- preferred: individual `png` files
+- acceptable: one tightly packed sprite sheet with a clear index map
+- scaling must use nearest-neighbor / pixel-perfect export
+
+AI generation guidance:
+- ask for:
+  - `16-bit retro pixel UI icon`
+  - `transparent background`
+  - `hard black outline`
+  - `no anti-aliasing`
+  - `game HUD icon`
+- after generation, clean up the icon in a pixel editor if the grid is muddy
+
+Recommended tools:
+- `Aseprite`
+- `LibreSprite`
+- `Piskel`
+- `Photoshop` or `Photopea` with nearest-neighbor export
 - The FAB should never float high enough to read like a random content card.
 
 ### 8.6 Section Titles

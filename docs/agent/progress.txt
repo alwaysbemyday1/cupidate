@@ -76,6 +76,9 @@ Completed Work
 - [x] Matching request/suggestion card simplification (Task 2026-04-02-01)
 - [x] Matching insight compaction for faster decisions (Task 2026-04-02-02)
 - [x] Matching PRD/document sync after QA pass (Task 2026-04-02-03)
+- [x] Home recommendation/privacy QA pass (Task 2026-04-02-04)
+- [x] Profile status-summary QA pass (Task 2026-04-02-05)
+- [x] Icon asset brief for dock/system UI (Task 2026-04-02-06)
 
 Next Tasks (Rebuild Track)
  - Task 2026-03-30-03: Device QA pass on Home readiness -> Network -> activation -> Matching flow

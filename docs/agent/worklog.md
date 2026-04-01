@@ -69,6 +69,50 @@ Changes:
 Verification:
 - Manual document review completed.
 
+### Task 2026-04-02-04 - Home QA Pass
+Status: Completed
+
+Changes:
+- Replaced the placeholder text-heart in Home recommendation cards with a neutral `MATCH` connector badge.
+- Added one concise recommendation reason line so cards explain why the pair is surfaced.
+- Hardened recommendation metadata so inactive/private cupidates do not leak extra context from Home.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand src/features/app/views/__tests__/HomeView.test.tsx src/features/app/__tests__/navigationTabs.test.tsx` passed.
+
+### Task 2026-04-02-05 - Profile QA Pass
+Status: Completed
+
+Changes:
+- Reworked `Cupid Profile` top summary from long explanatory text into compact status badges plus useful meta.
+- Added concise cupid status badges:
+  - active cupidate
+  - cupidate paused
+  - guide only
+- Added linked cupidate metadata when the cupid has an active dating profile.
+- Fixed malformed separator characters in profile identity / preference preview text.
+- Rebalanced cupidate header badges so active state and visibility read more cleanly.
+
+Verification:
+- `npx.cmd tsc --noEmit` passed.
+- `npm.cmd test -- --runInBand src/features/app/views/__tests__/ProfileView.test.tsx src/features/app/__tests__/profileOverlayFlow.test.tsx` passed.
+
+### Task 2026-04-02-06 - Icon Asset Brief
+Status: Completed
+
+Changes:
+- Added a concrete icon production brief to `design_system.md`.
+- Defined:
+  - required nav icon set
+  - optional neutral match-link glyph
+  - pixel export rules
+  - active/inactive state rules
+  - recommended pixel-editing tools
+
+Verification:
+- Manual doc review completed.
+
 Notes:
 - This pass was aimed at making the profile sheet trustworthy: the UI now matches both profile visibility and cupidate activation state.
 
