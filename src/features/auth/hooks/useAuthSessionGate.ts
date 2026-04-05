@@ -7,6 +7,7 @@ type AuthMode = "local" | "supabase";
 
 type UseAuthSessionGateResult = {
   mode: AuthMode;
+  isInitializing: boolean;
   isLoading: boolean;
   session: Session | null;
   userId: string | null;
@@ -35,6 +36,7 @@ export function useAuthSessionGate(): UseAuthSessionGateResult {
   const mode: AuthMode = !isSupabaseConfigured || isTestMode ? "local" : "supabase";
 
   const [isLoading, setIsLoading] = useState(mode === "supabase");
+  const [isInitializing, setIsInitializing] = useState(mode === "supabase");
   const [session, setSession] = useState<Session | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -111,12 +113,15 @@ export function useAuthSessionGate(): UseAuthSessionGateResult {
   useEffect(() => {
     if (mode !== "supabase" || !supabase) {
       setIsLoading(false);
+      setIsInitializing(false);
       setSession(null);
       setError(null);
       return;
     }
 
     let mounted = true;
+    setIsInitializing(true);
+    setIsLoading(true);
 
     const bootstrap = async () => {
       try {
@@ -138,6 +143,7 @@ export function useAuthSessionGate(): UseAuthSessionGateResult {
       } finally {
         if (mounted) {
           setIsLoading(false);
+          setIsInitializing(false);
         }
       }
     };
@@ -152,6 +158,7 @@ export function useAuthSessionGate(): UseAuthSessionGateResult {
       setSession(nextSession);
       setError(null);
       setIsLoading(false);
+      setIsInitializing(false);
     });
 
     return () => {
@@ -170,6 +177,7 @@ export function useAuthSessionGate(): UseAuthSessionGateResult {
 
   return {
     mode,
+    isInitializing,
     isLoading,
     session,
     userId: session?.user?.id ?? null,

@@ -15,10 +15,42 @@ export const styles = StyleSheet.create({
   },
   appShell: {
     flex: 1,
-    backgroundColor: c.background
+    backgroundColor: c.background,
+    overflow: "hidden"
+  },
+  appBackdrop: {
+    ...StyleSheet.absoluteFillObject
+  },
+  appBackdropGlow: {
+    position: "absolute",
+    borderRadius: 999
+  },
+  appBackdropGlowTop: {
+    width: 260,
+    height: 260,
+    right: -80,
+    top: -76,
+    backgroundColor: c.backgroundGlowA
+  },
+  appBackdropGlowMid: {
+    width: 320,
+    height: 320,
+    left: -170,
+    top: "28%",
+    backgroundColor: c.backgroundGlowB
+  },
+  appBackdropGlowBottom: {
+    width: 220,
+    height: 220,
+    right: -110,
+    bottom: 86,
+    backgroundColor: c.backgroundGlowC
   },
   container: {
     flex: 1,
+    width: "100%",
+    maxWidth: 960,
+    alignSelf: "center",
     backgroundColor: c.background,
     paddingHorizontal: s.md,
     paddingTop: s.sm
@@ -37,6 +69,26 @@ export const styles = StyleSheet.create({
   centerPanel: {
     flex: 1,
     justifyContent: "center"
+  },
+  bootScreen: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: s.lg
+  },
+  bootCard: {
+    width: "100%",
+    maxWidth: 280
+  },
+  bootCardContent: {
+    backgroundColor: c.surfaceRaised,
+    paddingVertical: s.lg,
+    paddingHorizontal: s.md,
+    alignItems: "center",
+    gap: s.sm
+  },
+  bootTitle: {
+    letterSpacing: 1
   },
 
   headerFrame: {

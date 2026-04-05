@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 import { useMemo, useState } from "react";
-import { View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 import { PixelBox } from "./src/features/app/components/PixelBox";
@@ -64,12 +64,44 @@ function CupidateHeader({ activeView, locked }: { activeView: AppView; locked?: 
   );
 }
 
+function AppBootstrapView() {
+  return (
+    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right", "bottom"]}>
+      <StatusBar style="light" />
+      <View style={styles.bootScreen}>
+        <PixelBox style={styles.bootCard} contentStyle={styles.bootCardContent}>
+          <PixelText variant="screenTitle" style={styles.bootTitle} color={designTokens.color.ink}>
+            CUPIDATE
+          </PixelText>
+          <ActivityIndicator color={designTokens.color.blueDark} size="small" />
+        </PixelBox>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+function AppBackdrop() {
+  return (
+    <View pointerEvents="none" style={styles.appBackdrop}>
+      <View style={[styles.appBackdropGlow, styles.appBackdropGlowTop]} />
+      <View style={[styles.appBackdropGlow, styles.appBackdropGlowMid]} />
+      <View style={[styles.appBackdropGlow, styles.appBackdropGlowBottom]} />
+    </View>
+  );
+}
+
 function CupidateAppShell() {
+  const isTestMode = process.env.NODE_ENV === "test";
   const authGate = useAuthSessionGate();
   const state = useCupidateAppState({
     isDataAccessEnabled: authGate.canAccessProtectedData
   });
-  const { t } = useI18n();
+  const { isReady: isI18nReady, t } = useI18n();
+  const isBootstrappingApp =
+    !isTestMode &&
+    (!isI18nReady ||
+      (authGate.mode === "supabase" && authGate.isInitializing) ||
+      (authGate.canAccessProtectedData && state.isBootstrappingData));
 
   const tabItems = useMemo<
     Array<{
@@ -88,22 +120,27 @@ function CupidateAppShell() {
     [t]
   );
 
+  if (isBootstrappingApp) {
+    return <AppBootstrapView />;
+  }
+
   if (authGate.mode === "supabase" && !authGate.canAccessProtectedData) {
     return (
       <SafeAreaView style={styles.safeArea} edges={["top", "left", "right", "bottom"]}>
         <StatusBar style="light" />
         <View style={styles.appShell}>
+          <AppBackdrop />
           <View style={styles.container}>
-          <CupidateHeader activeView="home" locked />
-          <View style={styles.screenBody}>
-            <AuthRequiredView
-              isLoading={authGate.isLoading}
-              error={authGate.error}
-              onRefresh={authGate.refresh}
-              onSignInWithPassword={authGate.signInWithPassword}
-              onSignUpWithPassword={authGate.signUpWithPassword}
-            />
-          </View>
+            <CupidateHeader activeView="home" locked />
+            <View style={styles.screenBody}>
+              <AuthRequiredView
+                isLoading={authGate.isLoading}
+                error={authGate.error}
+                onRefresh={authGate.refresh}
+                onSignInWithPassword={authGate.signInWithPassword}
+                onSignUpWithPassword={authGate.signUpWithPassword}
+              />
+            </View>
           </View>
         </View>
       </SafeAreaView>
@@ -114,6 +151,7 @@ function CupidateAppShell() {
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right", "bottom"]}>
       <StatusBar style="light" />
       <View style={styles.appShell}>
+        <AppBackdrop />
         <View style={styles.container}>
           <CupidateHeader activeView={state.activeView} />
 

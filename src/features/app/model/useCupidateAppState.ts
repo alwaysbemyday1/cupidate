@@ -1011,6 +1011,13 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     await currentCupidQuery.refetch();
   };
 
+  const isBootstrappingData =
+    isDataAccessEnabled &&
+    (currentCupidQuery.isPending ||
+      cupidatesQuery.isPending ||
+      connectionsQuery.isPending ||
+      matchCandidatesQuery.isPending);
+
   return {
     activeView,
     setActiveView,
@@ -1103,6 +1110,7 @@ export function useCupidateAppState(options?: UseCupidateAppStateOptions) {
     isMyLoading: currentCupidQuery.isLoading,
     myError,
     isDataAccessEnabled,
+    isBootstrappingData,
     onRegisterCupidate,
     onSaveCupidateProfile,
     onAddConnection,

@@ -5,6 +5,7 @@ import { loadStoredLocale, persistLocale } from "./storage";
 import type { Locale, TranslationKey, TranslationParams } from "./types";
 
 type I18nContextValue = {
+  isReady: boolean;
   locale: Locale;
   setLocale: (locale: Locale) => void;
   t: (key: TranslationKey, params?: TranslationParams) => string;
@@ -24,6 +25,7 @@ function interpolate(template: string, params?: TranslationParams) {
 const fallbackLocale: Locale = "en";
 
 const defaultContext: I18nContextValue = {
+  isReady: false,
   locale: fallbackLocale,
   setLocale: () => {},
   t: (key, params) => interpolate(messages[fallbackLocale][key] ?? key, params)
@@ -32,23 +34,34 @@ const defaultContext: I18nContextValue = {
 const I18nContext = createContext<I18nContextValue>(defaultContext);
 
 export function I18nProvider({ children, initialLocale = fallbackLocale }: PropsWithChildren<{ initialLocale?: Locale }>) {
+  const isTestMode = process.env.NODE_ENV === "test";
   const [locale, setLocale] = useState<Locale>(initialLocale);
+  const [isReady, setIsReady] = useState(isTestMode);
 
   useEffect(() => {
     let isMounted = true;
 
-    void loadStoredLocale().then((storedLocale) => {
-      if (!isMounted || !storedLocale) {
-        return;
-      }
+    const hydrateLocale = async () => {
+      try {
+        const storedLocale = await loadStoredLocale();
+        if (!isMounted || !storedLocale) {
+          return;
+        }
 
-      setLocale((currentLocale) => (currentLocale === storedLocale ? currentLocale : storedLocale));
-    });
+        setLocale((currentLocale) => (currentLocale === storedLocale ? currentLocale : storedLocale));
+      } finally {
+        if (isMounted && !isTestMode) {
+          setIsReady(true);
+        }
+      }
+    };
+
+    void hydrateLocale();
 
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [isTestMode]);
 
   const handleSetLocale = useCallback((nextLocale: Locale) => {
     setLocale(nextLocale);
@@ -57,6 +70,7 @@ export function I18nProvider({ children, initialLocale = fallbackLocale }: Props
 
   const value = useMemo<I18nContextValue>(
     () => ({
+      isReady,
       locale,
       setLocale: handleSetLocale,
       t: (key, params) => {
@@ -64,7 +78,7 @@ export function I18nProvider({ children, initialLocale = fallbackLocale }: Props
         return interpolate(template, params);
       }
     }),
-    [handleSetLocale, locale]
+    [handleSetLocale, isReady, locale]
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
