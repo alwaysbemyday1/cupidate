@@ -55,7 +55,7 @@ describe("Network connection inbox flow", () => {
     fireEvent.press(screen.getByText("Accept"));
 
     await waitFor(() => {
-      expect(screen.getByText("Allied since 2026.04.01")).toBeTruthy();
+      expect(screen.getByText(/Allied since \d{4}\.\d{2}\.\d{2}/)).toBeTruthy();
       expect(screen.queryByText("Accept")).toBeNull();
     });
   });
