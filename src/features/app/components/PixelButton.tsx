@@ -8,6 +8,7 @@ type PixelButtonProps = {
   label: string;
   active?: boolean;
   disabled?: boolean;
+  fullWidth?: boolean;
   variant?: ButtonVariant;
   testID?: string;
   onPress: () => void;
@@ -65,6 +66,7 @@ export function PixelButton({
   label,
   active,
   disabled,
+  fullWidth = false,
   variant = "neutral",
   testID,
   onPress
@@ -77,7 +79,7 @@ export function PixelButton({
       accessibilityState={{ disabled: !!disabled, selected: !!active }}
       disabled={disabled}
       onPress={onPress}
-      style={localStyles.pressable}
+      style={[localStyles.pressable, fullWidth ? localStyles.pressableFullWidth : null]}
       hitSlop={4}
       testID={testID}
     >
@@ -114,8 +116,10 @@ export function PixelButton({
 
 const localStyles = StyleSheet.create({
   pressable: {
-    minWidth: 96,
-    alignSelf: "flex-start"
+    minWidth: 96
+  },
+  pressableFullWidth: {
+    width: "100%"
   },
   shadowLayer: {
     backgroundColor: designTokens.color.shadow,

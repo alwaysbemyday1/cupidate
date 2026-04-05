@@ -463,21 +463,23 @@ export function MatchingView({
                     <View style={styles.matchingActionCell}>
                       <PixelButton
                         label={t("matching.actions.approve")}
-                      variant="success"
-                      disabled={isMutatingMatching}
-                      onPress={() =>
-                        onUpdateRequestStatus(item.sourceCupidateId, item.targetCupidateId, "accepted")
-                      }
+                        variant="success"
+                        disabled={isMutatingMatching}
+                        fullWidth
+                        onPress={() =>
+                          onUpdateRequestStatus(item.sourceCupidateId, item.targetCupidateId, "accepted")
+                        }
                       />
                     </View>
                     <View style={styles.matchingActionCell}>
                       <PixelButton
                         label={t("matching.actions.reject")}
-                      variant="danger"
-                      disabled={isMutatingMatching}
-                      onPress={() =>
-                        onUpdateRequestStatus(item.sourceCupidateId, item.targetCupidateId, "rejected")
-                      }
+                        variant="danger"
+                        disabled={isMutatingMatching}
+                        fullWidth
+                        onPress={() =>
+                          onUpdateRequestStatus(item.sourceCupidateId, item.targetCupidateId, "rejected")
+                        }
                       />
                     </View>
                   </>
@@ -491,6 +493,7 @@ export function MatchingView({
                       }
                       variant={item.request?.status === "completed" ? "neutral" : "primary"}
                       disabled={item.request?.status === "completed" || isMutatingMatching}
+                      fullWidth
                       onPress={() =>
                         onUpdateRequestStatus(item.sourceCupidateId, item.targetCupidateId, "completed")
                       }
@@ -566,6 +569,7 @@ export function MatchingView({
                       label={isMutatingMatching ? t("matching.actions.processing") : t("matching.actions.request")}
                       variant="primary"
                       disabled={isMutatingMatching}
+                      fullWidth
                       onPress={() => onSendRequest(item.sourceCupidateId, item.targetCupidateId)}
                     />
                   </View>
