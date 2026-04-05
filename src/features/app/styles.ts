@@ -63,8 +63,9 @@ export const styles = StyleSheet.create({
     flex: 1
   },
   panelContent: {
-    gap: s.md,
-    paddingBottom: z.tabBarHeight + z.tabBarInset + s.lg
+    gap: s.lg,
+    paddingTop: s.xxs,
+    paddingBottom: z.tabBarHeight + z.tabBarInset + s.xl
   },
   centerPanel: {
     flex: 1,
@@ -92,13 +93,13 @@ export const styles = StyleSheet.create({
   },
 
   headerFrame: {
-    marginBottom: s.sm
+    marginBottom: s.md
   },
   headerContent: {
-    minHeight: z.headerHeight,
+    minHeight: z.headerHeight + 2,
     backgroundColor: c.backgroundAlt,
     paddingHorizontal: s.md,
-    paddingVertical: s.xs,
+    paddingVertical: s.sm,
     justifyContent: "center"
   },
   headerRow: {
@@ -352,7 +353,7 @@ export const styles = StyleSheet.create({
   stateCard: {},
   stateCardContent: {
     padding: s.md,
-    gap: s.xs
+    gap: s.sm
   },
   stateCardLoading: {
     backgroundColor: c.surfaceAlt
@@ -385,12 +386,16 @@ export const styles = StyleSheet.create({
   },
 
   pageSectionTitle: {
-    marginTop: s.xxs,
-    color: c.inkInverse
+    marginTop: s.xs,
+    marginBottom: 2,
+    color: c.inkInverse,
+    letterSpacing: 0.5
   },
   surfaceSectionTitle: {
-    marginTop: s.xxs,
-    color: c.ink
+    marginTop: s.xs,
+    marginBottom: 2,
+    color: c.ink,
+    letterSpacing: 0.4
   },
   fieldLabel: {
     color: c.ink,
@@ -400,9 +405,9 @@ export const styles = StyleSheet.create({
     color: c.inkMuted
   },
   input: {
-    minHeight: 44,
+    minHeight: 46,
     borderWidth: b.normal,
-    borderColor: c.border,
+    borderColor: c.inputBorder,
     backgroundColor: c.inputFill,
     color: c.ink,
     paddingHorizontal: s.sm,
@@ -422,6 +427,7 @@ export const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: "row",
     flexWrap: "wrap",
+    alignItems: "stretch",
     gap: s.xs
   },
   errorText: {
@@ -434,7 +440,7 @@ export const styles = StyleSheet.create({
   listCardContent: {
     backgroundColor: c.surface,
     padding: s.md,
-    gap: s.xxs
+    gap: s.xs
   },
   listName: {
     color: c.ink,
@@ -657,14 +663,15 @@ export const styles = StyleSheet.create({
   networkRosterCard: {},
   networkRosterContent: {
     backgroundColor: c.surface,
-    padding: s.sm,
+    padding: s.md,
     gap: s.xs
   },
   networkRosterItem: {
     borderWidth: b.normal,
     borderColor: c.border,
     backgroundColor: c.surfaceAlt,
-    padding: s.sm
+    padding: s.sm,
+    gap: s.xs
   },
   networkRosterItemHeader: {
     flexDirection: "row",
@@ -681,7 +688,7 @@ export const styles = StyleSheet.create({
   networkRosterMain: {
     flex: 1,
     minWidth: 0,
-    gap: 2
+    gap: 4
   },
   networkRosterMeta: {
     color: c.inkMuted,
@@ -730,7 +737,7 @@ export const styles = StyleSheet.create({
     backgroundColor: c.surface,
     paddingHorizontal: s.md,
     paddingVertical: s.sm,
-    gap: s.xxs
+    gap: s.xs
   },
   networkSearchResults: {
     gap: s.xs
@@ -742,8 +749,8 @@ export const styles = StyleSheet.create({
   networkFabShadow: {
     backgroundColor: c.shadow,
     borderRadius: 24,
-    paddingRight: 2,
-    paddingBottom: 2
+    paddingRight: 3,
+    paddingBottom: 3
   },
   networkFabInner: {
     minWidth: 76,
@@ -788,7 +795,7 @@ export const styles = StyleSheet.create({
     backgroundColor: c.surface,
     padding: s.md,
     gap: s.sm,
-    maxHeight: 520
+    maxHeight: 560
   },
   networkComposerTopRow: {
     flexDirection: "row",
@@ -799,14 +806,14 @@ export const styles = StyleSheet.create({
   matchingPanelCard: {},
   matchingPanelContent: {
     backgroundColor: c.surface,
-    padding: s.sm,
-    gap: s.sm
+    padding: s.md,
+    gap: s.md
   },
   matchingRequestCard: {},
   matchingRequestContent: {
     backgroundColor: c.surfaceAlt,
     padding: s.sm,
-    gap: s.sm
+    gap: s.md
   },
   matchingCardTopRow: {
     flexDirection: "row",
@@ -900,7 +907,7 @@ export const styles = StyleSheet.create({
     borderWidth: b.normal,
     borderColor: c.border,
     backgroundColor: c.surfaceAlt,
-    padding: s.sm,
+    padding: s.md,
     gap: s.sm
   },
   matchingSuggestionProfiles: {
@@ -932,7 +939,7 @@ export const styles = StyleSheet.create({
   matchingInsightContent: {
     backgroundColor: c.surface,
     padding: s.md,
-    gap: s.sm
+    gap: s.md
   },
   matchingInsightSection: {
     gap: s.xs
@@ -1083,7 +1090,7 @@ export const styles = StyleSheet.create({
     borderColor: c.border,
     backgroundColor: c.surfaceAlt,
     paddingHorizontal: s.sm,
-    paddingVertical: s.xs
+    paddingVertical: s.sm
   },
   authStack: {
     gap: s.md
