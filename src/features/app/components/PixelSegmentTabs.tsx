@@ -80,7 +80,8 @@ const localStyles = StyleSheet.create({
   rail: {
     borderWidth: designTokens.border.normal,
     borderColor: designTokens.color.border,
-    backgroundColor: designTokens.color.surfaceRaised
+    backgroundColor: designTokens.color.surfaceRaised,
+    overflow: "hidden"
   },
   row: {
     flexDirection: "row"
@@ -110,7 +111,8 @@ const localStyles = StyleSheet.create({
     backgroundColor: designTokens.color.surfaceAlt
   },
   segmentFacePressed: {
-    transform: [{ translateY: 1 }]
+    transform: [{ translateY: 1 }],
+    opacity: 0.92
   },
   segmentStrip: {
     position: "absolute",
@@ -124,6 +126,7 @@ const localStyles = StyleSheet.create({
     backgroundColor: designTokens.color.pink
   },
   segmentLabel: {
-    textAlign: "center"
+    textAlign: "center",
+    letterSpacing: 0.2
   }
 });

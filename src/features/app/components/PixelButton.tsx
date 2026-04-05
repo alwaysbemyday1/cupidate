@@ -78,6 +78,7 @@ export function PixelButton({
       disabled={disabled}
       onPress={onPress}
       style={localStyles.pressable}
+      hitSlop={4}
       testID={testID}
     >
       {({ pressed }) => (
@@ -89,18 +90,19 @@ export function PixelButton({
             disabled ? localStyles.shadowLayerDisabled : null
           ]}
         >
-          <View
-            style={[
-              localStyles.face,
-              { backgroundColor: palette.backgroundColor },
+            <View
+              style={[
+                localStyles.face,
+                { backgroundColor: palette.backgroundColor },
               active ? localStyles.faceActive : null,
               pressed ? localStyles.facePressed : null,
               disabled ? localStyles.faceDisabled : null
             ]}
-          >
-            <View style={[localStyles.bevelLine, localStyles.bevelTop, { backgroundColor: palette.topLine }]} />
-            <View style={[localStyles.bevelLine, localStyles.bevelBottom, { backgroundColor: palette.bottomLine }]} />
-            <PixelText variant="button" color={palette.textColor} style={localStyles.label}>
+            >
+              <View style={localStyles.faceHighlight} />
+              <View style={[localStyles.bevelLine, localStyles.bevelTop, { backgroundColor: palette.topLine }]} />
+              <View style={[localStyles.bevelLine, localStyles.bevelBottom, { backgroundColor: palette.bottomLine }]} />
+              <PixelText variant="button" color={palette.textColor} style={localStyles.label}>
               {label}
             </PixelText>
           </View>
@@ -112,7 +114,8 @@ export function PixelButton({
 
 const localStyles = StyleSheet.create({
   pressable: {
-    minWidth: 96
+    minWidth: 96,
+    alignSelf: "flex-start"
   },
   shadowLayer: {
     backgroundColor: designTokens.color.shadow,
@@ -133,6 +136,7 @@ const localStyles = StyleSheet.create({
     minHeight: designTokens.size.buttonHeight,
     borderWidth: designTokens.border.normal,
     borderColor: designTokens.color.border,
+    overflow: "hidden",
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: designTokens.spacing.sm,
@@ -146,6 +150,14 @@ const localStyles = StyleSheet.create({
   },
   faceDisabled: {
     opacity: 0.58
+  },
+  faceHighlight: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    height: "50%",
+    backgroundColor: "rgba(255, 255, 255, 0.08)"
   },
   bevelLine: {
     position: "absolute",

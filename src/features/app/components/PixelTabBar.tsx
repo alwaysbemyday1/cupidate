@@ -196,6 +196,11 @@ const localStyles = StyleSheet.create({
     backgroundColor: designTokens.color.surfaceRaised,
     borderTopWidth: designTokens.border.heavy,
     borderColor: designTokens.color.border,
+    shadowColor: "#000000",
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: -2 },
+    elevation: 6,
     paddingTop: designTokens.spacing.xxs,
     paddingHorizontal: designTokens.spacing.xxs
   },
@@ -223,7 +228,8 @@ const localStyles = StyleSheet.create({
     backgroundColor: designTokens.color.surface
   },
   cellFacePressed: {
-    transform: [{ translateY: 1 }]
+    transform: [{ translateY: 1 }],
+    opacity: 0.94
   },
   cellFaceInactive: {
     backgroundColor: designTokens.color.surfaceRaised
@@ -248,7 +254,8 @@ const localStyles = StyleSheet.create({
     backgroundColor: designTokens.color.navyDark
   },
   cellLabel: {
-    textAlign: "center"
+    textAlign: "center",
+    letterSpacing: 0.2
   },
   glyphCanvas: {
     width: 14,

@@ -10,6 +10,7 @@ type PixelBoxProps = {
   backgroundColor?: string;
   borderColor?: string;
   shadowColor?: string;
+  highlightColor?: string;
 };
 
 export function PixelBox({
@@ -18,11 +19,15 @@ export function PixelBox({
   contentStyle,
   backgroundColor = designTokens.color.surface,
   borderColor = designTokens.color.border,
-  shadowColor = designTokens.color.shadow
+  shadowColor = designTokens.color.shadow,
+  highlightColor = "rgba(255, 255, 255, 0.35)"
 }: PixelBoxProps) {
   return (
     <View style={[localStyles.shadowLayer, { backgroundColor: shadowColor }, style]}>
-      <View style={[localStyles.contentLayer, { backgroundColor, borderColor }, contentStyle]}>{children}</View>
+      <View style={[localStyles.contentLayer, { backgroundColor, borderColor }, contentStyle]}>
+        <View pointerEvents="none" style={[localStyles.highlightLine, { backgroundColor: highlightColor }]} />
+        {children}
+      </View>
     </View>
   );
 }
@@ -34,6 +39,14 @@ const localStyles = StyleSheet.create({
   },
   contentLayer: {
     borderWidth: designTokens.border.normal,
-    borderRadius: 0
+    borderRadius: 0,
+    overflow: "hidden"
+  },
+  highlightLine: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    height: 2
   }
 });
