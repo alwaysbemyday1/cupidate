@@ -900,8 +900,25 @@ export const styles = StyleSheet.create({
   matchingStatusCompleted: {
     backgroundColor: c.gold
   },
-  matchingStatusText: {
+  matchingStatusTextDark: {
     color: c.ink
+  },
+  matchingStatusTextLight: {
+    color: c.inkInverse
+  },
+  matchingConnectorBadge: {
+    minWidth: 52,
+    alignSelf: "center",
+    borderWidth: b.normal,
+    borderColor: c.border,
+    backgroundColor: c.surfaceAlt,
+    paddingHorizontal: s.xs,
+    paddingVertical: 6,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  matchingConnectorText: {
+    color: c.blueDark
   },
   matchingSuggestionRow: {
     borderWidth: b.normal,

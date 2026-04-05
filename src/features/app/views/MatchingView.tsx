@@ -338,6 +338,14 @@ export function MatchingView({
     return styles.matchingStatusNeutral;
   }
 
+  function statusChipTextStyle(status?: MatchRequestStatus) {
+    if (status === "requested" || status === "accepted" || status === "rejected") {
+      return styles.matchingStatusTextLight;
+    }
+
+    return styles.matchingStatusTextDark;
+  }
+
   function renderMiniProfile(cupidateId: string, name: string, subtitle?: string) {
     return (
       <Pressable
@@ -417,9 +425,11 @@ export function MatchingView({
                   item.sourceName,
                   buildCupidateSubtitle(cupidateMap.get(item.sourceCupidateId), currentCupidId)
                 )}
-                <PixelText variant="screenTitle" style={styles.recommendationHeart}>
-                  {"<3"}
-                </PixelText>
+                <View style={styles.matchingConnectorBadge}>
+                  <PixelText variant="caption" style={styles.matchingConnectorText}>
+                    {t("matching.connector")}
+                  </PixelText>
+                </View>
                 {renderMiniProfile(
                   item.targetCupidateId,
                   item.targetName,
@@ -435,7 +445,7 @@ export function MatchingView({
                     </PixelText>
                   </View>
                   <View style={[styles.matchingStatusChip, statusChipStyle(item.request?.status)]}>
-                    <PixelText variant="caption" style={styles.matchingStatusText}>
+                    <PixelText variant="caption" style={statusChipTextStyle(item.request?.status)}>
                       {t(statusDisplayKey(item.request?.status ?? "none"))}
                     </PixelText>
                   </View>
@@ -519,9 +529,11 @@ export function MatchingView({
                   item.sourceName,
                   buildCupidateSubtitle(cupidateMap.get(item.sourceCupidateId), currentCupidId)
                 )}
-                <PixelText variant="screenTitle" style={styles.recommendationHeart}>
-                  {"<3"}
-                </PixelText>
+                <View style={styles.matchingConnectorBadge}>
+                  <PixelText variant="caption" style={styles.matchingConnectorText}>
+                    {t("matching.connector")}
+                  </PixelText>
+                </View>
                 {renderMiniProfile(
                   item.targetCupidateId,
                   item.targetName,
@@ -582,9 +594,11 @@ export function MatchingView({
               focusCard.sourceName,
               buildCupidateSubtitle(focusSourceCupidate, currentCupidId)
             )}
-            <PixelText variant="screenTitle" style={styles.recommendationHeart}>
-              {"<3"}
-            </PixelText>
+            <View style={styles.matchingConnectorBadge}>
+              <PixelText variant="caption" style={styles.matchingConnectorText}>
+                {t("matching.connector")}
+              </PixelText>
+            </View>
             {renderMiniProfile(
               focusCard.targetCupidateId,
               focusCard.targetName,
@@ -599,7 +613,7 @@ export function MatchingView({
               </PixelText>
             </View>
             <View style={[styles.matchingStatusChip, statusChipStyle(focusCard.request?.status)]}>
-              <PixelText variant="caption" style={styles.matchingStatusText}>
+              <PixelText variant="caption" style={statusChipTextStyle(focusCard.request?.status)}>
                 {t(statusDisplayKey(focusCard.request?.status ?? "none"))}
               </PixelText>
             </View>
