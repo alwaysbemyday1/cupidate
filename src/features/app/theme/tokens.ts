@@ -1,3 +1,12 @@
+import { Platform } from "react-native";
+
+const pixelFallbackFamily =
+  Platform.select({
+    ios: "Menlo",
+    android: "monospace",
+    default: "monospace"
+  }) ?? "monospace";
+
 export const designTokens = {
   color: {
     background: "#243552",
@@ -48,7 +57,7 @@ export const designTokens = {
     xxl: 32
   },
   font: {
-    family: "PixelFont",
+    family: pixelFallbackFamily,
     title: 20,
     section: 18,
     body: 14,
