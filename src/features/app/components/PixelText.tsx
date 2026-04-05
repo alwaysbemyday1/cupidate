@@ -56,27 +56,33 @@ const localStyles = StyleSheet.create({
   },
   screenTitle: {
     fontSize: designTokens.font.title,
-    lineHeight: 24
+    lineHeight: 26,
+    letterSpacing: 0.45
   },
   sectionTitle: {
     fontSize: designTokens.font.section,
-    lineHeight: 22
+    lineHeight: 24,
+    letterSpacing: 0.35
   },
   body: {
     fontSize: designTokens.font.body,
-    lineHeight: 19
+    lineHeight: 20,
+    letterSpacing: 0.15
   },
   label: {
     fontSize: designTokens.font.label,
-    lineHeight: 18
+    lineHeight: 18,
+    letterSpacing: 0.2
   },
   caption: {
     fontSize: designTokens.font.caption,
-    lineHeight: 16
+    lineHeight: 17,
+    letterSpacing: 0.1
   },
   button: {
     color: designTokens.color.inkInverse,
     fontSize: designTokens.font.body,
-    lineHeight: 16
+    lineHeight: 17,
+    letterSpacing: 0.2
   }
 });
